@@ -33,12 +33,21 @@ This tool generates optimal shift assignments for a group of students (acting in
     ```
 
 ## Usage
+## Usage
 
-Run the scheduler with:
-```sh
-python solve.py
-```
-This will generate a `.ics` file for each student in the current directory.
+1. **Build the shift configuration**:  
+  Run the shift builder script to create the `shifts.json` file:
+  ```sh
+  python shift_builder.py
+  ```
+  Follow the prompts to define shifts and constraints.
+
+2. **Run the scheduler**:  
+  Execute the scheduler, which will read from `shifts.json`:
+  ```sh
+  python solve.py
+  ```
+  This will generate a `.ics` file for each student in the current directory, a csv file of the schedule, and will print a structured student assignment.
 
 ## Configuration
 

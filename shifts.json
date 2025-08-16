@@ -1,0 +1,2009 @@
+[
+  {
+    "id": "West_2025070107",
+    "start": "2025-07-01T07:00:00",
+    "end": "2025-07-01T15:00:00",
+    "name": "West",
+    "category": "west",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "Acute_2025070107",
+    "start": "2025-07-01T07:00:00",
+    "end": "2025-07-01T17:00:00",
+    "name": "Acute",
+    "category": "acute",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "Trauma_2025070114",
+    "start": "2025-07-01T14:00:00",
+    "end": "2025-07-02T00:00:00",
+    "name": "Trauma",
+    "category": "trauma",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "E12_2025070107",
+    "start": "2025-07-01T07:00:00",
+    "end": "2025-07-01T17:00:00",
+    "name": "E12",
+    "category": "ccf",
+    "site": "CCF",
+    "is_overnight": false
+  },
+  {
+    "id": "E18_2025070110",
+    "start": "2025-07-01T10:00:00",
+    "end": "2025-07-01T18:00:00",
+    "name": "E18",
+    "category": "ccf",
+    "site": "CCF",
+    "is_overnight": false
+  },
+  {
+    "id": "Com Parma_2025070107",
+    "start": "2025-07-01T07:00:00",
+    "end": "2025-07-01T15:00:00",
+    "name": "Com Parma",
+    "category": "community",
+    "site": "Parma",
+    "is_overnight": false
+  },
+  {
+    "id": "Com Breckville_2025070107",
+    "start": "2025-07-01T07:00:00",
+    "end": "2025-07-01T15:00:00",
+    "name": "Com Breckville",
+    "category": "community",
+    "site": "Breckville",
+    "is_overnight": false
+  },
+  {
+    "id": "MLF Wayne_2025070107",
+    "start": "2025-07-01T07:00:00",
+    "end": "2025-07-01T17:00:00",
+    "name": "MLF Wayne",
+    "category": "mlf",
+    "site": "Wayne",
+    "is_overnight": false
+  },
+  {
+    "id": "MLF Lorain_2025070107",
+    "start": "2025-07-01T07:00:00",
+    "end": "2025-07-01T17:00:00",
+    "name": "MLF Lorain",
+    "category": "mlf",
+    "site": "orain",
+    "is_overnight": false
+  },
+  {
+    "id": "West_2025070307",
+    "start": "2025-07-03T07:00:00",
+    "end": "2025-07-03T15:00:00",
+    "name": "West",
+    "category": "west",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "Acute_2025070307",
+    "start": "2025-07-03T07:00:00",
+    "end": "2025-07-03T17:00:00",
+    "name": "Acute",
+    "category": "acute",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "Trauma_2025070314",
+    "start": "2025-07-03T14:00:00",
+    "end": "2025-07-04T00:00:00",
+    "name": "Trauma",
+    "category": "trauma",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "E12_2025070307",
+    "start": "2025-07-03T07:00:00",
+    "end": "2025-07-03T17:00:00",
+    "name": "E12",
+    "category": "ccf",
+    "site": "CCF",
+    "is_overnight": false
+  },
+  {
+    "id": "E18_2025070310",
+    "start": "2025-07-03T10:00:00",
+    "end": "2025-07-03T18:00:00",
+    "name": "E18",
+    "category": "ccf",
+    "site": "CCF",
+    "is_overnight": false
+  },
+  {
+    "id": "Metro Night_2025070321",
+    "start": "2025-07-03T21:00:00",
+    "end": "2025-07-05T21:00:00",
+    "name": "Metro Night",
+    "category": "overnight",
+    "site": "Metro",
+    "is_overnight": true
+  },
+  {
+    "id": "CCF Night_2025070321",
+    "start": "2025-07-03T21:00:00",
+    "end": "2025-07-05T21:00:00",
+    "name": "CCF Night",
+    "category": "overnight",
+    "site": "CCF",
+    "is_overnight": true
+  },
+  {
+    "id": "Com Parma_2025070307",
+    "start": "2025-07-03T07:00:00",
+    "end": "2025-07-03T15:00:00",
+    "name": "Com Parma",
+    "category": "community",
+    "site": "Parma",
+    "is_overnight": false
+  },
+  {
+    "id": "Com Breckville_2025070307",
+    "start": "2025-07-03T07:00:00",
+    "end": "2025-07-03T15:00:00",
+    "name": "Com Breckville",
+    "category": "community",
+    "site": "Breckville",
+    "is_overnight": false
+  },
+  {
+    "id": "MLF Wayne_2025070307",
+    "start": "2025-07-03T07:00:00",
+    "end": "2025-07-03T17:00:00",
+    "name": "MLF Wayne",
+    "category": "mlf",
+    "site": "Wayne",
+    "is_overnight": false
+  },
+  {
+    "id": "MLF Lorain_2025070307",
+    "start": "2025-07-03T07:00:00",
+    "end": "2025-07-03T17:00:00",
+    "name": "MLF Lorain",
+    "category": "mlf",
+    "site": "orain",
+    "is_overnight": false
+  },
+  {
+    "id": "West_2025070407",
+    "start": "2025-07-04T07:00:00",
+    "end": "2025-07-04T15:00:00",
+    "name": "West",
+    "category": "west",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "Acute_2025070407",
+    "start": "2025-07-04T07:00:00",
+    "end": "2025-07-04T17:00:00",
+    "name": "Acute",
+    "category": "acute",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "Trauma_2025070414",
+    "start": "2025-07-04T14:00:00",
+    "end": "2025-07-05T00:00:00",
+    "name": "Trauma",
+    "category": "trauma",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "E12_2025070407",
+    "start": "2025-07-04T07:00:00",
+    "end": "2025-07-04T17:00:00",
+    "name": "E12",
+    "category": "ccf",
+    "site": "CCF",
+    "is_overnight": false
+  },
+  {
+    "id": "E18_2025070410",
+    "start": "2025-07-04T10:00:00",
+    "end": "2025-07-04T18:00:00",
+    "name": "E18",
+    "category": "ccf",
+    "site": "CCF",
+    "is_overnight": false
+  },
+  {
+    "id": "Metro Night_2025070421",
+    "start": "2025-07-04T21:00:00",
+    "end": "2025-07-06T21:00:00",
+    "name": "Metro Night",
+    "category": "overnight",
+    "site": "Metro",
+    "is_overnight": true
+  },
+  {
+    "id": "CCF Night_2025070421",
+    "start": "2025-07-04T21:00:00",
+    "end": "2025-07-06T21:00:00",
+    "name": "CCF Night",
+    "category": "overnight",
+    "site": "CCF",
+    "is_overnight": true
+  },
+  {
+    "id": "Com Parma_2025070407",
+    "start": "2025-07-04T07:00:00",
+    "end": "2025-07-04T15:00:00",
+    "name": "Com Parma",
+    "category": "community",
+    "site": "Parma",
+    "is_overnight": false
+  },
+  {
+    "id": "Com Breckville_2025070407",
+    "start": "2025-07-04T07:00:00",
+    "end": "2025-07-04T15:00:00",
+    "name": "Com Breckville",
+    "category": "community",
+    "site": "Breckville",
+    "is_overnight": false
+  },
+  {
+    "id": "MLF Wayne_2025070407",
+    "start": "2025-07-04T07:00:00",
+    "end": "2025-07-04T17:00:00",
+    "name": "MLF Wayne",
+    "category": "mlf",
+    "site": "Wayne",
+    "is_overnight": false
+  },
+  {
+    "id": "MLF Lorain_2025070407",
+    "start": "2025-07-04T07:00:00",
+    "end": "2025-07-04T17:00:00",
+    "name": "MLF Lorain",
+    "category": "mlf",
+    "site": "orain",
+    "is_overnight": false
+  },
+  {
+    "id": "West_2025070507",
+    "start": "2025-07-05T07:00:00",
+    "end": "2025-07-05T15:00:00",
+    "name": "West",
+    "category": "west",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "Acute_2025070507",
+    "start": "2025-07-05T07:00:00",
+    "end": "2025-07-05T17:00:00",
+    "name": "Acute",
+    "category": "acute",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "Trauma_2025070514",
+    "start": "2025-07-05T14:00:00",
+    "end": "2025-07-06T00:00:00",
+    "name": "Trauma",
+    "category": "trauma",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "E12_2025070507",
+    "start": "2025-07-05T07:00:00",
+    "end": "2025-07-05T17:00:00",
+    "name": "E12",
+    "category": "ccf",
+    "site": "CCF",
+    "is_overnight": false
+  },
+  {
+    "id": "E18_2025070510",
+    "start": "2025-07-05T10:00:00",
+    "end": "2025-07-05T18:00:00",
+    "name": "E18",
+    "category": "ccf",
+    "site": "CCF",
+    "is_overnight": false
+  },
+  {
+    "id": "Metro Night_2025070521",
+    "start": "2025-07-05T21:00:00",
+    "end": "2025-07-07T21:00:00",
+    "name": "Metro Night",
+    "category": "overnight",
+    "site": "Metro",
+    "is_overnight": true
+  },
+  {
+    "id": "CCF Night_2025070521",
+    "start": "2025-07-05T21:00:00",
+    "end": "2025-07-07T21:00:00",
+    "name": "CCF Night",
+    "category": "overnight",
+    "site": "CCF",
+    "is_overnight": true
+  },
+  {
+    "id": "Com Parma_2025070507",
+    "start": "2025-07-05T07:00:00",
+    "end": "2025-07-05T15:00:00",
+    "name": "Com Parma",
+    "category": "community",
+    "site": "Parma",
+    "is_overnight": false
+  },
+  {
+    "id": "Com Breckville_2025070507",
+    "start": "2025-07-05T07:00:00",
+    "end": "2025-07-05T15:00:00",
+    "name": "Com Breckville",
+    "category": "community",
+    "site": "Breckville",
+    "is_overnight": false
+  },
+  {
+    "id": "MLF Wayne_2025070507",
+    "start": "2025-07-05T07:00:00",
+    "end": "2025-07-05T17:00:00",
+    "name": "MLF Wayne",
+    "category": "mlf",
+    "site": "Wayne",
+    "is_overnight": false
+  },
+  {
+    "id": "MLF Lorain_2025070507",
+    "start": "2025-07-05T07:00:00",
+    "end": "2025-07-05T17:00:00",
+    "name": "MLF Lorain",
+    "category": "mlf",
+    "site": "orain",
+    "is_overnight": false
+  },
+  {
+    "id": "West_2025070607",
+    "start": "2025-07-06T07:00:00",
+    "end": "2025-07-06T15:00:00",
+    "name": "West",
+    "category": "west",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "Acute_2025070607",
+    "start": "2025-07-06T07:00:00",
+    "end": "2025-07-06T17:00:00",
+    "name": "Acute",
+    "category": "acute",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "Trauma_2025070614",
+    "start": "2025-07-06T14:00:00",
+    "end": "2025-07-07T00:00:00",
+    "name": "Trauma",
+    "category": "trauma",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "E12_2025070607",
+    "start": "2025-07-06T07:00:00",
+    "end": "2025-07-06T17:00:00",
+    "name": "E12",
+    "category": "ccf",
+    "site": "CCF",
+    "is_overnight": false
+  },
+  {
+    "id": "E18_2025070610",
+    "start": "2025-07-06T10:00:00",
+    "end": "2025-07-06T18:00:00",
+    "name": "E18",
+    "category": "ccf",
+    "site": "CCF",
+    "is_overnight": false
+  },
+  {
+    "id": "Metro Night_2025070621",
+    "start": "2025-07-06T21:00:00",
+    "end": "2025-07-08T21:00:00",
+    "name": "Metro Night",
+    "category": "overnight",
+    "site": "Metro",
+    "is_overnight": true
+  },
+  {
+    "id": "CCF Night_2025070621",
+    "start": "2025-07-06T21:00:00",
+    "end": "2025-07-08T21:00:00",
+    "name": "CCF Night",
+    "category": "overnight",
+    "site": "CCF",
+    "is_overnight": true
+  },
+  {
+    "id": "Com Parma_2025070607",
+    "start": "2025-07-06T07:00:00",
+    "end": "2025-07-06T15:00:00",
+    "name": "Com Parma",
+    "category": "community",
+    "site": "Parma",
+    "is_overnight": false
+  },
+  {
+    "id": "Com Breckville_2025070607",
+    "start": "2025-07-06T07:00:00",
+    "end": "2025-07-06T15:00:00",
+    "name": "Com Breckville",
+    "category": "community",
+    "site": "Breckville",
+    "is_overnight": false
+  },
+  {
+    "id": "MLF Wayne_2025070607",
+    "start": "2025-07-06T07:00:00",
+    "end": "2025-07-06T17:00:00",
+    "name": "MLF Wayne",
+    "category": "mlf",
+    "site": "Wayne",
+    "is_overnight": false
+  },
+  {
+    "id": "MLF Lorain_2025070607",
+    "start": "2025-07-06T07:00:00",
+    "end": "2025-07-06T17:00:00",
+    "name": "MLF Lorain",
+    "category": "mlf",
+    "site": "orain",
+    "is_overnight": false
+  },
+  {
+    "id": "West_2025070707",
+    "start": "2025-07-07T07:00:00",
+    "end": "2025-07-07T15:00:00",
+    "name": "West",
+    "category": "west",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "Acute_2025070707",
+    "start": "2025-07-07T07:00:00",
+    "end": "2025-07-07T17:00:00",
+    "name": "Acute",
+    "category": "acute",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "Trauma_2025070714",
+    "start": "2025-07-07T14:00:00",
+    "end": "2025-07-08T00:00:00",
+    "name": "Trauma",
+    "category": "trauma",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "E12_2025070707",
+    "start": "2025-07-07T07:00:00",
+    "end": "2025-07-07T17:00:00",
+    "name": "E12",
+    "category": "ccf",
+    "site": "CCF",
+    "is_overnight": false
+  },
+  {
+    "id": "E18_2025070710",
+    "start": "2025-07-07T10:00:00",
+    "end": "2025-07-07T18:00:00",
+    "name": "E18",
+    "category": "ccf",
+    "site": "CCF",
+    "is_overnight": false
+  },
+  {
+    "id": "Metro Night_2025070721",
+    "start": "2025-07-07T21:00:00",
+    "end": "2025-07-09T21:00:00",
+    "name": "Metro Night",
+    "category": "overnight",
+    "site": "Metro",
+    "is_overnight": true
+  },
+  {
+    "id": "CCF Night_2025070721",
+    "start": "2025-07-07T21:00:00",
+    "end": "2025-07-09T21:00:00",
+    "name": "CCF Night",
+    "category": "overnight",
+    "site": "CCF",
+    "is_overnight": true
+  },
+  {
+    "id": "Com Parma_2025070707",
+    "start": "2025-07-07T07:00:00",
+    "end": "2025-07-07T15:00:00",
+    "name": "Com Parma",
+    "category": "community",
+    "site": "Parma",
+    "is_overnight": false
+  },
+  {
+    "id": "Com Breckville_2025070707",
+    "start": "2025-07-07T07:00:00",
+    "end": "2025-07-07T15:00:00",
+    "name": "Com Breckville",
+    "category": "community",
+    "site": "Breckville",
+    "is_overnight": false
+  },
+  {
+    "id": "MLF Wayne_2025070707",
+    "start": "2025-07-07T07:00:00",
+    "end": "2025-07-07T17:00:00",
+    "name": "MLF Wayne",
+    "category": "mlf",
+    "site": "Wayne",
+    "is_overnight": false
+  },
+  {
+    "id": "MLF Lorain_2025070707",
+    "start": "2025-07-07T07:00:00",
+    "end": "2025-07-07T17:00:00",
+    "name": "MLF Lorain",
+    "category": "mlf",
+    "site": "orain",
+    "is_overnight": false
+  },
+  {
+    "id": "West_2025070807",
+    "start": "2025-07-08T07:00:00",
+    "end": "2025-07-08T15:00:00",
+    "name": "West",
+    "category": "west",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "Acute_2025070807",
+    "start": "2025-07-08T07:00:00",
+    "end": "2025-07-08T17:00:00",
+    "name": "Acute",
+    "category": "acute",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "Trauma_2025070814",
+    "start": "2025-07-08T14:00:00",
+    "end": "2025-07-09T00:00:00",
+    "name": "Trauma",
+    "category": "trauma",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "E12_2025070807",
+    "start": "2025-07-08T07:00:00",
+    "end": "2025-07-08T17:00:00",
+    "name": "E12",
+    "category": "ccf",
+    "site": "CCF",
+    "is_overnight": false
+  },
+  {
+    "id": "E18_2025070810",
+    "start": "2025-07-08T10:00:00",
+    "end": "2025-07-08T18:00:00",
+    "name": "E18",
+    "category": "ccf",
+    "site": "CCF",
+    "is_overnight": false
+  },
+  {
+    "id": "Com Parma_2025070807",
+    "start": "2025-07-08T07:00:00",
+    "end": "2025-07-08T15:00:00",
+    "name": "Com Parma",
+    "category": "community",
+    "site": "Parma",
+    "is_overnight": false
+  },
+  {
+    "id": "Com Breckville_2025070807",
+    "start": "2025-07-08T07:00:00",
+    "end": "2025-07-08T15:00:00",
+    "name": "Com Breckville",
+    "category": "community",
+    "site": "Breckville",
+    "is_overnight": false
+  },
+  {
+    "id": "MLF Wayne_2025070807",
+    "start": "2025-07-08T07:00:00",
+    "end": "2025-07-08T17:00:00",
+    "name": "MLF Wayne",
+    "category": "mlf",
+    "site": "Wayne",
+    "is_overnight": false
+  },
+  {
+    "id": "MLF Lorain_2025070807",
+    "start": "2025-07-08T07:00:00",
+    "end": "2025-07-08T17:00:00",
+    "name": "MLF Lorain",
+    "category": "mlf",
+    "site": "orain",
+    "is_overnight": false
+  },
+  {
+    "id": "West_2025071007",
+    "start": "2025-07-10T07:00:00",
+    "end": "2025-07-10T15:00:00",
+    "name": "West",
+    "category": "west",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "Acute_2025071007",
+    "start": "2025-07-10T07:00:00",
+    "end": "2025-07-10T17:00:00",
+    "name": "Acute",
+    "category": "acute",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "Trauma_2025071014",
+    "start": "2025-07-10T14:00:00",
+    "end": "2025-07-11T00:00:00",
+    "name": "Trauma",
+    "category": "trauma",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "E12_2025071007",
+    "start": "2025-07-10T07:00:00",
+    "end": "2025-07-10T17:00:00",
+    "name": "E12",
+    "category": "ccf",
+    "site": "CCF",
+    "is_overnight": false
+  },
+  {
+    "id": "E18_2025071010",
+    "start": "2025-07-10T10:00:00",
+    "end": "2025-07-10T18:00:00",
+    "name": "E18",
+    "category": "ccf",
+    "site": "CCF",
+    "is_overnight": false
+  },
+  {
+    "id": "Metro Night_2025071021",
+    "start": "2025-07-10T21:00:00",
+    "end": "2025-07-12T21:00:00",
+    "name": "Metro Night",
+    "category": "overnight",
+    "site": "Metro",
+    "is_overnight": true
+  },
+  {
+    "id": "CCF Night_2025071021",
+    "start": "2025-07-10T21:00:00",
+    "end": "2025-07-12T21:00:00",
+    "name": "CCF Night",
+    "category": "overnight",
+    "site": "CCF",
+    "is_overnight": true
+  },
+  {
+    "id": "Com Parma_2025071007",
+    "start": "2025-07-10T07:00:00",
+    "end": "2025-07-10T15:00:00",
+    "name": "Com Parma",
+    "category": "community",
+    "site": "Parma",
+    "is_overnight": false
+  },
+  {
+    "id": "Com Breckville_2025071007",
+    "start": "2025-07-10T07:00:00",
+    "end": "2025-07-10T15:00:00",
+    "name": "Com Breckville",
+    "category": "community",
+    "site": "Breckville",
+    "is_overnight": false
+  },
+  {
+    "id": "MLF Wayne_2025071007",
+    "start": "2025-07-10T07:00:00",
+    "end": "2025-07-10T17:00:00",
+    "name": "MLF Wayne",
+    "category": "mlf",
+    "site": "Wayne",
+    "is_overnight": false
+  },
+  {
+    "id": "MLF Lorain_2025071007",
+    "start": "2025-07-10T07:00:00",
+    "end": "2025-07-10T17:00:00",
+    "name": "MLF Lorain",
+    "category": "mlf",
+    "site": "orain",
+    "is_overnight": false
+  },
+  {
+    "id": "West_2025071107",
+    "start": "2025-07-11T07:00:00",
+    "end": "2025-07-11T15:00:00",
+    "name": "West",
+    "category": "west",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "Acute_2025071107",
+    "start": "2025-07-11T07:00:00",
+    "end": "2025-07-11T17:00:00",
+    "name": "Acute",
+    "category": "acute",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "Trauma_2025071114",
+    "start": "2025-07-11T14:00:00",
+    "end": "2025-07-12T00:00:00",
+    "name": "Trauma",
+    "category": "trauma",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "E12_2025071107",
+    "start": "2025-07-11T07:00:00",
+    "end": "2025-07-11T17:00:00",
+    "name": "E12",
+    "category": "ccf",
+    "site": "CCF",
+    "is_overnight": false
+  },
+  {
+    "id": "E18_2025071110",
+    "start": "2025-07-11T10:00:00",
+    "end": "2025-07-11T18:00:00",
+    "name": "E18",
+    "category": "ccf",
+    "site": "CCF",
+    "is_overnight": false
+  },
+  {
+    "id": "Metro Night_2025071121",
+    "start": "2025-07-11T21:00:00",
+    "end": "2025-07-13T21:00:00",
+    "name": "Metro Night",
+    "category": "overnight",
+    "site": "Metro",
+    "is_overnight": true
+  },
+  {
+    "id": "CCF Night_2025071121",
+    "start": "2025-07-11T21:00:00",
+    "end": "2025-07-13T21:00:00",
+    "name": "CCF Night",
+    "category": "overnight",
+    "site": "CCF",
+    "is_overnight": true
+  },
+  {
+    "id": "Com Parma_2025071107",
+    "start": "2025-07-11T07:00:00",
+    "end": "2025-07-11T15:00:00",
+    "name": "Com Parma",
+    "category": "community",
+    "site": "Parma",
+    "is_overnight": false
+  },
+  {
+    "id": "Com Breckville_2025071107",
+    "start": "2025-07-11T07:00:00",
+    "end": "2025-07-11T15:00:00",
+    "name": "Com Breckville",
+    "category": "community",
+    "site": "Breckville",
+    "is_overnight": false
+  },
+  {
+    "id": "MLF Wayne_2025071107",
+    "start": "2025-07-11T07:00:00",
+    "end": "2025-07-11T17:00:00",
+    "name": "MLF Wayne",
+    "category": "mlf",
+    "site": "Wayne",
+    "is_overnight": false
+  },
+  {
+    "id": "MLF Lorain_2025071107",
+    "start": "2025-07-11T07:00:00",
+    "end": "2025-07-11T17:00:00",
+    "name": "MLF Lorain",
+    "category": "mlf",
+    "site": "orain",
+    "is_overnight": false
+  },
+  {
+    "id": "West_2025071207",
+    "start": "2025-07-12T07:00:00",
+    "end": "2025-07-12T15:00:00",
+    "name": "West",
+    "category": "west",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "Acute_2025071207",
+    "start": "2025-07-12T07:00:00",
+    "end": "2025-07-12T17:00:00",
+    "name": "Acute",
+    "category": "acute",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "Trauma_2025071214",
+    "start": "2025-07-12T14:00:00",
+    "end": "2025-07-13T00:00:00",
+    "name": "Trauma",
+    "category": "trauma",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "E12_2025071207",
+    "start": "2025-07-12T07:00:00",
+    "end": "2025-07-12T17:00:00",
+    "name": "E12",
+    "category": "ccf",
+    "site": "CCF",
+    "is_overnight": false
+  },
+  {
+    "id": "E18_2025071210",
+    "start": "2025-07-12T10:00:00",
+    "end": "2025-07-12T18:00:00",
+    "name": "E18",
+    "category": "ccf",
+    "site": "CCF",
+    "is_overnight": false
+  },
+  {
+    "id": "Metro Night_2025071221",
+    "start": "2025-07-12T21:00:00",
+    "end": "2025-07-14T21:00:00",
+    "name": "Metro Night",
+    "category": "overnight",
+    "site": "Metro",
+    "is_overnight": true
+  },
+  {
+    "id": "CCF Night_2025071221",
+    "start": "2025-07-12T21:00:00",
+    "end": "2025-07-14T21:00:00",
+    "name": "CCF Night",
+    "category": "overnight",
+    "site": "CCF",
+    "is_overnight": true
+  },
+  {
+    "id": "Com Parma_2025071207",
+    "start": "2025-07-12T07:00:00",
+    "end": "2025-07-12T15:00:00",
+    "name": "Com Parma",
+    "category": "community",
+    "site": "Parma",
+    "is_overnight": false
+  },
+  {
+    "id": "Com Breckville_2025071207",
+    "start": "2025-07-12T07:00:00",
+    "end": "2025-07-12T15:00:00",
+    "name": "Com Breckville",
+    "category": "community",
+    "site": "Breckville",
+    "is_overnight": false
+  },
+  {
+    "id": "MLF Wayne_2025071207",
+    "start": "2025-07-12T07:00:00",
+    "end": "2025-07-12T17:00:00",
+    "name": "MLF Wayne",
+    "category": "mlf",
+    "site": "Wayne",
+    "is_overnight": false
+  },
+  {
+    "id": "MLF Lorain_2025071207",
+    "start": "2025-07-12T07:00:00",
+    "end": "2025-07-12T17:00:00",
+    "name": "MLF Lorain",
+    "category": "mlf",
+    "site": "orain",
+    "is_overnight": false
+  },
+  {
+    "id": "West_2025071307",
+    "start": "2025-07-13T07:00:00",
+    "end": "2025-07-13T15:00:00",
+    "name": "West",
+    "category": "west",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "Acute_2025071307",
+    "start": "2025-07-13T07:00:00",
+    "end": "2025-07-13T17:00:00",
+    "name": "Acute",
+    "category": "acute",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "Trauma_2025071314",
+    "start": "2025-07-13T14:00:00",
+    "end": "2025-07-14T00:00:00",
+    "name": "Trauma",
+    "category": "trauma",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "E12_2025071307",
+    "start": "2025-07-13T07:00:00",
+    "end": "2025-07-13T17:00:00",
+    "name": "E12",
+    "category": "ccf",
+    "site": "CCF",
+    "is_overnight": false
+  },
+  {
+    "id": "E18_2025071310",
+    "start": "2025-07-13T10:00:00",
+    "end": "2025-07-13T18:00:00",
+    "name": "E18",
+    "category": "ccf",
+    "site": "CCF",
+    "is_overnight": false
+  },
+  {
+    "id": "Metro Night_2025071321",
+    "start": "2025-07-13T21:00:00",
+    "end": "2025-07-15T21:00:00",
+    "name": "Metro Night",
+    "category": "overnight",
+    "site": "Metro",
+    "is_overnight": true
+  },
+  {
+    "id": "CCF Night_2025071321",
+    "start": "2025-07-13T21:00:00",
+    "end": "2025-07-15T21:00:00",
+    "name": "CCF Night",
+    "category": "overnight",
+    "site": "CCF",
+    "is_overnight": true
+  },
+  {
+    "id": "Com Parma_2025071307",
+    "start": "2025-07-13T07:00:00",
+    "end": "2025-07-13T15:00:00",
+    "name": "Com Parma",
+    "category": "community",
+    "site": "Parma",
+    "is_overnight": false
+  },
+  {
+    "id": "Com Breckville_2025071307",
+    "start": "2025-07-13T07:00:00",
+    "end": "2025-07-13T15:00:00",
+    "name": "Com Breckville",
+    "category": "community",
+    "site": "Breckville",
+    "is_overnight": false
+  },
+  {
+    "id": "MLF Wayne_2025071307",
+    "start": "2025-07-13T07:00:00",
+    "end": "2025-07-13T17:00:00",
+    "name": "MLF Wayne",
+    "category": "mlf",
+    "site": "Wayne",
+    "is_overnight": false
+  },
+  {
+    "id": "MLF Lorain_2025071307",
+    "start": "2025-07-13T07:00:00",
+    "end": "2025-07-13T17:00:00",
+    "name": "MLF Lorain",
+    "category": "mlf",
+    "site": "orain",
+    "is_overnight": false
+  },
+  {
+    "id": "West_2025071407",
+    "start": "2025-07-14T07:00:00",
+    "end": "2025-07-14T15:00:00",
+    "name": "West",
+    "category": "west",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "Acute_2025071407",
+    "start": "2025-07-14T07:00:00",
+    "end": "2025-07-14T17:00:00",
+    "name": "Acute",
+    "category": "acute",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "Trauma_2025071414",
+    "start": "2025-07-14T14:00:00",
+    "end": "2025-07-15T00:00:00",
+    "name": "Trauma",
+    "category": "trauma",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "E12_2025071407",
+    "start": "2025-07-14T07:00:00",
+    "end": "2025-07-14T17:00:00",
+    "name": "E12",
+    "category": "ccf",
+    "site": "CCF",
+    "is_overnight": false
+  },
+  {
+    "id": "E18_2025071410",
+    "start": "2025-07-14T10:00:00",
+    "end": "2025-07-14T18:00:00",
+    "name": "E18",
+    "category": "ccf",
+    "site": "CCF",
+    "is_overnight": false
+  },
+  {
+    "id": "Metro Night_2025071421",
+    "start": "2025-07-14T21:00:00",
+    "end": "2025-07-16T21:00:00",
+    "name": "Metro Night",
+    "category": "overnight",
+    "site": "Metro",
+    "is_overnight": true
+  },
+  {
+    "id": "CCF Night_2025071421",
+    "start": "2025-07-14T21:00:00",
+    "end": "2025-07-16T21:00:00",
+    "name": "CCF Night",
+    "category": "overnight",
+    "site": "CCF",
+    "is_overnight": true
+  },
+  {
+    "id": "Com Parma_2025071407",
+    "start": "2025-07-14T07:00:00",
+    "end": "2025-07-14T15:00:00",
+    "name": "Com Parma",
+    "category": "community",
+    "site": "Parma",
+    "is_overnight": false
+  },
+  {
+    "id": "Com Breckville_2025071407",
+    "start": "2025-07-14T07:00:00",
+    "end": "2025-07-14T15:00:00",
+    "name": "Com Breckville",
+    "category": "community",
+    "site": "Breckville",
+    "is_overnight": false
+  },
+  {
+    "id": "MLF Wayne_2025071407",
+    "start": "2025-07-14T07:00:00",
+    "end": "2025-07-14T17:00:00",
+    "name": "MLF Wayne",
+    "category": "mlf",
+    "site": "Wayne",
+    "is_overnight": false
+  },
+  {
+    "id": "MLF Lorain_2025071407",
+    "start": "2025-07-14T07:00:00",
+    "end": "2025-07-14T17:00:00",
+    "name": "MLF Lorain",
+    "category": "mlf",
+    "site": "orain",
+    "is_overnight": false
+  },
+  {
+    "id": "West_2025071507",
+    "start": "2025-07-15T07:00:00",
+    "end": "2025-07-15T15:00:00",
+    "name": "West",
+    "category": "west",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "Acute_2025071507",
+    "start": "2025-07-15T07:00:00",
+    "end": "2025-07-15T17:00:00",
+    "name": "Acute",
+    "category": "acute",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "Trauma_2025071514",
+    "start": "2025-07-15T14:00:00",
+    "end": "2025-07-16T00:00:00",
+    "name": "Trauma",
+    "category": "trauma",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "E12_2025071507",
+    "start": "2025-07-15T07:00:00",
+    "end": "2025-07-15T17:00:00",
+    "name": "E12",
+    "category": "ccf",
+    "site": "CCF",
+    "is_overnight": false
+  },
+  {
+    "id": "E18_2025071510",
+    "start": "2025-07-15T10:00:00",
+    "end": "2025-07-15T18:00:00",
+    "name": "E18",
+    "category": "ccf",
+    "site": "CCF",
+    "is_overnight": false
+  },
+  {
+    "id": "Com Parma_2025071507",
+    "start": "2025-07-15T07:00:00",
+    "end": "2025-07-15T15:00:00",
+    "name": "Com Parma",
+    "category": "community",
+    "site": "Parma",
+    "is_overnight": false
+  },
+  {
+    "id": "Com Breckville_2025071507",
+    "start": "2025-07-15T07:00:00",
+    "end": "2025-07-15T15:00:00",
+    "name": "Com Breckville",
+    "category": "community",
+    "site": "Breckville",
+    "is_overnight": false
+  },
+  {
+    "id": "MLF Wayne_2025071507",
+    "start": "2025-07-15T07:00:00",
+    "end": "2025-07-15T17:00:00",
+    "name": "MLF Wayne",
+    "category": "mlf",
+    "site": "Wayne",
+    "is_overnight": false
+  },
+  {
+    "id": "MLF Lorain_2025071507",
+    "start": "2025-07-15T07:00:00",
+    "end": "2025-07-15T17:00:00",
+    "name": "MLF Lorain",
+    "category": "mlf",
+    "site": "orain",
+    "is_overnight": false
+  },
+  {
+    "id": "West_2025071707",
+    "start": "2025-07-17T07:00:00",
+    "end": "2025-07-17T15:00:00",
+    "name": "West",
+    "category": "west",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "Acute_2025071707",
+    "start": "2025-07-17T07:00:00",
+    "end": "2025-07-17T17:00:00",
+    "name": "Acute",
+    "category": "acute",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "Trauma_2025071714",
+    "start": "2025-07-17T14:00:00",
+    "end": "2025-07-18T00:00:00",
+    "name": "Trauma",
+    "category": "trauma",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "E12_2025071707",
+    "start": "2025-07-17T07:00:00",
+    "end": "2025-07-17T17:00:00",
+    "name": "E12",
+    "category": "ccf",
+    "site": "CCF",
+    "is_overnight": false
+  },
+  {
+    "id": "E18_2025071710",
+    "start": "2025-07-17T10:00:00",
+    "end": "2025-07-17T18:00:00",
+    "name": "E18",
+    "category": "ccf",
+    "site": "CCF",
+    "is_overnight": false
+  },
+  {
+    "id": "Metro Night_2025071721",
+    "start": "2025-07-17T21:00:00",
+    "end": "2025-07-19T21:00:00",
+    "name": "Metro Night",
+    "category": "overnight",
+    "site": "Metro",
+    "is_overnight": true
+  },
+  {
+    "id": "CCF Night_2025071721",
+    "start": "2025-07-17T21:00:00",
+    "end": "2025-07-19T21:00:00",
+    "name": "CCF Night",
+    "category": "overnight",
+    "site": "CCF",
+    "is_overnight": true
+  },
+  {
+    "id": "Com Parma_2025071707",
+    "start": "2025-07-17T07:00:00",
+    "end": "2025-07-17T15:00:00",
+    "name": "Com Parma",
+    "category": "community",
+    "site": "Parma",
+    "is_overnight": false
+  },
+  {
+    "id": "Com Breckville_2025071707",
+    "start": "2025-07-17T07:00:00",
+    "end": "2025-07-17T15:00:00",
+    "name": "Com Breckville",
+    "category": "community",
+    "site": "Breckville",
+    "is_overnight": false
+  },
+  {
+    "id": "MLF Wayne_2025071707",
+    "start": "2025-07-17T07:00:00",
+    "end": "2025-07-17T17:00:00",
+    "name": "MLF Wayne",
+    "category": "mlf",
+    "site": "Wayne",
+    "is_overnight": false
+  },
+  {
+    "id": "MLF Lorain_2025071707",
+    "start": "2025-07-17T07:00:00",
+    "end": "2025-07-17T17:00:00",
+    "name": "MLF Lorain",
+    "category": "mlf",
+    "site": "orain",
+    "is_overnight": false
+  },
+  {
+    "id": "West_2025071807",
+    "start": "2025-07-18T07:00:00",
+    "end": "2025-07-18T15:00:00",
+    "name": "West",
+    "category": "west",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "Acute_2025071807",
+    "start": "2025-07-18T07:00:00",
+    "end": "2025-07-18T17:00:00",
+    "name": "Acute",
+    "category": "acute",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "Trauma_2025071814",
+    "start": "2025-07-18T14:00:00",
+    "end": "2025-07-19T00:00:00",
+    "name": "Trauma",
+    "category": "trauma",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "E12_2025071807",
+    "start": "2025-07-18T07:00:00",
+    "end": "2025-07-18T17:00:00",
+    "name": "E12",
+    "category": "ccf",
+    "site": "CCF",
+    "is_overnight": false
+  },
+  {
+    "id": "E18_2025071810",
+    "start": "2025-07-18T10:00:00",
+    "end": "2025-07-18T18:00:00",
+    "name": "E18",
+    "category": "ccf",
+    "site": "CCF",
+    "is_overnight": false
+  },
+  {
+    "id": "Metro Night_2025071821",
+    "start": "2025-07-18T21:00:00",
+    "end": "2025-07-20T21:00:00",
+    "name": "Metro Night",
+    "category": "overnight",
+    "site": "Metro",
+    "is_overnight": true
+  },
+  {
+    "id": "CCF Night_2025071821",
+    "start": "2025-07-18T21:00:00",
+    "end": "2025-07-20T21:00:00",
+    "name": "CCF Night",
+    "category": "overnight",
+    "site": "CCF",
+    "is_overnight": true
+  },
+  {
+    "id": "Com Parma_2025071807",
+    "start": "2025-07-18T07:00:00",
+    "end": "2025-07-18T15:00:00",
+    "name": "Com Parma",
+    "category": "community",
+    "site": "Parma",
+    "is_overnight": false
+  },
+  {
+    "id": "Com Breckville_2025071807",
+    "start": "2025-07-18T07:00:00",
+    "end": "2025-07-18T15:00:00",
+    "name": "Com Breckville",
+    "category": "community",
+    "site": "Breckville",
+    "is_overnight": false
+  },
+  {
+    "id": "MLF Wayne_2025071807",
+    "start": "2025-07-18T07:00:00",
+    "end": "2025-07-18T17:00:00",
+    "name": "MLF Wayne",
+    "category": "mlf",
+    "site": "Wayne",
+    "is_overnight": false
+  },
+  {
+    "id": "MLF Lorain_2025071807",
+    "start": "2025-07-18T07:00:00",
+    "end": "2025-07-18T17:00:00",
+    "name": "MLF Lorain",
+    "category": "mlf",
+    "site": "orain",
+    "is_overnight": false
+  },
+  {
+    "id": "West_2025071907",
+    "start": "2025-07-19T07:00:00",
+    "end": "2025-07-19T15:00:00",
+    "name": "West",
+    "category": "west",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "Acute_2025071907",
+    "start": "2025-07-19T07:00:00",
+    "end": "2025-07-19T17:00:00",
+    "name": "Acute",
+    "category": "acute",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "Trauma_2025071914",
+    "start": "2025-07-19T14:00:00",
+    "end": "2025-07-20T00:00:00",
+    "name": "Trauma",
+    "category": "trauma",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "E12_2025071907",
+    "start": "2025-07-19T07:00:00",
+    "end": "2025-07-19T17:00:00",
+    "name": "E12",
+    "category": "ccf",
+    "site": "CCF",
+    "is_overnight": false
+  },
+  {
+    "id": "E18_2025071910",
+    "start": "2025-07-19T10:00:00",
+    "end": "2025-07-19T18:00:00",
+    "name": "E18",
+    "category": "ccf",
+    "site": "CCF",
+    "is_overnight": false
+  },
+  {
+    "id": "Metro Night_2025071921",
+    "start": "2025-07-19T21:00:00",
+    "end": "2025-07-21T21:00:00",
+    "name": "Metro Night",
+    "category": "overnight",
+    "site": "Metro",
+    "is_overnight": true
+  },
+  {
+    "id": "CCF Night_2025071921",
+    "start": "2025-07-19T21:00:00",
+    "end": "2025-07-21T21:00:00",
+    "name": "CCF Night",
+    "category": "overnight",
+    "site": "CCF",
+    "is_overnight": true
+  },
+  {
+    "id": "Com Parma_2025071907",
+    "start": "2025-07-19T07:00:00",
+    "end": "2025-07-19T15:00:00",
+    "name": "Com Parma",
+    "category": "community",
+    "site": "Parma",
+    "is_overnight": false
+  },
+  {
+    "id": "Com Breckville_2025071907",
+    "start": "2025-07-19T07:00:00",
+    "end": "2025-07-19T15:00:00",
+    "name": "Com Breckville",
+    "category": "community",
+    "site": "Breckville",
+    "is_overnight": false
+  },
+  {
+    "id": "MLF Wayne_2025071907",
+    "start": "2025-07-19T07:00:00",
+    "end": "2025-07-19T17:00:00",
+    "name": "MLF Wayne",
+    "category": "mlf",
+    "site": "Wayne",
+    "is_overnight": false
+  },
+  {
+    "id": "MLF Lorain_2025071907",
+    "start": "2025-07-19T07:00:00",
+    "end": "2025-07-19T17:00:00",
+    "name": "MLF Lorain",
+    "category": "mlf",
+    "site": "orain",
+    "is_overnight": false
+  },
+  {
+    "id": "West_2025072007",
+    "start": "2025-07-20T07:00:00",
+    "end": "2025-07-20T15:00:00",
+    "name": "West",
+    "category": "west",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "Acute_2025072007",
+    "start": "2025-07-20T07:00:00",
+    "end": "2025-07-20T17:00:00",
+    "name": "Acute",
+    "category": "acute",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "Trauma_2025072014",
+    "start": "2025-07-20T14:00:00",
+    "end": "2025-07-21T00:00:00",
+    "name": "Trauma",
+    "category": "trauma",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "E12_2025072007",
+    "start": "2025-07-20T07:00:00",
+    "end": "2025-07-20T17:00:00",
+    "name": "E12",
+    "category": "ccf",
+    "site": "CCF",
+    "is_overnight": false
+  },
+  {
+    "id": "E18_2025072010",
+    "start": "2025-07-20T10:00:00",
+    "end": "2025-07-20T18:00:00",
+    "name": "E18",
+    "category": "ccf",
+    "site": "CCF",
+    "is_overnight": false
+  },
+  {
+    "id": "Metro Night_2025072021",
+    "start": "2025-07-20T21:00:00",
+    "end": "2025-07-22T21:00:00",
+    "name": "Metro Night",
+    "category": "overnight",
+    "site": "Metro",
+    "is_overnight": true
+  },
+  {
+    "id": "CCF Night_2025072021",
+    "start": "2025-07-20T21:00:00",
+    "end": "2025-07-22T21:00:00",
+    "name": "CCF Night",
+    "category": "overnight",
+    "site": "CCF",
+    "is_overnight": true
+  },
+  {
+    "id": "Com Parma_2025072007",
+    "start": "2025-07-20T07:00:00",
+    "end": "2025-07-20T15:00:00",
+    "name": "Com Parma",
+    "category": "community",
+    "site": "Parma",
+    "is_overnight": false
+  },
+  {
+    "id": "Com Breckville_2025072007",
+    "start": "2025-07-20T07:00:00",
+    "end": "2025-07-20T15:00:00",
+    "name": "Com Breckville",
+    "category": "community",
+    "site": "Breckville",
+    "is_overnight": false
+  },
+  {
+    "id": "MLF Wayne_2025072007",
+    "start": "2025-07-20T07:00:00",
+    "end": "2025-07-20T17:00:00",
+    "name": "MLF Wayne",
+    "category": "mlf",
+    "site": "Wayne",
+    "is_overnight": false
+  },
+  {
+    "id": "MLF Lorain_2025072007",
+    "start": "2025-07-20T07:00:00",
+    "end": "2025-07-20T17:00:00",
+    "name": "MLF Lorain",
+    "category": "mlf",
+    "site": "orain",
+    "is_overnight": false
+  },
+  {
+    "id": "West_2025072107",
+    "start": "2025-07-21T07:00:00",
+    "end": "2025-07-21T15:00:00",
+    "name": "West",
+    "category": "west",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "Acute_2025072107",
+    "start": "2025-07-21T07:00:00",
+    "end": "2025-07-21T17:00:00",
+    "name": "Acute",
+    "category": "acute",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "Trauma_2025072114",
+    "start": "2025-07-21T14:00:00",
+    "end": "2025-07-22T00:00:00",
+    "name": "Trauma",
+    "category": "trauma",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "E12_2025072107",
+    "start": "2025-07-21T07:00:00",
+    "end": "2025-07-21T17:00:00",
+    "name": "E12",
+    "category": "ccf",
+    "site": "CCF",
+    "is_overnight": false
+  },
+  {
+    "id": "E18_2025072110",
+    "start": "2025-07-21T10:00:00",
+    "end": "2025-07-21T18:00:00",
+    "name": "E18",
+    "category": "ccf",
+    "site": "CCF",
+    "is_overnight": false
+  },
+  {
+    "id": "Metro Night_2025072121",
+    "start": "2025-07-21T21:00:00",
+    "end": "2025-07-23T21:00:00",
+    "name": "Metro Night",
+    "category": "overnight",
+    "site": "Metro",
+    "is_overnight": true
+  },
+  {
+    "id": "CCF Night_2025072121",
+    "start": "2025-07-21T21:00:00",
+    "end": "2025-07-23T21:00:00",
+    "name": "CCF Night",
+    "category": "overnight",
+    "site": "CCF",
+    "is_overnight": true
+  },
+  {
+    "id": "Com Parma_2025072107",
+    "start": "2025-07-21T07:00:00",
+    "end": "2025-07-21T15:00:00",
+    "name": "Com Parma",
+    "category": "community",
+    "site": "Parma",
+    "is_overnight": false
+  },
+  {
+    "id": "Com Breckville_2025072107",
+    "start": "2025-07-21T07:00:00",
+    "end": "2025-07-21T15:00:00",
+    "name": "Com Breckville",
+    "category": "community",
+    "site": "Breckville",
+    "is_overnight": false
+  },
+  {
+    "id": "MLF Wayne_2025072107",
+    "start": "2025-07-21T07:00:00",
+    "end": "2025-07-21T17:00:00",
+    "name": "MLF Wayne",
+    "category": "mlf",
+    "site": "Wayne",
+    "is_overnight": false
+  },
+  {
+    "id": "MLF Lorain_2025072107",
+    "start": "2025-07-21T07:00:00",
+    "end": "2025-07-21T17:00:00",
+    "name": "MLF Lorain",
+    "category": "mlf",
+    "site": "orain",
+    "is_overnight": false
+  },
+  {
+    "id": "West_2025072207",
+    "start": "2025-07-22T07:00:00",
+    "end": "2025-07-22T15:00:00",
+    "name": "West",
+    "category": "west",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "Acute_2025072207",
+    "start": "2025-07-22T07:00:00",
+    "end": "2025-07-22T17:00:00",
+    "name": "Acute",
+    "category": "acute",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "Trauma_2025072214",
+    "start": "2025-07-22T14:00:00",
+    "end": "2025-07-23T00:00:00",
+    "name": "Trauma",
+    "category": "trauma",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "E12_2025072207",
+    "start": "2025-07-22T07:00:00",
+    "end": "2025-07-22T17:00:00",
+    "name": "E12",
+    "category": "ccf",
+    "site": "CCF",
+    "is_overnight": false
+  },
+  {
+    "id": "E18_2025072210",
+    "start": "2025-07-22T10:00:00",
+    "end": "2025-07-22T18:00:00",
+    "name": "E18",
+    "category": "ccf",
+    "site": "CCF",
+    "is_overnight": false
+  },
+  {
+    "id": "Com Parma_2025072207",
+    "start": "2025-07-22T07:00:00",
+    "end": "2025-07-22T15:00:00",
+    "name": "Com Parma",
+    "category": "community",
+    "site": "Parma",
+    "is_overnight": false
+  },
+  {
+    "id": "Com Breckville_2025072207",
+    "start": "2025-07-22T07:00:00",
+    "end": "2025-07-22T15:00:00",
+    "name": "Com Breckville",
+    "category": "community",
+    "site": "Breckville",
+    "is_overnight": false
+  },
+  {
+    "id": "MLF Wayne_2025072207",
+    "start": "2025-07-22T07:00:00",
+    "end": "2025-07-22T17:00:00",
+    "name": "MLF Wayne",
+    "category": "mlf",
+    "site": "Wayne",
+    "is_overnight": false
+  },
+  {
+    "id": "MLF Lorain_2025072207",
+    "start": "2025-07-22T07:00:00",
+    "end": "2025-07-22T17:00:00",
+    "name": "MLF Lorain",
+    "category": "mlf",
+    "site": "orain",
+    "is_overnight": false
+  },
+  {
+    "id": "West_2025072407",
+    "start": "2025-07-24T07:00:00",
+    "end": "2025-07-24T15:00:00",
+    "name": "West",
+    "category": "west",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "Acute_2025072407",
+    "start": "2025-07-24T07:00:00",
+    "end": "2025-07-24T17:00:00",
+    "name": "Acute",
+    "category": "acute",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "Trauma_2025072414",
+    "start": "2025-07-24T14:00:00",
+    "end": "2025-07-25T00:00:00",
+    "name": "Trauma",
+    "category": "trauma",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "E12_2025072407",
+    "start": "2025-07-24T07:00:00",
+    "end": "2025-07-24T17:00:00",
+    "name": "E12",
+    "category": "ccf",
+    "site": "CCF",
+    "is_overnight": false
+  },
+  {
+    "id": "E18_2025072410",
+    "start": "2025-07-24T10:00:00",
+    "end": "2025-07-24T18:00:00",
+    "name": "E18",
+    "category": "ccf",
+    "site": "CCF",
+    "is_overnight": false
+  },
+  {
+    "id": "Metro Night_2025072421",
+    "start": "2025-07-24T21:00:00",
+    "end": "2025-07-26T21:00:00",
+    "name": "Metro Night",
+    "category": "overnight",
+    "site": "Metro",
+    "is_overnight": true
+  },
+  {
+    "id": "CCF Night_2025072421",
+    "start": "2025-07-24T21:00:00",
+    "end": "2025-07-26T21:00:00",
+    "name": "CCF Night",
+    "category": "overnight",
+    "site": "CCF",
+    "is_overnight": true
+  },
+  {
+    "id": "Com Parma_2025072407",
+    "start": "2025-07-24T07:00:00",
+    "end": "2025-07-24T15:00:00",
+    "name": "Com Parma",
+    "category": "community",
+    "site": "Parma",
+    "is_overnight": false
+  },
+  {
+    "id": "Com Breckville_2025072407",
+    "start": "2025-07-24T07:00:00",
+    "end": "2025-07-24T15:00:00",
+    "name": "Com Breckville",
+    "category": "community",
+    "site": "Breckville",
+    "is_overnight": false
+  },
+  {
+    "id": "MLF Wayne_2025072407",
+    "start": "2025-07-24T07:00:00",
+    "end": "2025-07-24T17:00:00",
+    "name": "MLF Wayne",
+    "category": "mlf",
+    "site": "Wayne",
+    "is_overnight": false
+  },
+  {
+    "id": "MLF Lorain_2025072407",
+    "start": "2025-07-24T07:00:00",
+    "end": "2025-07-24T17:00:00",
+    "name": "MLF Lorain",
+    "category": "mlf",
+    "site": "orain",
+    "is_overnight": false
+  },
+  {
+    "id": "West_2025072507",
+    "start": "2025-07-25T07:00:00",
+    "end": "2025-07-25T15:00:00",
+    "name": "West",
+    "category": "west",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "Acute_2025072507",
+    "start": "2025-07-25T07:00:00",
+    "end": "2025-07-25T17:00:00",
+    "name": "Acute",
+    "category": "acute",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "Trauma_2025072514",
+    "start": "2025-07-25T14:00:00",
+    "end": "2025-07-26T00:00:00",
+    "name": "Trauma",
+    "category": "trauma",
+    "site": "Metro",
+    "is_overnight": false
+  },
+  {
+    "id": "E12_2025072507",
+    "start": "2025-07-25T07:00:00",
+    "end": "2025-07-25T17:00:00",
+    "name": "E12",
+    "category": "ccf",
+    "site": "CCF",
+    "is_overnight": false
+  },
+  {
+    "id": "E18_2025072510",
+    "start": "2025-07-25T10:00:00",
+    "end": "2025-07-25T18:00:00",
+    "name": "E18",
+    "category": "ccf",
+    "site": "CCF",
+    "is_overnight": false
+  },
+  {
+    "id": "Metro Night_2025072521",
+    "start": "2025-07-25T21:00:00",
+    "end": "2025-07-27T21:00:00",
+    "name": "Metro Night",
+    "category": "overnight",
+    "site": "Metro",
+    "is_overnight": true
+  },
+  {
+    "id": "CCF Night_2025072521",
+    "start": "2025-07-25T21:00:00",
+    "end": "2025-07-27T21:00:00",
+    "name": "CCF Night",
+    "category": "overnight",
+    "site": "CCF",
+    "is_overnight": true
+  },
+  {
+    "id": "Com Parma_2025072507",
+    "start": "2025-07-25T07:00:00",
+    "end": "2025-07-25T15:00:00",
+    "name": "Com Parma",
+    "category": "community",
+    "site": "Parma",
+    "is_overnight": false
+  },
+  {
+    "id": "Com Breckville_2025072507",
+    "start": "2025-07-25T07:00:00",
+    "end": "2025-07-25T15:00:00",
+    "name": "Com Breckville",
+    "category": "community",
+    "site": "Breckville",
+    "is_overnight": false
+  },
+  {
+    "id": "MLF Wayne_2025072507",
+    "start": "2025-07-25T07:00:00",
+    "end": "2025-07-25T17:00:00",
+    "name": "MLF Wayne",
+    "category": "mlf",
+    "site": "Wayne",
+    "is_overnight": false
+  },
+  {
+    "id": "MLF Lorain_2025072507",
+    "start": "2025-07-25T07:00:00",
+    "end": "2025-07-25T17:00:00",
+    "name": "MLF Lorain",
+    "category": "mlf",
+    "site": "orain",
+    "is_overnight": false
+  }
+]

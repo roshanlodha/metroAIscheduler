@@ -3,125 +3,39 @@ from datetime import date, datetime, timedelta
 import itertools
 from icalendar import Calendar, Event
 import pytz
+import json
+from collections import defaultdict
+import csv
 
 # ----------------------
 # 1. Problem parameters
 # ----------------------
 
 students = ['Lodha', 'Kareti', 'Schmidt', 'Cipriani', 'Pozo', 'Oleson', 'Cowles']
+shifts_file = "shifts.json"
 
-# Rotation window: July 1–25, 2025 (skip Wednesdays)
-start_date = date(2025, 7, 1)
-end_date   = date(2025, 7, 25)
-num_days   = (end_date - start_date).days + 1
+# ----------------------
+# 2. Load shifts file
+# ----------------------
+
+def load_shifts_json(filename):
+    with open(filename, 'r') as f:
+        data = json.load(f)
+    # Convert ISO strings back to datetime objects
+    for s in data:
+        s['start'] = datetime.fromisoformat(s['start'])
+        s['end'] = datetime.fromisoformat(s['end'])
+    return data
+
+all_shifts = load_shifts_json(shifts_file)
+start_date = min([s['start'] for s in all_shifts])
+end_date = max([s['end'] for s in all_shifts])
+num_days = (end_date - start_date).days + 1
 all_dates = [
     start_date + timedelta(days=i)
     for i in range(num_days)
     #if (start_date + timedelta(days=i)).weekday() != 2
 ]
-
-# Shift definitions: key → start hour (24h)
-shift_defs = {
-    # Metro shifts
-    'West':        7,
-    # 'WestAM':        7,
-    # 'WestPM':       17,
-    'Acute':            7,
-    # 'A1':            7,
-    # 'A2':            7,
-    # 'C1':            11,
-    # 'C2':            11,
-    # 'E1':            15,
-    # 'E2':            15,
-    'Trauma':       14,
-
-    # CCF shifts
-    'E12':           7,
-    'E18':          10,
-
-    # Overnight shifts
-    'Metro Night': 21,  # overnight at Metro
-    'CCF Night': 21,   # overnight at CCF
-    
-    # Community Shifts
-    'Com Parma': 7,
-    'Com Breckville': 7,
-
-    # MLF Shifts
-    'MLF Wayne': 7,
-    'MLF Lorain': 7,
-}
-
-# Categories by name
-west_names      = {'West', 'WestAM', 'WestPM'}
-acute_names     = {'Acute', 'A1', 'A2', 'C1', 'C2', 'E1', 'E2'}
-trauma_names    = {'Trauma'}
-ccf_names       = {'E12', 'E18'}
-overnight_names = {'Metro Night', 'CCF Night'}
-community_names = {'Com Parma', 'Com Breckville'}
-mlf_names       = {'MLF Wayne', 'MLF Lorain'}
-
-# ------------------------
-# 2. Build the all_shifts
-# ------------------------
-
-all_shifts = []
-for current_date in all_dates:
-    # Skip Wednesdays (weekday() == 2)
-    if current_date.weekday() == 2:
-        continue
-    for name, hour in shift_defs.items():
-        is_overnight = name in overnight_names
-        # Prevent overnight shifts from starting on Tuesday or Wednesday
-        if is_overnight and current_date.weekday() in (1, 2):  # 1=Tuesday, 2=Wednesday
-            continue
-        start_dt = datetime(
-            current_date.year,
-            current_date.month,
-            current_date.day,
-            hour, 0
-        )
-        if is_overnight:
-            duration = timedelta(hours=48)
-        elif name in {'West', 'Com Parma', 'Com Breckville', 'E18'}:
-            duration = timedelta(hours=8)
-        else:
-            duration = timedelta(hours=10)
-
-        # Determine category
-        if is_overnight:
-            category = 'overnight'
-        elif name in trauma_names:
-            category = 'trauma'
-        elif name in ccf_names:
-            category = 'ccf'
-        elif name in acute_names:
-            category = 'acute'
-        elif name in west_names:
-            category = 'west'
-        elif name in community_names:
-            category = 'community'
-        elif name in mlf_names:
-            category = 'mlf'
-        
-        if is_overnight:
-            site = 'CCF' if name == 'CCF Night' else 'Metro'
-        elif name in community_names:
-            site = name.strip('Com ').replace(' ', '')
-        elif name in mlf_names:
-            site = name.strip('MLF ').replace(' ', '')
-        else:
-            site = 'CCF' if name in ccf_names else 'Metro'
-
-        all_shifts.append({
-            'id':           f"{name}_{start_dt:%Y%m%d%H}",
-            'start':        start_dt,
-            'end':          start_dt + duration,
-            'name':         name,
-            'category':     category,
-            'site':         site,
-            'is_overnight': is_overnight,
-        })
 
 # ----------------------
 # 3. Build the CSP model
@@ -296,8 +210,48 @@ if status in (cp_model.OPTIMAL, cp_model.FEASIBLE):
                 event.add('location', s['site'])
                 cal.add_component(event)
 
-
         # Write to file
         with open(f"{student}_schedule.ics", "wb") as f:
             f.write(cal.to_ical())
         print(f"iCal calendar saved as {student}_schedule.ics")
+
+        # Build a mapping: student -> date -> shift info
+        schedule_table = defaultdict(dict)
+        for student in students:
+            assigned = [s for s in all_shifts if solver.Value(x[(s['id'], student)])]
+            for s in assigned:
+                # For overnight shifts, mark both days
+                if s['is_overnight']:
+                    day1 = s['start'].date()
+                    day2 = (s['start'] + timedelta(days=1)).date()
+                    info = f"{s['name']} ({s['site']})"
+                    schedule_table[student][day1] = info
+                    schedule_table[student][day2] = info
+                else:
+                    day = s['start'].date()
+                    info = f"{s['name']} ({s['site']})"
+                    schedule_table[student][day] = info
+
+        # Prepare header
+        header = ["Student"] + [d.strftime("%m/%d") for d in all_dates]
+
+        # Prepare rows
+        rows = []
+        for student in students:
+            row = [student]
+            for d in all_dates:
+                shift_info = schedule_table[student].get(d.date(), "")
+                row.append(shift_info)
+            rows.append(row)
+
+        # Print header and rows to console
+        print("\t".join(header))
+        for row in rows:
+            print("\t".join(row))
+
+        # Save as CSV
+        with open("schedule_table.csv", "w", newline='') as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(header)
+            writer.writerows(rows)
+        print("Schedule table saved as schedule_table.csv")
