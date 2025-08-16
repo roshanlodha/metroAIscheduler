@@ -11,7 +11,7 @@ import csv
 # 1. Problem parameters
 # ----------------------
 
-students = ['Roshan', 'Christopher', 'Parker', 'Tegan', 'Brennan', 'Ogheneovo', 'Rachel']
+students = ['Roshan', 'Roshan2', 'Roshan3', 'Roshan4', 'Roshan5', 'Roshan6', 'Roshan7']
 shifts_file = "bidmc_shifts.json"
 
 # ----------------------
