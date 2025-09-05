@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MetroAI Scheduler</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f7f7f7;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 420px;
+            margin: 40px auto;
+            background: #fff;
+            padding: 32px 28px 24px 28px;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #555;
+            font-size: 1.1em;
+            margin-bottom: 24px;
+        }
+        label {
+            font-weight: 500;
+            color: #333;
+        }
+        input[type="text"], input[type="file"] {
+            width: 100%;
+            margin-top: 6px;
+            margin-bottom: 18px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        input[type="submit"] {
+            background: #0078d4;
+            color: #fff;
+            border: none;
+            padding: 10px 0;
+            width: 100%;
+            border-radius: 4px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        input[type="submit"]:hover {
+            background: #005fa3;
+        }
+        .result, .download-link {
+            margin-top: 18px;
+            text-align: center;
+        }
+        .download-link a {
+            color: #0078d4;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .download-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Schedule Generator</h1>
+        <div class="subtitle">Generate shifts.json using the <a href="{{ url_for('define_shifts') }}">shift builder</a>, then enter student names to generate a schedule.</div>
+        <form method="post" enctype="multipart/form-data">
+            <label for="students">Student Names (comma separated):</label>
+            <input type="text" name="students" id="students" placeholder="LastName1, LastName2, ...">
+            <label for="shiftsfile">Shifts JSON File:</label>
+            <input type="file" name="shiftsfile" id="shiftsfile" accept=".json">
+            <input type="submit" value="Upload and Run">
+        </form>
+        {% if result %}
+            <div class="result"><p>{{ result }}</p></div>
+        {% endif %}
+        {% if csv_ready %}
+            <div class="download-link">
+                <a href="{{ url_for('download_csv') }}">Download schedule_table.csv</a>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html></div>

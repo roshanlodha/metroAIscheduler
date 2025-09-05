@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Define Shifts</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f7f7f7;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 420px;
+            margin: 40px auto;
+            background: #fff;
+            padding: 32px 28px 24px 28px;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #555;
+            font-size: 1.1em;
+            margin-bottom: 24px;
+        }
+        label {
+            font-weight: 500;
+            color: #333;
+        }
+        input[type="text"], input[type="file"], input[type="date"] {
+            width: 100%;
+            margin-top: 6px;
+            margin-bottom: 18px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        input[type="submit"], button {
+            background: #0078d4;
+            color: #fff;
+            border: none;
+            padding: 10px 0;
+            width: 100%;
+            border-radius: 4px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        input[type="submit"]:hover, button:hover {
+            background: #005fa3;
+        }
+        .result, .download-link, .error {
+            margin-top: 18px;
+            text-align: center;
+        }
+        .download-link a {
+            color: #0078d4;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .download-link a:hover {
+            text-decoration: underline;
+        }
+        .error {
+            color: red;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Shift Builder</h1>
+        <div class="subtitle">Enter the shift start and end dates (do not include the orientation day), then return to <a href="{{ url_for('index') }}">schedule generator</a>.</div>
+        <form method="post">
+            <label for="start_date">Start Date:</label>
+            <input type="date" name="start_date" required>
+
+            <label for="end_date">End Date:</label>
+            <input type="date" name="end_date" required>
+
+            <input type="submit" value="Generate Shifts">
+        </form>
+
+        {% if shifts_ready %}
+            <div class="result">Shifts file generated!</div>
+            <div class="download-link">
+                <a href="{{ url_for('download_shifts') }}">Download shifts.json</a>
+            </div>
+        {% endif %}
+
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+    </div>
+</body>
+</html>
