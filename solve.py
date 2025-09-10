@@ -7,8 +7,6 @@ import json
 from collections import defaultdict
 import csv
 
-students = ['Lodha', 'Kareti', 'Schmidt', 'Cipriani', 'Pozo', 'Oleson', 'Cowles']
-
 def load_shifts_json(filename):
     with open(filename, 'r') as f:
         data = json.load(f)

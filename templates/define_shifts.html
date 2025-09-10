@@ -10,7 +10,7 @@
             padding: 0;
         }
         .container {
-            max-width: 420px;
+            max-width: 460px;
             margin: 40px auto;
             background: #fff;
             padding: 32px 28px 24px 28px;
@@ -32,13 +32,20 @@
             font-weight: 500;
             color: #333;
         }
-        input[type="text"], input[type="file"], input[type="date"] {
+        input[type="text"], input[type="file"], input[type="date"], select {
             width: 100%;
             margin-top: 6px;
             margin-bottom: 18px;
             padding: 8px;
             border: 1px solid #ccc;
             border-radius: 4px;
+        }
+        .date-row {
+            display: flex;
+            gap: 16px;
+        }
+        .date-row div {
+            flex: 1;
         }
         input[type="submit"], button {
             background: #0078d4;
@@ -75,13 +82,26 @@
 <body>
     <div class="container">
         <h1>Shift Builder</h1>
-        <div class="subtitle">Enter the shift start and end dates (do not include the orientation day), then return to <a href="{{ url_for('index') }}">schedule generator</a>.</div>
+        <div class="subtitle">
+            Enter the shift start and end dates (do not include the orientation day), 
+            then return to <a href="{{ url_for('index') }}">schedule generator</a>.
+        </div>
         <form method="post">
-            <label for="start_date">Start Date:</label>
-            <input type="date" name="start_date" required>
+            <label for="institution">Rotation Institution:</label>
+            <select name="institution" id="institution">
+                <option value="MetroHealth">MetroHealth</option>
+            </select>
 
-            <label for="end_date">End Date:</label>
-            <input type="date" name="end_date" required>
+            <div class="date-row">
+                <div>
+                    <label for="start_date">Start Date:</label>
+                    <input type="date" name="start_date" required>
+                </div>
+                <div>
+                    <label for="end_date">End Date:</label>
+                    <input type="date" name="end_date" required>
+                </div>
+            </div>
 
             <input type="submit" value="Generate Shifts">
         </form>
