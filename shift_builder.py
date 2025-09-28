@@ -1,121 +1,140 @@
 import json
-from datetime import date, datetime, timedelta
+import re
+from datetime import date, datetime, time, timedelta
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
-# Shift definitions: key → start hour (24h)
-shift_defs = {
-    # Metro shifts
-    'West': 7,
-    'Acute': 7,
-    'Trauma': 14,
-
-    # CCF shifts
-    'E12': 7,
-    'E18': 10,
-
-    # Overnight shifts
-    'Metro Night': 21,  # overnight at Metro
-    'CCF Night': 21,   # overnight at CCF
-    
-    # Community Shifts
-    'Com Parma': 7,
-    'Com Breckville': 7,
-
-    # MLF Shifts
-    'MLF Wayne': 7,
-    'MLF Lorain': 7,
+BASE_DIR = Path(__file__).resolve().parent
+TEMPLATES_DIR = BASE_DIR / "shift_templates"
+DAY_NAME_TO_INDEX = {
+    "Monday": 0,
+    "Tuesday": 1,
+    "Wednesday": 2,
+    "Thursday": 3,
+    "Friday": 4,
+    "Saturday": 5,
+    "Sunday": 6,
 }
+INDEX_TO_DAY_NAME = {v: k for k, v in DAY_NAME_TO_INDEX.items()}
+TIME_FORMAT = "%H:%M"
 
-# Categories by name
-west_names      = {'West', 'WestAM', 'WestPM'}
-acute_names     = {'Acute', 'A1', 'A2', 'C1', 'C2', 'E1', 'E2'}
-trauma_names    = {'Trauma'}
-ccf_names       = {'E12', 'E18'}
-overnight_names = {'Metro Night', 'CCF Night'}
-community_names = {'Com Parma', 'Com Breckville'}
-mlf_names       = {'MLF Wayne', 'MLF Lorain'}
 
-def build_shifts(start_date, end_date):
-    """
-    Build all_shifts for the given start_date and end_date (date objects).
-    Skips Wednesdays and overnight shifts on Tuesday/Wednesday.
-    Returns: list of shift dicts.
-    """
-    num_days = (end_date - start_date).days + 1
-    all_dates = [
-        start_date + timedelta(days=i)
-        for i in range(num_days)
-    ]
+def ensure_templates_dir() -> None:
+    """Ensure the directory for storing shift templates exists."""
+    TEMPLATES_DIR.mkdir(parents=True, exist_ok=True)
 
-    all_shifts = []
-    for current_date in all_dates:
-        # Skip Wednesdays (weekday() == 2)
-        if current_date.weekday() == 2:
+
+def _slugify(value: str) -> str:
+    value = value.strip().lower()
+    value = re.sub(r"[^a-z0-9]+", "-", value)
+    value = value.strip("-")
+    return value or "template"
+
+
+def list_templates() -> List[Dict[str, Any]]:
+    """Return metadata for all saved templates."""
+    ensure_templates_dir()
+    templates = []
+    for path in sorted(TEMPLATES_DIR.glob("*.json")):
+        with path.open("r", encoding="utf-8") as f:
+            data = json.load(f)
+        templates.append({
+            "slug": path.stem,
+            "template_name": data.get("template_name", path.stem),
+            "institution": data.get("institution", ""),
+            "path": str(path),
+        })
+    return templates
+
+
+def load_template(slug: str) -> Dict[str, Any]:
+    ensure_templates_dir()
+    path = TEMPLATES_DIR / f"{slug}.json"
+    if not path.exists():
+        raise FileNotFoundError(f"Template '{slug}' not found")
+    with path.open("r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def save_template(
+    template_name: str,
+    institution: str,
+    week_slots: List[Dict[str, Any]],
+    slug: Optional[str] = None,
+) -> str:
+    """Persist a shift template and return its slug."""
+    ensure_templates_dir()
+    slug = slug or _slugify(template_name)
+    data = {
+        "template_name": template_name,
+        "institution": institution,
+        "week_slots": week_slots,
+    }
+    path = TEMPLATES_DIR / f"{slug}.json"
+    with path.open("w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2)
+    return slug
+
+
+def _parse_time(value: str) -> time:
+    return datetime.strptime(value, TIME_FORMAT).time()
+
+
+def build_shifts_from_template(
+    template: Dict[str, Any],
+    start_date: date,
+    end_date: date,
+) -> List[Dict[str, Any]]:
+    """Expand a weekly template into dated shifts between start_date and end_date."""
+    week_slots = template.get("week_slots", [])
+    slots_by_index: Dict[int, List[Dict[str, Any]]] = {i: [] for i in range(7)}
+    for slot in week_slots:
+        day_name = slot.get("day_of_week")
+        if day_name not in DAY_NAME_TO_INDEX:
             continue
-        for name, hour in shift_defs.items():
-            is_overnight = name in overnight_names
-            # Prevent overnight shifts from starting on Tuesday or Wednesday
-            if is_overnight and current_date.weekday() in (1, 2):  # 1=Tuesday, 2=Wednesday
-                continue
-            start_dt = datetime(
-                current_date.year,
-                current_date.month,
-                current_date.day,
-                hour, 0
-            )
-            if is_overnight:
-                duration = timedelta(hours=48)
-            elif name in {'West', 'Com Parma', 'Com Breckville', 'E18'}:
-                duration = timedelta(hours=8)
-            else:
-                duration = timedelta(hours=10)
+        slots_by_index[DAY_NAME_TO_INDEX[day_name]].append(slot)
 
-            # Determine category
-            if is_overnight:
-                category = 'overnight'
-            elif name in trauma_names:
-                category = 'trauma'
-            elif name in ccf_names:
-                category = 'ccf'
-            elif name in acute_names:
-                category = 'acute'
-            elif name in west_names:
-                category = 'west'
-            elif name in community_names:
-                category = 'community'
-            elif name in mlf_names:
-                category = 'mlf'
-            
-            if is_overnight:
-                site = 'CCF' if name == 'CCF Night' else 'Metro'
-            elif name in community_names:
-                site = name.strip('Com ').replace(' ', '')
-            elif name in mlf_names:
-                site = name.strip('MLF ').replace(' ', '')
-            else:
-                site = 'CCF' if name in ccf_names else 'Metro'
+    all_shifts: List[Dict[str, Any]] = []
+    current_day = start_date
+    while current_day <= end_date:
+        weekday_index = current_day.weekday()
+        for slot in slots_by_index.get(weekday_index, []):
+            start_time = _parse_time(slot["start_time"])
+            start_dt = datetime.combine(current_day, start_time)
+            duration_hours = float(slot.get("duration_hours", 10))
+            block_hours = float(slot.get("block_hours", duration_hours))
+            end_dt = start_dt + timedelta(hours=duration_hours)
+            block_end = start_dt + timedelta(hours=block_hours)
+            name = slot["name"]
+            shift_id = f"{name}_{start_dt:%Y%m%d%H%M}"
 
             all_shifts.append({
-                'id':           f"{name}_{start_dt:%Y%m%d%H}",
-                'start':        start_dt,
-                'end':          start_dt + duration,
-                'name':         name,
-                'category':     category,
-                'site':         site,
-                'is_overnight': is_overnight,
+                "id": shift_id,
+                "start": start_dt,
+                "end": end_dt,
+                "block_end": block_end,
+                "name": name,
+                "category": slot.get("category", ""),
+                "site": slot.get("site", ""),
+                "is_overnight": bool(slot.get("is_overnight", False)),
             })
+        current_day += timedelta(days=1)
     return all_shifts
 
-def save_shifts_json(filename, shifts):
-    # Convert datetime objects to ISO strings for JSON serialization
-    def serialize_shift(s):
+
+def save_shifts_json(filename: str, shifts: List[Dict[str, Any]]) -> None:
+    """Persist expanded shifts to disk (datetimes serialized to ISO strings)."""
+    def serialize_shift(s: Dict[str, Any]) -> Dict[str, Any]:
         return {
-            'id': s['id'],
-            'start': s['start'].isoformat(),
-            'end': s['end'].isoformat(),
-            'name': s['name'],
-            'category': s['category'],
-            'site': s['site'],
-            'is_overnight': s['is_overnight'],
+            "id": s["id"],
+            "start": s["start"].isoformat(),
+            "end": s["end"].isoformat(),
+            "block_end": s["block_end"].isoformat(),
+            "name": s["name"],
+            "category": s.get("category", ""),
+            "site": s.get("site", ""),
+            "is_overnight": s.get("is_overnight", False),
         }
-    with open(filename, 'w') as f:
+
+    with open(filename, "w", encoding="utf-8") as f:
         json.dump([serialize_shift(s) for s in shifts], f, indent=2)

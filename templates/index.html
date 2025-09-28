@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>MetroAI Scheduler</title>
+    <title>Schedule Generator</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -10,83 +10,180 @@
             padding: 0;
         }
         .container {
-            max-width: 420px;
+            max-width: 720px;
             margin: 40px auto;
             background: #fff;
-            padding: 32px 28px 24px 28px;
-            border-radius: 8px;
+            padding: 32px 36px 28px 36px;
+            border-radius: 10px;
             box-shadow: 0 2px 12px rgba(0,0,0,0.08);
         }
         h1 {
             text-align: center;
             color: #2c3e50;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
         .subtitle {
             text-align: center;
             color: #555;
-            font-size: 1.1em;
-            margin-bottom: 24px;
+            font-size: 1.05em;
+            margin-bottom: 22px;
         }
-        label {
+        a {
+            color: #0068c9;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        form label {
+            display: block;
             font-weight: 500;
-            color: #333;
+            color: #34495e;
+            margin-top: 16px;
+            margin-bottom: 6px;
         }
-        input[type="text"], input[type="file"] {
+        input[type="text"], input[type="date"], select, input[type="number"] {
             width: 100%;
-            margin-top: 6px;
-            margin-bottom: 18px;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+            padding: 9px;
+            border: 1px solid #cfd8dc;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+        .row {
+            display: flex;
+            gap: 18px;
+        }
+        .row .col {
+            flex: 1;
+        }
+        .constraints {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px 22px;
+            margin-top: 12px;
+        }
+        .constraints label {
+            margin-top: 0;
         }
         input[type="submit"] {
+            margin-top: 26px;
             background: #0078d4;
             color: #fff;
             border: none;
-            padding: 10px 0;
+            padding: 12px 0;
             width: 100%;
-            border-radius: 4px;
-            font-size: 1em;
+            border-radius: 6px;
+            font-size: 1.05em;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: background 0.2s ease-in-out;
         }
         input[type="submit"]:hover {
             background: #005fa3;
         }
-        .result, .download-link {
+        .messages {
             margin-top: 18px;
+        }
+        .error {
+            background: #fdecea;
+            color: #c0392b;
+            padding: 10px 14px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+        .success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 10px 14px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+        .downloads {
+            margin-top: 16px;
             text-align: center;
         }
-        .download-link a {
-            color: #0078d4;
-            text-decoration: none;
-            font-weight: 500;
+        .downloads a {
+            margin: 0 8px;
         }
-        .download-link a:hover {
-            text-decoration: underline;
+        .empty-state {
+            text-align: center;
+            background: #fff3cd;
+            color: #8a6d3b;
+            padding: 12px 16px;
+            border-radius: 6px;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Schedule Generator</h1>
-        <div class="subtitle">Generate shifts.json using the <a href="{{ url_for('define_shifts') }}">shift builder</a>, then enter student names to generate a schedule.</div>
-        <form method="post" enctype="multipart/form-data">
-            <label for="students">Student Names (comma separated):</label>
-            <input type="text" name="students" id="students" placeholder="LastName1, LastName2, ...">
-            <label for="shiftsfile">Shifts JSON File:</label>
-            <input type="file" name="shiftsfile" id="shiftsfile" accept=".json">
-            <input type="submit" value="Upload and Run">
+        <div class="subtitle">
+            Step 1: create or edit a template in the <a href="{{ url_for('define_shifts') }}">shift builder</a>.<br>
+            Step 2: choose a template, set the date range and constraints, then solve.
+        </div>
+
+        {% if templates %}
+        <form method="post">
+            <label for="template_slug">Shift Template</label>
+            <select name="template_slug" id="template_slug" required>
+                <option value="" disabled {% if not selected_template %}selected{% endif %}>Select a template…</option>
+                {% for tpl in templates %}
+                    <option value="{{ tpl.slug }}" {% if tpl.slug == selected_template %}selected{% endif %}>
+                        {{ tpl.template_name }}{% if tpl.institution %} — {{ tpl.institution }}{% endif %}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <label for="students">Student Names (comma separated)</label>
+            <input type="text" name="students" id="students" placeholder="LastName1, LastName2, ..." value="{{ students_input }}">
+
+            <div class="row">
+                <div class="col">
+                    <label for="start_date">Start Date</label>
+                    <input type="date" name="start_date" id="start_date" value="{{ start_date_value }}" required>
+                </div>
+                <div class="col">
+                    <label for="end_date">End Date</label>
+                    <input type="date" name="end_date" id="end_date" value="{{ end_date_value }}" required>
+                </div>
+            </div>
+
+            <h3>Per-Student Constraints</h3>
+            <div class="constraints">
+                {% for key, label in constraint_fields %}
+                    <div>
+                        <label for="{{ key }}">{{ label }}</label>
+                        <input type="number" name="{{ key }}" id="{{ key }}" value="{{ constraints[key] }}" min="0">
+                    </div>
+                {% endfor %}
+            </div>
+
+            <input type="submit" value="Generate Schedule">
         </form>
-        {% if result %}
-            <div class="result"><p>{{ result }}</p></div>
+        {% else %}
+            <div class="empty-state">
+                No templates saved yet. Visit the <a href="{{ url_for('define_shifts') }}">shift builder</a> to create the first one.
+            </div>
         {% endif %}
-        {% if csv_ready %}
-            <div class="download-link">
+
+        <div class="messages">
+            {% for error in errors %}
+                <div class="error">{{ error }}</div>
+            {% endfor %}
+            {% if result %}
+                <div class="success">{{ result }}</div>
+            {% endif %}
+        </div>
+
+        {% if result %}
+            <div class="downloads">
                 <a href="{{ url_for('download_csv') }}">Download schedule_table.csv</a>
+                <a href="{{ url_for('download_shifts') }}">Download shifts.json</a>
+            </div>
+        {% elif csv_ready %}
+            <div class="downloads">
+                <a href="{{ url_for('download_csv') }}">Download previous schedule_table.csv</a>
             </div>
         {% endif %}
     </div>
 </body>
-</html></div>
+</html>
