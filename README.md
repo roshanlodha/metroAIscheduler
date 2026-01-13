@@ -40,6 +40,33 @@ python solve.py
 ```
 This will generate a `.ics` file for each student in the current directory.
 
+## Static Web Version (GitHub Pages)
+
+This repo also includes a fully static, browser-only version that recreates the same constraints as `solve.py`, but outputs a simple CSV instead of `.ics`.
+
+- Entry point: [index.html](index.html)
+- Logic: [app.js](app.js)
+
+### Run locally
+
+Because browsers restrict loading WASM/files from `file://`, run a tiny local server:
+
+```sh
+python3 -m http.server 8000
+```
+
+Then open:
+
+- `http://localhost:8000/`
+
+### Deploy on GitHub Pages
+
+- Push to GitHub
+- Repo Settings → Pages → Deploy from branch (root)
+- Visit your Pages URL and click "Generate schedule" → "Download CSV"
+
+The web version uses `glpk.js` (WASM) via CDN to solve a 0–1 ILP in the browser.
+
 ## Configuration
 
 - **Students**:  
