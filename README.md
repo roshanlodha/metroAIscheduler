@@ -1,92 +1,78 @@
-# MetroAI Scheduler
+# Metro AI Scheduler (macOS SwiftUI)
 
-Automated shift scheduling for acting interns at Metro/CCF rotation.
+Metro AI Scheduler is a macOS desktop app that builds student schedules with constraint programming.
 
-## Overview
+## Xcode Structure
 
-This tool generates optimal shift assignments for a group of students (acting interns) rotating through Metro and CCF, subject to a set of scheduling constraints. For each student, an individual `.ics` calendar file is produced, which can be imported into most calendar applications.
+- `MetroAIScheduler.xcodeproj` (native macOS app project)
+- Target: `MetroAIScheduler`
+- Deployment target: `macOS 26.0`
+- Swift sources: `Sources/MetroAISchedulerApp/**`
+- Bundled solver script resource: `Sources/MetroAISchedulerApp/Resources/ortools_solver.py`
 
-## Features
+Open in Xcode:
 
-- Automatically assigns shifts to students based on customizable constraints.
-- Generates `.ics` calendar files for each student, including orientation and conference events.
-- Prints a summary of each student's schedule to the console for quick inspection.
-
-## Requirements
-
-- Python 3.8+
-- [Google OR-Tools](https://developers.google.com/optimization) (`pip install ortools`)
-- [icalendar](https://pypi.org/project/icalendar/) (`pip install icalendar`)
-- [pytz](https://pypi.org/project/pytz/) (`pip installed with icalendar by default`)
-
-## Setup
-
-1. **Clone the repository** and navigate to the project directory.
-2. **(Optional but recommended)**: Create and activate a Python virtual environment:
-    ```sh
-    python3 -m venv env
-    source env/bin/activate
-    ```
-3. **Install dependencies**:
-    ```sh
-    pip install ortools icalendar
-    ```
-
-## Usage
-
-Run the scheduler with:
-```sh
-python solve.py
-```
-This will generate a `.ics` file for each student in the current directory.
-
-## Static Web Version (GitHub Pages)
-
-This repo also includes a fully static, browser-only version that recreates the same constraints as `solve.py`, but outputs a simple CSV instead of `.ics`.
-
-- Entry point: [index.html](index.html)
-- Logic: [app.js](app.js)
-
-### Run locally
-
-Because browsers restrict loading WASM/files from `file://`, run a tiny local server:
-
-```sh
-python3 -m http.server 8000
+```bash
+open MetroAIScheduler.xcodeproj
 ```
 
-Then open:
+Run with `Cmd+R`.
 
-- `http://localhost:8000/`
+## One-Command .app Build
 
-### Deploy on GitHub Pages
+Use:
 
-- Push to GitHub
-- Repo Settings → Pages → Deploy from branch (root)
-- Visit your Pages URL and click "Generate schedule" → "Download CSV"
+```bash
+./build.sh
+```
 
-The web version uses `glpk.js` (WASM) via CDN to solve a 0–1 ILP in the browser.
+This script:
 
-## Configuration
+1. Builds `MetroAIScheduler.app` in Release mode via `xcodebuild`.
+2. Extracts bundled CPython runtime from:
+   - `cpython-3.12.12+20260127-aarch64-apple-darwin-install_only.tar`
+3. Copies Python packages (including OR-Tools) from:
+   - `env/lib/python3.12/site-packages`
+4. Embeds both into:
+   - `MetroAIScheduler.app/Contents/Resources/python`
+5. Outputs distributable app at:
+   - `dist/MetroAIScheduler.app`
 
-- **Students**:  
-  Edit the `students` list near the top of `solve.py` to specify the names of the acting interns.
+No Python or pip installation is required on end-user machines.
 
-- **Rotation Dates**:  
-  Adjust `start_date` and `end_date` in `solve.py` to set the rotation window.
+## Requirements to Build
 
-- **Shifts and Constraints**:  
-  Shift definitions and scheduling constraints are defined in `solve.py`. These can be modified if needed, but the defaults are set for typical Metro/CCF rotations.
+- Latest stable Xcode (tested with Xcode 26.2)
+- These files present in repo root:
+  - `cpython-3.12.12+20260127-aarch64-apple-darwin-install_only.tar`
+  - `env/lib/python3.12/site-packages` (with `ortools`)
 
-## Output
+## Tests (Swift Package)
 
-- For each student, a file named `<student>_schedule.ics` will be created.
-- The script also prints a summary of each student's assigned shifts to the console.
+```bash
+swift test
+```
 
-## License
+Coverage includes:
 
-This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+- shift instance expansion
+- overlap/rest conflict detection
+- JSON encode/decode round-trip
+- deterministic solver fixture
 
-## Credits
+## Sample Data
 
-Developed by Roshan Lodha.
+- Example project JSON: `Examples/sample_project.json`
+
+## Modeling Decisions
+
+- Overnight duration:
+  - If `lengthHours` is set, that exact duration is used in solver/UI/CSV/ICS.
+  - If `lengthHours` is nil and `isOvernight=true`, duration defaults to `max(1, numShiftsRequired * 24 - timeOffHours)` hours.
+- Total-shift counting:
+  - Per student: weighted equality `sum(shift weights) == numShiftsRequired`.
+  - Non-overnight weight = `1`.
+  - Overnight weight = `overnightShiftWeight` (configurable).
+- Rest constraints:
+  - Overlapping shifts cannot both be assigned to the same student.
+  - Non-overlapping shifts require gap `>= timeOffHours`.

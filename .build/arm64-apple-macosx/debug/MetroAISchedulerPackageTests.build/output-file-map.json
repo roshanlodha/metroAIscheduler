@@ -1,0 +1,12 @@
+{
+  "": {
+    "swift-dependencies": "/Users/roshanlodha/Documents/metroAIscheduler/.build/arm64-apple-macosx/debug/MetroAISchedulerPackageTests.build/master.swiftdeps"
+  },
+  "/Users/roshanlodha/Documents/metroAIscheduler/.build/arm64-apple-macosx/debug/MetroAISchedulerPackageTests.derived/runner.swift": {
+    "dependencies": "/Users/roshanlodha/Documents/metroAIscheduler/.build/arm64-apple-macosx/debug/MetroAISchedulerPackageTests.build/runner.d",
+    "object": "/Users/roshanlodha/Documents/metroAIscheduler/.build/arm64-apple-macosx/debug/MetroAISchedulerPackageTests.build/runner.swift.o",
+    "swiftmodule": "/Users/roshanlodha/Documents/metroAIscheduler/.build/arm64-apple-macosx/debug/MetroAISchedulerPackageTests.build/runner~partial.swiftmodule",
+    "swift-dependencies": "/Users/roshanlodha/Documents/metroAIscheduler/.build/arm64-apple-macosx/debug/MetroAISchedulerPackageTests.build/runner.swiftdeps",
+    "diagnostics": "/Users/roshanlodha/Documents/metroAIscheduler/.build/arm64-apple-macosx/debug/MetroAISchedulerPackageTests.build/runner.dia"
+  }
+}
