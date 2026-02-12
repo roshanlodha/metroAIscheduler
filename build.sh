@@ -26,6 +26,9 @@ if [[ ! -d "$VENV_SITE_PACKAGES" ]]; then
   exit 1
 fi
 
+echo "[0/5] Clearing local build caches"
+rm -rf "$DERIVED_DATA_PATH" "$ROOT_DIR/.build" "$DIST_APP_PATH" "$PY_STAGING_DIR"
+
 echo "[1/5] Building MetroAIScheduler.app (Release)"
 xcodebuild \
   -project "$PROJECT_PATH" \

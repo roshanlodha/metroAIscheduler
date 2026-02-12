@@ -83,11 +83,11 @@ struct StudentsView: View {
 
     private func ensureTrailingEmptyRow() {
         let nonEmpty = project.students.filter { !isEmpty($0) }
-        if nonEmpty.count != project.students.count {
-            project.students = nonEmpty
-        }
-        if project.students.last.map(isEmpty) != true {
-            project.students.append(Student())
+        let trailingEmpty = project.students.last.flatMap { isEmpty($0) ? $0 : nil } ?? Student()
+        let desired = nonEmpty + [trailingEmpty]
+
+        if desired != project.students {
+            project.students = desired
         }
     }
 
