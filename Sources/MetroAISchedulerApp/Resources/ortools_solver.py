@@ -56,17 +56,96 @@ def main() -> int:
         for sh_idx, _ in enumerate(shifts):
             x[(s_idx, sh_idx)] = model.NewBoolVar(f"x_{s_idx}_{sh_idx}")
 
-    # Each student must hit required weighted shift total.
+    overnight_type_ids = {type_id for type_id, t in shift_types.items() if t.get("name", "").strip().lower() == "overnight"}
+    overnight_required = 0
+    for t in shift_types.values():
+        if t.get("name", "").strip().lower() == "overnight":
+            overnight_required = max(0, int(t.get("minShifts") or 0))
+            break
+
+    overnight_shift_indices = []
+    for idx, sh in enumerate(shifts):
+        template = templates.get(sh["templateId"], {})
+        template_type_id = template.get("shiftTypeId")
+        # Overnight block semantics are driven by the dedicated Overnight shift type.
+        is_overnight_shift = template_type_id in overnight_type_ids
+        if is_overnight_shift:
+            overnight_shift_indices.append(idx)
+
+    # Each student must hit required shift count, collapsing an overnight block to one unit.
     user_target = int(rules["numShiftsRequired"])
-    overnight_block_days = int(rules.get("overnightBlockCount", 2))
-    target = max(0, user_target - overnight_block_days + 1)
-    overnight_weight = int(rules.get("overnightShiftWeight", 1))
+    target = max(0, user_target - max(0, overnight_required - 1))
     for s_idx, _ in enumerate(students):
         terms = []
-        for sh_idx, sh in enumerate(shifts):
-            weight = overnight_weight if sh["isOvernight"] else 1
-            terms.append(x[(s_idx, sh_idx)] * weight)
+        for sh_idx, _ in enumerate(shifts):
+            terms.append(x[(s_idx, sh_idx)])
         model.Add(sum(terms) == target)
+
+    # Overnight requirement is derived from Overnight shift type minShifts.
+    if overnight_required > 0:
+        for s_idx, _ in enumerate(students):
+            model.Add(sum(x[(s_idx, sh_idx)] for sh_idx in overnight_shift_indices) == overnight_required)
+
+    # Overnight shifts for each student must be a single contiguous block.
+    if overnight_required > 1:
+        overnight_ordered = sorted(
+            overnight_shift_indices,
+            key=lambda idx: parse_dt(shifts[idx]["startDateTime"]),
+        )
+        valid_windows = []
+        window_spans = []
+        for start in range(0, len(overnight_ordered) - overnight_required + 1):
+            window = overnight_ordered[start:start + overnight_required]
+            starts = [parse_dt(shifts[idx]["startDateTime"]) for idx in window]
+            consecutive = True
+            for i in range(1, len(starts)):
+                if (starts[i] - starts[i - 1]).total_seconds() != 86400:
+                    consecutive = False
+                    break
+            if consecutive:
+                valid_windows.append(window)
+                window_spans.append((parse_dt(shifts[window[0]]["startDateTime"]), parse_dt(shifts[window[-1]]["endDateTime"])))
+
+        if not valid_windows:
+            out = {
+                "status": "INFEASIBLE",
+                "assignments": [],
+                "diagnostic": {
+                    "message": "No feasible overnight block exists in the current window.",
+                    "details": [
+                        f"Required overnight shifts/student: {overnight_required}",
+                        "No contiguous overnight run is available from shift offerings and dates.",
+                    ],
+                },
+            }
+            json.dump(out, open(output_path, "w", encoding="utf-8"), indent=2)
+            return 0
+
+        for s_idx, _ in enumerate(students):
+            start_vars = []
+            for w_idx, _ in enumerate(valid_windows):
+                start_vars.append(model.NewBoolVar(f"overnight_block_{s_idx}_{w_idx}"))
+
+            model.Add(sum(start_vars) == 1)
+
+            for sh_idx in overnight_ordered:
+                covers = [start_vars[w_idx] for w_idx, window in enumerate(valid_windows) if sh_idx in window]
+                if covers:
+                    model.Add(x[(s_idx, sh_idx)] == sum(covers))
+                else:
+                    model.Add(x[(s_idx, sh_idx)] == 0)
+
+            # If a block window is chosen, no other shift may overlap its full span.
+            for w_idx, _ in enumerate(valid_windows):
+                block_var = start_vars[w_idx]
+                block_start, block_end = window_spans[w_idx]
+                for sh_idx, sh in enumerate(shifts):
+                    if sh_idx in valid_windows[w_idx]:
+                        continue
+                    sh_start = parse_dt(sh["startDateTime"])
+                    sh_end = parse_dt(sh["endDateTime"])
+                    if sh_start < block_end and block_start < sh_end:
+                        model.Add(x[(s_idx, sh_idx)] + block_var <= 1)
 
     # At most one student per shift instance when enabled.
     if rules.get("noDoubleBooking", True):
@@ -145,13 +224,13 @@ def main() -> int:
         }
     else:
         total_required = len(students) * target
-        weighted_capacity = sum(overnight_weight if sh["isOvernight"] else 1 for sh in shifts)
+        total_capacity = len(shifts)
         details = [
             f"User requested shifts/student: {user_target}",
-            f"Overnight block days: {overnight_block_days}",
+            f"Required overnight shifts/student: {overnight_required}",
             f"Internal target assignments/student: {target}",
-            f"Required weighted assignments: {total_required}",
-            f"Weighted shift capacity (if all unique): {weighted_capacity}",
+            f"Required assignments: {total_required}",
+            f"Shift capacity (if all unique): {total_capacity}",
             f"Double booking: {'off' if not rules.get('noDoubleBooking', True) else 'on'}",
             "Check min/max per-shift-type constraints and rest-hour conflicts.",
         ]

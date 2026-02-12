@@ -79,8 +79,7 @@
     "timezone": "America/New_York",
     "noDoubleBooking": true,
     "allowOvernightBeforeWednesday": true,
-    "solverTimeLimitSeconds": 20,
-    "overnightShiftWeight": 1
+    "solverTimeLimitSeconds": 20
   },
   "blockWindow": {
     "startDate": "2026-03-02T00:00:00Z",

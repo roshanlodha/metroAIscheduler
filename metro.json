@@ -17,26 +17,26 @@
     {
       "id": "f18f102e-3214-44d8-93e3-c47a72ce15c4",
       "name": "Trauma",
-      "minShifts": null,
+      "minShifts": 1,
       "maxShifts": null
     },
     {
       "id": "25799f58-af95-46bf-b17f-ec571ec88ddf",
       "name": "Overnight",
-      "minShifts": 1,
+      "minShifts": 2,
       "maxShifts": null
     },
     {
       "id": "2c9af7c3-cc65-4095-b31c-cc3831fbf1cf",
       "name": "Community",
-      "minShifts": null,
+      "minShifts": 1,
       "maxShifts": 1
     },
     {
       "id": "14e2403d-35e3-419e-849f-9d866cf8d26b",
       "name": "MLF",
-      "minShifts": null,
-      "maxShifts": null
+      "minShifts": 1,
+      "maxShifts": 1
     }
   ],
   "shifts": [
@@ -55,7 +55,20 @@
     },
     {
       "id": "d2e360d3-44f2-44ec-9a64-4f5e6755b785",
-      "name": "Acute",
+      "name": "A1",
+      "location": "Metro",
+      "isOvernight": false,
+      "minShifts": null,
+      "maxShifts": null,
+      "shiftTypeId": "d8a06c71-327f-4c59-9b17-bb95abb03456",
+      "startTime": { "hour": 7, "minute": 0 },
+      "endTime": { "hour": 17, "minute": 0 },
+      "daysOffered": [2, 3, 5, 6, 7, 1],
+      "active": true
+    },
+    {
+      "id": "5fbf08af-f04f-4b8c-95e4-f3961536c9e3",
+      "name": "A2",
       "location": "Metro",
       "isOvernight": false,
       "minShifts": null,
@@ -81,7 +94,20 @@
     },
     {
       "id": "f85783dc-c116-4ec2-99e7-2360ef3df196",
-      "name": "Overnight",
+      "name": "O1",
+      "location": "Metro",
+      "isOvernight": true,
+      "minShifts": null,
+      "maxShifts": null,
+      "shiftTypeId": "25799f58-af95-46bf-b17f-ec571ec88ddf",
+      "startTime": { "hour": 21, "minute": 0 },
+      "endTime": { "hour": 7, "minute": 0 },
+      "daysOffered": [2, 5, 6, 7, 1],
+      "active": true
+    },
+    {
+      "id": "9a8d0f74-b3a4-4f7e-9d55-4b4f33ac22a1",
+      "name": "O2",
       "location": "Metro",
       "isOvernight": true,
       "minShifts": null,

@@ -73,11 +73,11 @@ Coverage includes:
 
 - Overnight duration:
   - If `lengthHours` is set, that exact duration is used in solver/UI/CSV/ICS.
-  - If `lengthHours` is nil and `isOvernight=true`, duration defaults to `max(1, numShiftsRequired * 24 - timeOffHours)` hours.
+  - If `lengthHours` is nil and `isOvernight=true`, duration defaults to 10 hours.
 - Total-shift counting:
-  - Per student: weighted equality `sum(shift weights) == numShiftsRequired`.
-  - Non-overnight weight = `1`.
-  - Overnight weight = `overnightShiftWeight` (configurable).
+  - Per student: exact equality `sum(assigned shifts) == numShiftsRequired - max(0, overnightRequired - 1)`.
+  - `overnightRequired` is derived from `minShifts` on the `Overnight` shift type.
+  - Overnight assignments are constrained to one contiguous block per student.
 - Rest constraints:
   - Overlapping shifts cannot both be assigned to the same student.
   - Non-overlapping shifts require gap `>= timeOffHours`.

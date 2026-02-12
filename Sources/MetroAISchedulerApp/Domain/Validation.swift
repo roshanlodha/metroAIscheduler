@@ -19,12 +19,6 @@ enum ProjectValidator {
         if project.rules.timeOffHours < 0 {
             issues.append(.init(field: "rules.timeOffHours", message: "Time off hours must be >= 0."))
         }
-        if project.rules.overnightShiftWeight <= 0 {
-            issues.append(.init(field: "rules.overnightShiftWeight", message: "Overnight shift weight must be > 0."))
-        }
-        if project.rules.overnightBlockCount <= 0 {
-            issues.append(.init(field: "rules.overnightBlockCount", message: "Overnight block count must be > 0."))
-        }
         if project.shiftTemplates.isEmpty {
             issues.append(.init(field: "shiftTemplates", message: "Add at least one shift to the active template."))
         }

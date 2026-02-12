@@ -106,23 +106,6 @@ struct ShiftTemplatesView: View {
                 .buttonStyle(.borderless)
             }
 
-            HStack(spacing: 5) {
-                ForEach(dayOrder) { day in
-                    Toggle(day.shortName.prefix(2), isOn: Binding(
-                        get: { shift.wrappedValue.daysOffered.contains(day) },
-                        set: { include in
-                            if include {
-                                shift.wrappedValue.daysOffered.insert(day)
-                            } else {
-                                shift.wrappedValue.daysOffered.remove(day)
-                            }
-                        }
-                    ))
-                    .toggleStyle(.button)
-                    .font(.caption2)
-                }
-            }
-
             if isSelected {
                 Divider()
                 shiftInlineEditor(shift: shift)
@@ -181,6 +164,25 @@ struct ShiftTemplatesView: View {
                 labeledRow("End") {
                     DatePicker("", selection: dateBinding(for: shift.endTime, fallback: shift.startTime.wrappedValue), displayedComponents: .hourAndMinute)
                         .labelsHidden()
+                }
+            }
+
+            labeledRow("Days") {
+                HStack(spacing: 5) {
+                    ForEach(dayOrder) { day in
+                        Toggle(day.shortName.prefix(2), isOn: Binding(
+                            get: { shift.wrappedValue.daysOffered.contains(day) },
+                            set: { include in
+                                if include {
+                                    shift.wrappedValue.daysOffered.insert(day)
+                                } else {
+                                    shift.wrappedValue.daysOffered.remove(day)
+                                }
+                            }
+                        ))
+                        .toggleStyle(.button)
+                        .font(.caption2)
+                    }
                 }
             }
         }

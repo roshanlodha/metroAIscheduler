@@ -41,10 +41,11 @@ struct DeterministicFixtureSolver: SolverAdapter {
         var usedByStudent: [UUID: [GeneratedShiftInstance]] = [:]
         var shiftTaken: Set<String> = []
 
-        let assignmentTarget = max(0, project.rules.numShiftsRequired - project.rules.overnightBlockCount + 1)
+        let overnightCount = overnightShiftsRequired(project: project)
+        let assignmentTarget = max(0, project.rules.numShiftsRequired - max(0, overnightCount - 1))
 
         for student in sortedStudents {
-            var score = 0
+            var assigned = 0
             for shift in sortedShifts {
                 if project.rules.noDoubleBooking && shiftTaken.contains(shift.id) { continue }
                 let existing = usedByStudent[student.id, default: []]
@@ -53,11 +54,18 @@ struct DeterministicFixtureSolver: SolverAdapter {
                 assignments.append(Assignment(studentId: student.id, shiftInstanceId: shift.id))
                 usedByStudent[student.id, default: []].append(shift)
                 shiftTaken.insert(shift.id)
-                score += shift.isOvernight ? project.rules.overnightShiftWeight : 1
-                if score >= assignmentTarget { break }
+                assigned += 1
+                if assigned >= assignmentTarget { break }
             }
         }
 
         return ScheduleResult(generatedAt: Date(), shiftInstances: shiftInstances, assignments: assignments)
+    }
+
+    private func overnightShiftsRequired(project: ScheduleTemplateProject) -> Int {
+        guard let overnightType = project.shiftTypes.first(where: { $0.name.caseInsensitiveCompare("Overnight") == .orderedSame }) else {
+            return 0
+        }
+        return max(0, overnightType.minShifts ?? 0)
     }
 }

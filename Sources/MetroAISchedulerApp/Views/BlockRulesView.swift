@@ -18,13 +18,7 @@ struct BlockRulesView: View {
                     Text("Minimum rest hours: \(project.rules.timeOffHours)")
                 }
                 Stepper(value: $project.rules.numShiftsRequired, in: 0...100) {
-                    Text("Required total shift score per student: \(project.rules.numShiftsRequired)")
-                }
-                Stepper(value: $project.rules.overnightShiftWeight, in: 1...10) {
-                    Text("Overnight shift weight: \(project.rules.overnightShiftWeight)")
-                }
-                Stepper(value: $project.rules.overnightBlockCount, in: 1...7) {
-                    Text("Overnight block days: \(project.rules.overnightBlockCount)")
+                    Text("Required Number of Shifts: \(project.rules.numShiftsRequired)")
                 }
                 Stepper(value: $project.rules.solverTimeLimitSeconds, in: 1...300) {
                     Text("Solver time limit (sec): \(project.rules.solverTimeLimitSeconds)")

@@ -128,8 +128,6 @@ struct GlobalScheduleRules: Codable, Equatable {
     var noDoubleBooking: Bool
     var conferenceDay: Weekday
     var solverTimeLimitSeconds: Int
-    var overnightShiftWeight: Int
-    var overnightBlockCount: Int
 
     static var `default`: GlobalScheduleRules {
         GlobalScheduleRules(
@@ -138,9 +136,7 @@ struct GlobalScheduleRules: Codable, Equatable {
             timezone: "America/New_York",
             noDoubleBooking: true,
             conferenceDay: .wednesday,
-            solverTimeLimitSeconds: 20,
-            overnightShiftWeight: 1,
-            overnightBlockCount: 2
+            solverTimeLimitSeconds: 20
         )
     }
 
@@ -151,8 +147,6 @@ struct GlobalScheduleRules: Codable, Equatable {
         case noDoubleBooking
         case conferenceDay
         case solverTimeLimitSeconds
-        case overnightShiftWeight
-        case overnightBlockCount
         case allowOvernightBeforeWednesday
     }
 
@@ -162,9 +156,7 @@ struct GlobalScheduleRules: Codable, Equatable {
         timezone: String,
         noDoubleBooking: Bool,
         conferenceDay: Weekday,
-        solverTimeLimitSeconds: Int,
-        overnightShiftWeight: Int,
-        overnightBlockCount: Int
+        solverTimeLimitSeconds: Int
     ) {
         self.timeOffHours = timeOffHours
         self.numShiftsRequired = numShiftsRequired
@@ -172,8 +164,6 @@ struct GlobalScheduleRules: Codable, Equatable {
         self.noDoubleBooking = noDoubleBooking
         self.conferenceDay = conferenceDay
         self.solverTimeLimitSeconds = solverTimeLimitSeconds
-        self.overnightShiftWeight = overnightShiftWeight
-        self.overnightBlockCount = overnightBlockCount
     }
 
     init(from decoder: Decoder) throws {
@@ -183,8 +173,6 @@ struct GlobalScheduleRules: Codable, Equatable {
         timezone = try container.decode(String.self, forKey: .timezone)
         noDoubleBooking = try container.decode(Bool.self, forKey: .noDoubleBooking)
         solverTimeLimitSeconds = try container.decode(Int.self, forKey: .solverTimeLimitSeconds)
-        overnightShiftWeight = try container.decode(Int.self, forKey: .overnightShiftWeight)
-        overnightBlockCount = try container.decodeIfPresent(Int.self, forKey: .overnightBlockCount) ?? 2
 
         if let conferenceDay = try container.decodeIfPresent(Weekday.self, forKey: .conferenceDay) {
             self.conferenceDay = conferenceDay
@@ -202,8 +190,6 @@ struct GlobalScheduleRules: Codable, Equatable {
         try container.encode(noDoubleBooking, forKey: .noDoubleBooking)
         try container.encode(conferenceDay, forKey: .conferenceDay)
         try container.encode(solverTimeLimitSeconds, forKey: .solverTimeLimitSeconds)
-        try container.encode(overnightShiftWeight, forKey: .overnightShiftWeight)
-        try container.encode(overnightBlockCount, forKey: .overnightBlockCount)
     }
 }
 

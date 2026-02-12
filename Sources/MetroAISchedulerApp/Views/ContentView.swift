@@ -124,13 +124,24 @@ private struct ActionsAndRulesPane: View {
                     VStack(alignment: .leading, spacing: 10) {
                         Text("Block Window")
                             .font(.headline)
-                        styledRow("Start Date") {
-                            DatePicker("", selection: $viewModel.project.blockWindow.startDate, displayedComponents: .date)
-                                .labelsHidden()
+                        HStack(spacing: 16) {
+                            styledRow("Start Date") {
+                                DatePicker("", selection: $viewModel.project.blockWindow.startDate, displayedComponents: .date)
+                                    .labelsHidden()
+                            }
+                            styledRow("End Date") {
+                                DatePicker("", selection: $viewModel.project.blockWindow.endDate, displayedComponents: .date)
+                                    .labelsHidden()
+                            }
                         }
-                        styledRow("End Date") {
-                            DatePicker("", selection: $viewModel.project.blockWindow.endDate, displayedComponents: .date)
-                                .labelsHidden()
+                        styledRow("Conference Day") {
+                            Picker("", selection: $viewModel.project.rules.conferenceDay) {
+                                ForEach(weekdayOrder) { day in
+                                    Text(day.fullName).tag(day)
+                                }
+                            }
+                            .labelsHidden()
+                            .frame(maxWidth: 180)
                         }
                     }
                 }
@@ -146,31 +157,12 @@ private struct ActionsAndRulesPane: View {
                             in: 0...72
                         )
                         styledStepperRow(
-                            title: "Required shift score/student",
+                            title: "Required Number of Shifts",
                             value: $viewModel.project.rules.numShiftsRequired,
                             in: 0...100
                         )
-                        styledStepperRow(
-                            title: "Overnight shift weight",
-                            value: $viewModel.project.rules.overnightShiftWeight,
-                            in: 1...10
-                        )
-                        styledStepperRow(
-                            title: "Overnight block days",
-                            value: $viewModel.project.rules.overnightBlockCount,
-                            in: 1...7
-                        )
 
                         Toggle("No double booking", isOn: $viewModel.project.rules.noDoubleBooking)
-                        styledRow("Conference Day") {
-                            Picker("", selection: $viewModel.project.rules.conferenceDay) {
-                                ForEach(weekdayOrder) { day in
-                                    Text(day.fullName).tag(day)
-                                }
-                            }
-                            .labelsHidden()
-                            .frame(maxWidth: 180)
-                        }
                     }
                 }
 
