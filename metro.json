@@ -1,0 +1,102 @@
+{
+  "id": "a17f84c8-bdbc-4f82-86a4-9ab317a95eed",
+  "name": "Metro ED (no CCF)",
+  "shifts": [
+    {
+      "id": "0c4fc02f-c2f2-45a1-ac8b-55ec5cbf4b8c",
+      "name": "West",
+      "location": "Metro",
+      "isOvernight": false,
+      "minShifts": null,
+      "maxShifts": null,
+      "startTime": { "hour": 7, "minute": 0 },
+      "lengthHours": 8,
+      "daysOffered": [2, 3, 5, 6, 7, 1],
+      "active": true
+    },
+    {
+      "id": "d2e360d3-44f2-44ec-9a64-4f5e6755b785",
+      "name": "Acute",
+      "location": "Metro",
+      "isOvernight": false,
+      "minShifts": null,
+      "maxShifts": null,
+      "startTime": { "hour": 7, "minute": 0 },
+      "lengthHours": 10,
+      "daysOffered": [2, 3, 5, 6, 7, 1],
+      "active": true
+    },
+    {
+      "id": "f67e2dad-ad42-4ab5-a8ab-e31c6267ab1e",
+      "name": "Trauma",
+      "location": "Metro",
+      "isOvernight": false,
+      "minShifts": null,
+      "maxShifts": null,
+      "startTime": { "hour": 14, "minute": 0 },
+      "lengthHours": 10,
+      "daysOffered": [2, 3, 5, 6, 7, 1],
+      "active": true
+    },
+    {
+      "id": "f85783dc-c116-4ec2-99e7-2360ef3df196",
+      "name": "Overnight",
+      "location": "Metro",
+      "isOvernight": true,
+      "minShifts": null,
+      "maxShifts": null,
+      "startTime": { "hour": 21, "minute": 0 },
+      "lengthHours": 48,
+      "daysOffered": [2, 5, 6, 7, 1],
+      "active": true
+    },
+    {
+      "id": "fd74acde-85fd-4702-ad9d-87be7a033f84",
+      "name": "Community Parma",
+      "location": "Parma",
+      "isOvernight": false,
+      "minShifts": null,
+      "maxShifts": null,
+      "startTime": { "hour": 7, "minute": 0 },
+      "lengthHours": 8,
+      "daysOffered": [2, 3, 5, 6, 7, 1],
+      "active": true
+    },
+    {
+      "id": "b8f23058-b90f-4549-88f8-4f3287f68f37",
+      "name": "Community Brecksville",
+      "location": "Brecksville",
+      "isOvernight": false,
+      "minShifts": null,
+      "maxShifts": null,
+      "startTime": { "hour": 7, "minute": 0 },
+      "lengthHours": 8,
+      "daysOffered": [2, 3, 5, 6, 7, 1],
+      "active": true
+    },
+    {
+      "id": "14ff3d38-81f4-4df3-a65d-c6b8ef4f577e",
+      "name": "MLF Wayne",
+      "location": "Wayne",
+      "isOvernight": false,
+      "minShifts": null,
+      "maxShifts": null,
+      "startTime": { "hour": 7, "minute": 0 },
+      "lengthHours": 10,
+      "daysOffered": [2, 3, 5, 6, 7, 1],
+      "active": true
+    },
+    {
+      "id": "f4d66348-6cc2-49a5-8baf-dc4766d368f9",
+      "name": "MLF Lorain",
+      "location": "Lorain",
+      "isOvernight": false,
+      "minShifts": null,
+      "maxShifts": null,
+      "startTime": { "hour": 7, "minute": 0 },
+      "lengthHours": 10,
+      "daysOffered": [2, 3, 5, 6, 7, 1],
+      "active": true
+    }
+  ]
+}

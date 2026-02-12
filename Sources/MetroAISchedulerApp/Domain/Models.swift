@@ -204,8 +204,8 @@ struct ScheduleTemplateProject: Codable, Equatable {
         try container.encode(blockWindow, forKey: .blockWindow)
     }
 
-    static func empty(now _: Date = Date()) -> ScheduleTemplateProject {
-        let blockWindow = defaultBlockWindow()
+    static func empty(now: Date = Date()) -> ScheduleTemplateProject {
+        let blockWindow = defaultBlockWindow(now: now)
         return ScheduleTemplateProject(
             schemaVersion: 2,
             name: "Untitled Project",
@@ -217,8 +217,8 @@ struct ScheduleTemplateProject: Codable, Equatable {
         )
     }
 
-    static func sample(now _: Date = Date()) -> ScheduleTemplateProject {
-        let blockWindow = defaultBlockWindow()
+    static func sample(now: Date = Date()) -> ScheduleTemplateProject {
+        let blockWindow = defaultBlockWindow(now: now)
         let metroTemplate = MetroPresetFactory.metroEDTemplate()
         return ScheduleTemplateProject(
             schemaVersion: 2,
@@ -234,11 +234,14 @@ struct ScheduleTemplateProject: Codable, Equatable {
         )
     }
 
-    private static func defaultBlockWindow() -> BlockWindow {
+    private static func defaultBlockWindow(now: Date) -> BlockWindow {
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = TimeZone(identifier: GlobalScheduleRules.default.timezone) ?? .current
-        let start = calendar.date(from: DateComponents(year: 2026, month: 2, day: 5)) ?? Date()
-        let end = calendar.date(from: DateComponents(year: 2026, month: 2, day: 27)) ?? start
+        calendar.firstWeekday = 2
+
+        let weekStart = calendar.dateInterval(of: .weekOfYear, for: now)?.start ?? calendar.startOfDay(for: now)
+        let start = calendar.date(byAdding: .day, value: 3, to: weekStart) ?? weekStart // Thursday of current week
+        let end = calendar.date(byAdding: .day, value: 22, to: start) ?? start // Friday, 3 weeks after Thursday
         return BlockWindow(startDate: start, endDate: end)
     }
 }
