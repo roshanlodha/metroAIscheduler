@@ -9,10 +9,10 @@ struct MonthlyCalendarPage: View {
     let shiftTypes: [ShiftType]
 
     @Environment(\.dismiss) private var dismiss
-    @State private var focusedMonth: Date = Date()
+    @State private var focusedWeekStart: Date = Date()
+    @State private var selectedStudentIDs: Set<UUID> = []
 
-    private let dayColumnWidth: CGFloat = 220
-    private let dayCellHeight: CGFloat = 170
+    private let dayCellHeight: CGFloat = 470
 
     private var calendar: Calendar {
         var cal = Calendar(identifier: .gregorian)
@@ -23,6 +23,14 @@ struct MonthlyCalendarPage: View {
 
     private var studentByID: [UUID: Student] {
         Dictionary(uniqueKeysWithValues: students.map { ($0.id, $0) })
+    }
+
+    private var orderedStudents: [Student] {
+        students.sorted {
+            let left = $0.displayName.isEmpty ? $0.email : $0.displayName
+            let right = $1.displayName.isEmpty ? $1.email : $1.displayName
+            return left.localizedCaseInsensitiveCompare(right) == .orderedAscending
+        }
     }
 
     private var assignedStudentByShiftID: [String: Student] {
@@ -42,70 +50,91 @@ struct MonthlyCalendarPage: View {
         Dictionary(uniqueKeysWithValues: shiftTemplates.map { ($0.id, $0) })
     }
 
-    private var orderedShiftTypes: [ShiftType] {
-        shiftTypes.sorted {
-            $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
+    private var weekDays: [Date] {
+        (0..<7).compactMap { offset in
+            calendar.date(byAdding: .day, value: offset, to: focusedWeekStart)
         }
     }
 
     var body: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 14) {
             header
-            legend
+            studentLegend
 
-            ScrollView([.horizontal, .vertical]) {
-                VStack(spacing: 0) {
-                    weekdayHeaderRow
-                    monthGrid
+            VStack(spacing: 0) {
+                HStack(spacing: 0) {
+                    ForEach(weekDays, id: \.self) { day in
+                        weekdayHeader(for: day)
+                    }
                 }
-                .frame(width: dayColumnWidth * 7)
-                .background(Color(nsColor: .windowBackgroundColor))
-                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 10, style: .continuous)
-                        .stroke(Color.primary.opacity(0.14), lineWidth: 1)
-                )
+
+                HStack(spacing: 0) {
+                    ForEach(weekDays, id: \.self) { day in
+                        DayCell(
+                            day: day,
+                            isToday: calendar.isDateInToday(day),
+                            shifts: shifts(on: day),
+                            timezoneIdentifier: timezoneIdentifier,
+                            onDropShift: moveShift
+                        )
+                        .frame(maxWidth: .infinity, minHeight: dayCellHeight, maxHeight: dayCellHeight)
+                    }
+                }
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color(nsColor: .windowBackgroundColor))
+            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .stroke(Color.primary.opacity(0.12), lineWidth: 1)
+            )
 
             HStack {
                 Spacer()
                 Button("Done") { dismiss() }
             }
         }
-        .padding(16)
-        .frame(minWidth: 1100, minHeight: 760)
+        .padding(18)
+        .frame(minWidth: 1080, minHeight: 640)
         .onAppear {
             if let minDate = result.shiftInstances.map(\.startDateTime).min() {
-                focusedMonth = startOfMonth(for: minDate)
+                focusedWeekStart = startOfWeek(for: minDate)
             } else {
-                focusedMonth = startOfMonth(for: Date())
+                focusedWeekStart = startOfWeek(for: Date())
             }
+            if selectedStudentIDs.isEmpty {
+                selectedStudentIDs = Set(students.map(\.id))
+            }
+        }
+        .onChange(of: students.map(\.id)) { _, ids in
+            let incoming = Set(ids)
+            let retained = selectedStudentIDs.intersection(incoming)
+            let newIDs = incoming.subtracting(selectedStudentIDs)
+            selectedStudentIDs = retained.union(newIDs)
         }
     }
 
     private var header: some View {
         HStack {
-            Text("Monthly Shift Calendar")
+            Text("Weekly Shift Calendar")
                 .font(.title3)
 
             Spacer()
 
             Button {
-                if let previous = calendar.date(byAdding: .month, value: -1, to: focusedMonth) {
-                    focusedMonth = previous
+                if let previous = calendar.date(byAdding: .day, value: -7, to: focusedWeekStart) {
+                    focusedWeekStart = previous
                 }
             } label: {
                 Image(systemName: "chevron.left")
             }
 
-            Text(focusedMonth.formatted(.dateTime.year().month(.wide)))
+            Text(weekRangeLabel)
                 .font(.title2.weight(.semibold))
-                .frame(minWidth: 260)
+                .frame(minWidth: 320)
 
             Button {
-                if let next = calendar.date(byAdding: .month, value: 1, to: focusedMonth) {
-                    focusedMonth = next
+                if let next = calendar.date(byAdding: .day, value: 7, to: focusedWeekStart) {
+                    focusedWeekStart = next
                 }
             } label: {
                 Image(systemName: "chevron.right")
@@ -113,13 +142,28 @@ struct MonthlyCalendarPage: View {
         }
     }
 
-    private var legend: some View {
+    private var weekRangeLabel: String {
+        guard let weekEnd = calendar.date(byAdding: .day, value: 6, to: focusedWeekStart) else {
+            return focusedWeekStart.formatted(.dateTime.month(.abbreviated).day().year())
+        }
+
+        let sameMonth = calendar.component(.month, from: focusedWeekStart) == calendar.component(.month, from: weekEnd)
+        let sameYear = calendar.component(.year, from: focusedWeekStart) == calendar.component(.year, from: weekEnd)
+
+        if sameMonth && sameYear {
+            return "\(focusedWeekStart.formatted(.dateTime.month(.wide))) \(focusedWeekStart.formatted(.dateTime.day()))-\(weekEnd.formatted(.dateTime.day())), \(focusedWeekStart.formatted(.dateTime.year()))"
+        }
+
+        return "\(focusedWeekStart.formatted(.dateTime.month(.abbreviated).day())) - \(weekEnd.formatted(.dateTime.month(.abbreviated).day().year()))"
+    }
+
+    private var studentLegend: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 10) {
-                ForEach(orderedShiftTypes) { type in
-                    LegendChip(
-                        name: type.name,
-                        color: type.color.swatchColor
+            HStack(spacing: 12) {
+                ForEach(orderedStudents) { student in
+                    StudentLegendToggle(
+                        name: student.displayName.isEmpty ? student.email : student.displayName,
+                        isOn: studentSelectionBinding(for: student.id)
                     )
                 }
             }
@@ -127,67 +171,32 @@ struct MonthlyCalendarPage: View {
         }
     }
 
-    private var weekdayHeaderRow: some View {
-        LazyVGrid(columns: Array(repeating: GridItem(.fixed(dayColumnWidth), spacing: 0), count: 7), spacing: 0) {
-            ForEach(weekdayLabels, id: \.self) { label in
-                Text(label)
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.secondary)
-                    .frame(width: dayColumnWidth, height: 30)
-                    .background(Color(nsColor: .underPageBackgroundColor))
-                    .overlay(Rectangle().stroke(Color.primary.opacity(0.08), lineWidth: 0.5))
+    private func studentSelectionBinding(for id: UUID) -> Binding<Bool> {
+        Binding(
+            get: { selectedStudentIDs.contains(id) },
+            set: { isSelected in
+                if isSelected {
+                    selectedStudentIDs.insert(id)
+                } else {
+                    selectedStudentIDs.remove(id)
+                }
             }
-        }
+        )
     }
 
-    private var monthGrid: some View {
-        LazyVGrid(columns: Array(repeating: GridItem(.fixed(dayColumnWidth), spacing: 0), count: 7), spacing: 0) {
-            ForEach(monthGridDays, id: \.id) { entry in
-                DayCell(
-                    day: entry.day,
-                    isCurrentMonth: entry.isCurrentMonth,
-                    isToday: calendar.isDateInToday(entry.day),
-                    shifts: shifts(on: entry.day),
-                    timezoneIdentifier: timezoneIdentifier,
-                    onDropShift: moveShift
-                )
-                .frame(width: dayColumnWidth, height: dayCellHeight)
-            }
+    @ViewBuilder
+    private func weekdayHeader(for day: Date) -> some View {
+        VStack(spacing: 2) {
+            Text(day.formatted(.dateTime.weekday(.abbreviated)))
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.secondary)
+            Text(day.formatted(.dateTime.month(.abbreviated).day()))
+                .font(.caption.weight(.medium))
         }
-    }
-
-    private var weekdayLabels: [String] {
-        let symbols = calendar.shortWeekdaySymbols
-        let startIndex = max(0, calendar.firstWeekday - 1)
-        return Array(symbols[startIndex...] + symbols[..<startIndex])
-    }
-
-    private var monthGridDays: [CalendarGridDay] {
-        let monthStart = startOfMonth(for: focusedMonth)
-        guard let daysRange = calendar.range(of: .day, in: .month, for: monthStart) else { return [] }
-
-        let firstWeekday = calendar.component(.weekday, from: monthStart)
-        let leadingCount = (firstWeekday - calendar.firstWeekday + 7) % 7
-
-        var entries: [CalendarGridDay] = []
-
-        for offset in stride(from: leadingCount, to: 0, by: -1) {
-            guard let day = calendar.date(byAdding: .day, value: -offset, to: monthStart) else { continue }
-            entries.append(CalendarGridDay(day: day, isCurrentMonth: false))
-        }
-
-        for day in daysRange {
-            guard let date = calendar.date(byAdding: .day, value: day - 1, to: monthStart) else { continue }
-            entries.append(CalendarGridDay(day: date, isCurrentMonth: true))
-        }
-
-        while entries.count < 42 {
-            guard let last = entries.last?.day,
-                  let next = calendar.date(byAdding: .day, value: 1, to: last) else { break }
-            entries.append(CalendarGridDay(day: next, isCurrentMonth: false))
-        }
-
-        return entries
+        .frame(maxWidth: .infinity)
+        .frame(height: 38)
+        .background(Color(nsColor: .underPageBackgroundColor))
+        .overlay(Rectangle().stroke(Color.primary.opacity(0.08), lineWidth: 0.5))
     }
 
     private func shifts(on day: Date) -> [CalendarShift] {
@@ -196,11 +205,14 @@ struct MonthlyCalendarPage: View {
             .sorted { $0.startDateTime < $1.startDateTime }
             .compactMap { instance in
                 guard let student = assignedStudentByShiftID[instance.id] else { return nil }
+                guard selectedStudentIDs.contains(student.id) else { return nil }
+
                 let template = shiftTemplateByID[instance.templateId]
                 let typeColor = template
                     .flatMap { $0.shiftTypeId }
                     .flatMap { shiftTypeByID[$0] }
                     .map { $0.color.swatchColor } ?? .gray
+
                 return CalendarShift(
                     id: instance.id,
                     shiftName: instance.name,
@@ -227,15 +239,27 @@ struct MonthlyCalendarPage: View {
         result.shiftInstances[index].endDateTime = nextStart.addingTimeInterval(duration)
     }
 
-    private func startOfMonth(for date: Date) -> Date {
-        let components = calendar.dateComponents([.year, .month], from: date)
-        return calendar.date(from: components) ?? date
+    private func startOfWeek(for date: Date) -> Date {
+        calendar.dateInterval(of: .weekOfYear, for: date)?.start ?? calendar.startOfDay(for: date)
+    }
+}
+
+private struct StudentLegendToggle: View {
+    let name: String
+    @Binding var isOn: Bool
+
+    var body: some View {
+        Toggle(isOn: $isOn) {
+            Text(name)
+                .font(.caption)
+                .lineLimit(1)
+        }
+        .toggleStyle(.checkbox)
     }
 }
 
 private struct DayCell: View {
     let day: Date
-    let isCurrentMonth: Bool
     let isToday: Bool
     let shifts: [CalendarShift]
     let timezoneIdentifier: String
@@ -247,7 +271,7 @@ private struct DayCell: View {
         VStack(alignment: .leading, spacing: 5) {
             Text(day.formatted(.dateTime.day()))
                 .font(.caption.weight(isToday ? .bold : .regular))
-                .foregroundStyle(isCurrentMonth ? .primary : .secondary)
+                .foregroundStyle(.primary)
 
             ScrollView(.vertical, showsIndicators: true) {
                 VStack(alignment: .leading, spacing: 4) {
@@ -263,7 +287,7 @@ private struct DayCell: View {
                         .padding(.horizontal, 6)
                         .padding(.vertical, 4)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(shift.color.opacity(0.92))
+                        .background(shift.color.opacity(0.93))
                         .foregroundStyle(.white)
                         .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
                         .draggable(shift.id)
@@ -305,10 +329,7 @@ private struct DayCell: View {
         if isToday {
             return Color.accentColor.opacity(0.08)
         }
-        if isCurrentMonth {
-            return Color(nsColor: .windowBackgroundColor)
-        }
-        return Color(nsColor: .underPageBackgroundColor)
+        return Color(nsColor: .windowBackgroundColor)
     }
 
     private func timeLabel(start: Date, end: Date) -> String {
@@ -316,32 +337,6 @@ private struct DayCell: View {
         formatter.timeZone = TimeZone(identifier: timezoneIdentifier) ?? .current
         return "\(start.formatted(formatter))-\(end.formatted(formatter))"
     }
-}
-
-private struct LegendChip: View {
-    let name: String
-    let color: Color
-
-    var body: some View {
-        HStack(spacing: 6) {
-            Circle()
-                .fill(color)
-                .frame(width: 10, height: 10)
-            Text(name)
-                .font(.caption)
-                .lineLimit(1)
-        }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 5)
-        .background(Color(nsColor: .underPageBackgroundColor))
-        .clipShape(Capsule())
-    }
-}
-
-private struct CalendarGridDay: Identifiable {
-    let id = UUID()
-    let day: Date
-    let isCurrentMonth: Bool
 }
 
 private struct CalendarShift: Identifiable {

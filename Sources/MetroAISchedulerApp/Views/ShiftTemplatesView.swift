@@ -386,13 +386,13 @@ extension ShiftTypeColor {
 
     var swatchColor: Color {
         switch self {
-        case .red: return .red
-        case .orange: return .orange
-        case .yellow: return .yellow
-        case .green: return .green
-        case .blue: return .blue
-        case .purple: return .purple
-        case .brown: return .brown
+        case .red: return Color(red: 1.0, green: 0.23, blue: 0.19)
+        case .orange: return Color(red: 1.0, green: 0.58, blue: 0.0)
+        case .yellow: return Color(red: 1.0, green: 0.80, blue: 0.0)
+        case .green: return Color(red: 0.20, green: 0.78, blue: 0.35)
+        case .blue: return Color(red: 0.0, green: 0.48, blue: 1.0)
+        case .purple: return Color(red: 0.69, green: 0.32, blue: 0.87)
+        case .brown: return Color(red: 0.67, green: 0.49, blue: 0.33)
         }
     }
 
