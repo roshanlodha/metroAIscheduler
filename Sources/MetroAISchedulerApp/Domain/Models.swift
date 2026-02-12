@@ -46,6 +46,7 @@ struct ShiftTemplate: Identifiable, Codable, Equatable {
     var minShifts: Int?
     var maxShifts: Int?
     var startTime: LocalTime
+    var endTime: LocalTime?
     var lengthHours: Int?
     var daysOffered: Set<Weekday>
     var active: Bool
@@ -58,7 +59,8 @@ struct ShiftTemplate: Identifiable, Codable, Equatable {
         minShifts: Int? = nil,
         maxShifts: Int? = nil,
         startTime: LocalTime = LocalTime(),
-        lengthHours: Int? = 8,
+        endTime: LocalTime? = LocalTime(hour: 16, minute: 0),
+        lengthHours: Int? = nil,
         daysOffered: Set<Weekday> = Set(Weekday.allCases),
         active: Bool = true
     ) {
@@ -69,6 +71,7 @@ struct ShiftTemplate: Identifiable, Codable, Equatable {
         self.minShifts = minShifts
         self.maxShifts = maxShifts
         self.startTime = startTime
+        self.endTime = endTime
         self.lengthHours = lengthHours
         self.daysOffered = daysOffered
         self.active = active
@@ -253,14 +256,14 @@ enum MetroPresetFactory {
         return ShiftBundleTemplate(
             name: "Metro ED (from solve.py)",
             shifts: [
-                ShiftTemplate(name: "West", location: "Metro", isOvernight: false, minShifts: nil, maxShifts: nil, startTime: LocalTime(hour: 7, minute: 0), lengthHours: 8, daysOffered: regularDays, active: true),
-                ShiftTemplate(name: "Acute", location: "Metro", isOvernight: false, minShifts: nil, maxShifts: nil, startTime: LocalTime(hour: 7, minute: 0), lengthHours: 10, daysOffered: regularDays, active: true),
-                ShiftTemplate(name: "Trauma", location: "Metro", isOvernight: false, minShifts: nil, maxShifts: nil, startTime: LocalTime(hour: 14, minute: 0), lengthHours: 10, daysOffered: regularDays, active: true),
-                ShiftTemplate(name: "Overnight", location: "Metro", isOvernight: true, minShifts: nil, maxShifts: nil, startTime: LocalTime(hour: 21, minute: 0), lengthHours: 48, daysOffered: overnightDays, active: true),
-                ShiftTemplate(name: "Community Parma", location: "Parma", isOvernight: false, minShifts: nil, maxShifts: nil, startTime: LocalTime(hour: 7, minute: 0), lengthHours: 8, daysOffered: regularDays, active: true),
-                ShiftTemplate(name: "Community Brecksville", location: "Brecksville", isOvernight: false, minShifts: nil, maxShifts: nil, startTime: LocalTime(hour: 7, minute: 0), lengthHours: 8, daysOffered: regularDays, active: true),
-                ShiftTemplate(name: "MLF Wayne", location: "Wayne", isOvernight: false, minShifts: nil, maxShifts: nil, startTime: LocalTime(hour: 7, minute: 0), lengthHours: 10, daysOffered: regularDays, active: true),
-                ShiftTemplate(name: "MLF Lorain", location: "Lorain", isOvernight: false, minShifts: nil, maxShifts: nil, startTime: LocalTime(hour: 7, minute: 0), lengthHours: 10, daysOffered: regularDays, active: true)
+                ShiftTemplate(name: "West", location: "Metro", isOvernight: false, minShifts: 1, maxShifts: 1, startTime: LocalTime(hour: 7, minute: 0), endTime: LocalTime(hour: 15, minute: 0), lengthHours: nil, daysOffered: regularDays, active: true),
+                ShiftTemplate(name: "Acute", location: "Metro", isOvernight: false, minShifts: 1, maxShifts: 1, startTime: LocalTime(hour: 7, minute: 0), endTime: LocalTime(hour: 17, minute: 0), lengthHours: nil, daysOffered: regularDays, active: true),
+                ShiftTemplate(name: "Trauma", location: "Metro", isOvernight: false, minShifts: 1, maxShifts: 1, startTime: LocalTime(hour: 14, minute: 0), endTime: LocalTime(hour: 0, minute: 0), lengthHours: nil, daysOffered: regularDays, active: true),
+                ShiftTemplate(name: "Overnight", location: "Metro", isOvernight: true, minShifts: 1, maxShifts: 1, startTime: LocalTime(hour: 21, minute: 0), endTime: LocalTime(hour: 7, minute: 0), lengthHours: nil, daysOffered: overnightDays, active: true),
+                ShiftTemplate(name: "Community Parma", location: "Parma", isOvernight: false, minShifts: 1, maxShifts: 1, startTime: LocalTime(hour: 7, minute: 0), endTime: LocalTime(hour: 15, minute: 0), lengthHours: nil, daysOffered: regularDays, active: true),
+                ShiftTemplate(name: "Community Brecksville", location: "Brecksville", isOvernight: false, minShifts: 1, maxShifts: 1, startTime: LocalTime(hour: 7, minute: 0), endTime: LocalTime(hour: 15, minute: 0), lengthHours: nil, daysOffered: regularDays, active: true),
+                ShiftTemplate(name: "MLF Wayne", location: "Wayne", isOvernight: false, minShifts: 1, maxShifts: 1, startTime: LocalTime(hour: 7, minute: 0), endTime: LocalTime(hour: 17, minute: 0), lengthHours: nil, daysOffered: regularDays, active: true),
+                ShiftTemplate(name: "MLF Lorain", location: "Lorain", isOvernight: false, minShifts: 1, maxShifts: 1, startTime: LocalTime(hour: 7, minute: 0), endTime: LocalTime(hour: 17, minute: 0), lengthHours: nil, daysOffered: regularDays, active: true)
             ]
         )
     }

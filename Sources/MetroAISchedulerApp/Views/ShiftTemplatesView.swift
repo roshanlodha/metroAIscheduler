@@ -14,14 +14,14 @@ struct ShiftTemplatesView: View {
                     ForEach(viewModel.project.shiftTemplates) { shift in
                         VStack(alignment: .leading, spacing: 2) {
                             Text(shift.name.isEmpty ? "Untitled Shift" : shift.name)
-                            Text("\(shift.location) • \(shift.startTime.display)")
+                            Text("\(shift.location) • \(displayTimeRange(shift: shift))")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
                         .tag(shift.id)
                     }
                 }
-                .frame(minHeight: 200)
+                .frame(minHeight: 220)
             } label: {
                 Text("Shift List")
             }
@@ -29,50 +29,79 @@ struct ShiftTemplatesView: View {
             GroupBox {
                 if let shiftBinding = selectedShiftBinding {
                     ScrollView {
-                        VStack(alignment: .leading, spacing: 10) {
+                        VStack(alignment: .leading, spacing: 12) {
                             Text("Shift Parameters")
                                 .font(.headline)
 
-                            TextField("Name", text: shiftBinding.name)
-                            TextField("Location", text: shiftBinding.location)
+                            labeledRow("Name") {
+                                TextField("Shift name", text: shiftBinding.name)
+                                Button(role: .destructive) {
+                                    deleteSelectedShift()
+                                } label: {
+                                    Image(systemName: "trash")
+                                }
+                                .buttonStyle(.borderless)
+                            }
 
-                            HStack(spacing: 16) {
-                                Toggle("Overnight", isOn: shiftBinding.isOvernight)
-                                Toggle("Active", isOn: shiftBinding.active)
+                            labeledRow("Location") {
+                                TextField("Location", text: shiftBinding.location)
+                            }
+
+                            labeledRow("Overnight") {
+                                Toggle("", isOn: shiftBinding.isOvernight)
+                                    .labelsHidden()
                             }
 
                             Divider()
 
                             Text("Per Student Limits")
                                 .font(.subheadline)
+                                .foregroundStyle(.secondary)
+
                             HStack(spacing: 12) {
-                                TextField("Min shifts", value: shiftBinding.minShifts, format: .number)
-                                TextField("Max shifts", value: shiftBinding.maxShifts, format: .number)
+                                labeledStepperRow(
+                                    title: "Min shifts",
+                                    value: intBinding(shiftBinding.minShifts, fallback: 1),
+                                    range: 1...40
+                                )
+                                labeledStepperRow(
+                                    title: "Max shifts",
+                                    value: intBinding(shiftBinding.maxShifts, fallback: max(1, shiftBinding.minShifts.wrappedValue ?? 1)),
+                                    range: max(1, shiftBinding.minShifts.wrappedValue ?? 1)...80
+                                )
                             }
 
                             Divider()
 
                             Text("Timing")
                                 .font(.subheadline)
-                            Stepper(value: shiftBinding.startTime.hour, in: 0...23) {
-                                Text("Start hour: \(shiftBinding.startTime.hour.wrappedValue)")
+                                .foregroundStyle(.secondary)
+
+                            HStack(spacing: 12) {
+                                labeledRow("Start") {
+                                    DatePicker(
+                                        "",
+                                        selection: dateBinding(for: shiftBinding.startTime),
+                                        displayedComponents: .hourAndMinute
+                                    )
+                                    .labelsHidden()
+                                }
+                                labeledRow("End") {
+                                    DatePicker(
+                                        "",
+                                        selection: dateBinding(for: shiftBinding.endTime, fallback: shiftBinding.startTime.wrappedValue),
+                                        displayedComponents: .hourAndMinute
+                                    )
+                                    .labelsHidden()
+                                }
                             }
-                            Stepper(value: shiftBinding.startTime.minute, in: 0...59) {
-                                Text("Start minute: \(shiftBinding.startTime.minute.wrappedValue)")
-                            }
-                            TextField("Length hours (optional for overnight)", value: shiftBinding.lengthHours, format: .number)
 
                             Divider()
 
                             Text("Days Offered")
                                 .font(.subheadline)
+                                .foregroundStyle(.secondary)
                             WeekdayPicker(title: "", selected: shiftBinding.daysOffered)
-
-                            Button(role: .destructive) {
-                                deleteSelectedShift()
-                            } label: {
-                                Text("Delete Shift")
-                            }
                         }
                         .padding(.vertical, 6)
                     }
@@ -119,7 +148,14 @@ struct ShiftTemplatesView: View {
     }
 
     private func addShift() {
-        let shift = ShiftTemplate(daysOffered: [.monday, .tuesday, .thursday, .friday, .saturday, .sunday])
+        let shift = ShiftTemplate(
+            minShifts: 1,
+            maxShifts: 1,
+            startTime: LocalTime(hour: 7, minute: 0),
+            endTime: LocalTime(hour: 15, minute: 0),
+            daysOffered: [.monday, .tuesday, .thursday, .friday, .saturday, .sunday],
+            active: true
+        )
         viewModel.project.shiftTemplates.append(shift)
         selectedShiftID = shift.id
     }
@@ -148,6 +184,78 @@ struct ShiftTemplatesView: View {
         if panel.runModal() == .OK, let url = panel.url {
             viewModel.exportShiftSchedule(to: url)
         }
+    }
+
+    private func intBinding(_ source: Binding<Int?>, fallback: Int) -> Binding<Int> {
+        Binding<Int>(
+            get: { source.wrappedValue ?? fallback },
+            set: { source.wrappedValue = $0 }
+        )
+    }
+
+    private func dateBinding(for source: Binding<LocalTime?>, fallback: LocalTime) -> Binding<Date> {
+        Binding<Date>(
+            get: { localTimeToDate(source.wrappedValue ?? fallback) },
+            set: { source.wrappedValue = dateToLocalTime($0) }
+        )
+    }
+
+    private func dateBinding(for source: Binding<LocalTime>) -> Binding<Date> {
+        Binding<Date>(
+            get: { localTimeToDate(source.wrappedValue) },
+            set: { source.wrappedValue = dateToLocalTime($0) }
+        )
+    }
+
+    private func localTimeToDate(_ value: LocalTime) -> Date {
+        let calendar = Calendar(identifier: .gregorian)
+        let now = Date()
+        var components = calendar.dateComponents([.year, .month, .day], from: now)
+        components.hour = value.hour
+        components.minute = value.minute
+        return calendar.date(from: components) ?? now
+    }
+
+    private func dateToLocalTime(_ date: Date) -> LocalTime {
+        let calendar = Calendar(identifier: .gregorian)
+        return LocalTime(
+            hour: calendar.component(.hour, from: date),
+            minute: calendar.component(.minute, from: date)
+        )
+    }
+
+    private func displayTimeRange(shift: ShiftTemplate) -> String {
+        let start = localTimeToDate(shift.startTime).formatted(date: .omitted, time: .shortened)
+        let endLocal = shift.endTime ?? shift.startTime
+        let end = localTimeToDate(endLocal).formatted(date: .omitted, time: .shortened)
+        return "\(start)-\(end)"
+    }
+
+    @ViewBuilder
+    private func labeledRow<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {
+        HStack(alignment: .center, spacing: 10) {
+            Text("\(title):")
+                .fontWeight(.medium)
+                .frame(width: 80, alignment: .leading)
+            content()
+        }
+    }
+
+    @ViewBuilder
+    private func labeledStepperRow(title: String, value: Binding<Int>, range: ClosedRange<Int>) -> some View {
+        HStack(spacing: 10) {
+            Text("\(title):")
+                .fontWeight(.medium)
+            Stepper(value: value, in: range) {
+                Text("\(value.wrappedValue)")
+                    .monospacedDigit()
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(.vertical, 4)
+        .padding(.horizontal, 10)
+        .background(Color(nsColor: .underPageBackgroundColor))
+        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
     }
 }
 

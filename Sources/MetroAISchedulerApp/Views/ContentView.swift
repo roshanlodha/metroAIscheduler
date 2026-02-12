@@ -119,23 +119,45 @@ private struct ActionsAndRulesPane: View {
                     }
                 }
 
-                GroupBox("Block Window") {
-                    DatePicker("Start Date", selection: $viewModel.project.blockWindow.startDate, displayedComponents: .date)
-                    DatePicker("End Date", selection: $viewModel.project.blockWindow.endDate, displayedComponents: .date)
+                GroupBox {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("Block Window")
+                            .font(.headline)
+                        styledRow("Start Date") {
+                            DatePicker("", selection: $viewModel.project.blockWindow.startDate, displayedComponents: .date)
+                                .labelsHidden()
+                        }
+                        styledRow("End Date") {
+                            DatePicker("", selection: $viewModel.project.blockWindow.endDate, displayedComponents: .date)
+                                .labelsHidden()
+                        }
+                    }
                 }
 
-                GroupBox("General Rules") {
-                    Stepper(value: $viewModel.project.rules.timeOffHours, in: 0...72) {
-                        Text("Minimum rest hours: \(viewModel.project.rules.timeOffHours)")
+                GroupBox {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("General Rules")
+                            .font(.headline)
+
+                        styledStepperRow(
+                            title: "Minimum rest hours",
+                            value: $viewModel.project.rules.timeOffHours,
+                            in: 0...72
+                        )
+                        styledStepperRow(
+                            title: "Required shift score/student",
+                            value: $viewModel.project.rules.numShiftsRequired,
+                            in: 0...100
+                        )
+                        styledStepperRow(
+                            title: "Overnight shift weight",
+                            value: $viewModel.project.rules.overnightShiftWeight,
+                            in: 1...10
+                        )
+
+                        Toggle("No double booking", isOn: $viewModel.project.rules.noDoubleBooking)
+                        Toggle("Allow overnight before Wednesday", isOn: $viewModel.project.rules.allowOvernightBeforeWednesday)
                     }
-                    Stepper(value: $viewModel.project.rules.numShiftsRequired, in: 0...100) {
-                        Text("Required total shift score per student: \(viewModel.project.rules.numShiftsRequired)")
-                    }
-                    Stepper(value: $viewModel.project.rules.overnightShiftWeight, in: 1...10) {
-                        Text("Overnight shift weight: \(viewModel.project.rules.overnightShiftWeight)")
-                    }
-                    Toggle("No double booking", isOn: $viewModel.project.rules.noDoubleBooking)
-                    Toggle("Allow overnight before Wednesday", isOn: $viewModel.project.rules.allowOvernightBeforeWednesday)
                 }
 
                 if !viewModel.validationIssues.isEmpty {
@@ -181,6 +203,34 @@ private struct ActionsAndRulesPane: View {
         if panel.runModal() == .OK, let url = panel.url {
             viewModel.saveCSV(to: url)
         }
+    }
+
+    @ViewBuilder
+    private func styledRow<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {
+        HStack(spacing: 10) {
+            Text("\(title):")
+                .fontWeight(.medium)
+                .frame(width: 110, alignment: .leading)
+            content()
+            Spacer(minLength: 0)
+        }
+    }
+
+    @ViewBuilder
+    private func styledStepperRow(title: String, value: Binding<Int>, in range: ClosedRange<Int>) -> some View {
+        HStack(spacing: 10) {
+            Text("\(title):")
+                .fontWeight(.medium)
+                .frame(width: 190, alignment: .leading)
+            Stepper(value: value, in: range) {
+                Text("\(value.wrappedValue)")
+                    .monospacedDigit()
+            }
+        }
+        .padding(.vertical, 4)
+        .padding(.horizontal, 10)
+        .background(Color(nsColor: .underPageBackgroundColor))
+        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
     }
 }
 

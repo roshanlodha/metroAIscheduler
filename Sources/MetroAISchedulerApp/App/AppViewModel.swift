@@ -23,6 +23,7 @@ final class AppViewModel: ObservableObject {
     }
 
     func createSchedule() {
+        normalizeProject()
         validate()
         guard validationIssues.isEmpty else {
             statusMessage = "Fix validation issues before solving."
@@ -68,6 +69,7 @@ final class AppViewModel: ObservableObject {
     func loadProject(from url: URL) {
         do {
             project = try ProjectStore.loadProject(from: url)
+            normalizeProject()
             result = nil
             statusMessage = "Loaded project: \(project.name)"
             validate()
@@ -78,6 +80,7 @@ final class AppViewModel: ObservableObject {
 
     func saveProject(to url: URL) {
         do {
+            normalizeProject()
             try ProjectStore.saveProject(project, to: url)
             statusMessage = "Project saved."
         } catch {
@@ -139,6 +142,7 @@ final class AppViewModel: ObservableObject {
         project.shiftTemplates = bundle.shifts.map { shift in
             var copy = shift
             copy.id = UUID()
+            copy.active = true
             return copy
         }
         statusMessage = "Loaded template: \(bundle.name)"
@@ -161,6 +165,7 @@ final class AppViewModel: ObservableObject {
         project.shiftTemplates = preset.shifts.map { shift in
             var copy = shift
             copy.id = UUID()
+            copy.active = true
             return copy
         }
         if !project.templateLibrary.contains(where: { $0.name == preset.name }) {
@@ -168,5 +173,24 @@ final class AppViewModel: ObservableObject {
         }
         statusMessage = "Loaded Metro preset shifts."
         validate()
+    }
+
+    private func normalizeProject() {
+        project.students.removeAll { student in
+            student.firstName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
+            student.lastName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
+            student.email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        }
+        project.shiftTemplates = project.shiftTemplates.map { shift in
+            var copy = shift
+            copy.active = true
+            if copy.minShifts == nil {
+                copy.minShifts = 1
+            }
+            if copy.maxShifts == nil {
+                copy.maxShifts = copy.minShifts
+            }
+            return copy
+        }
     }
 }

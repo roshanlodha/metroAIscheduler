@@ -16,7 +16,7 @@ enum ShiftExpansion {
             let weekdayValue = calendar.component(.weekday, from: day)
             let weekday = Weekday(rawValue: weekdayValue)
 
-            for template in project.shiftTemplates where template.active {
+            for template in project.shiftTemplates {
                 guard let weekday, template.daysOffered.contains(weekday) else { continue }
                 if template.isOvernight, !project.rules.allowOvernightBeforeWednesday,
                    weekday == .monday || weekday == .tuesday {
@@ -30,10 +30,9 @@ enum ShiftExpansion {
                 components.timeZone = timezone
 
                 guard let startDate = calendar.date(from: components) else { continue }
-                let lengthHours = template.lengthHours ?? defaultLengthHours(template: template, rules: project.rules)
-                guard lengthHours > 0 else { continue }
-
-                guard let endDate = calendar.date(byAdding: .hour, value: lengthHours, to: startDate) else { continue }
+                guard let endDate = resolveEndDate(startDate: startDate, template: template, calendar: calendar, rules: project.rules) else {
+                    continue
+                }
                 let overnight = template.isOvernight || !calendar.isDate(startDate, inSameDayAs: endDate)
 
                 let identifier = "\(template.id.uuidString.lowercased())|\(isoString(startDate))"
@@ -60,6 +59,29 @@ enum ShiftExpansion {
     static func defaultLengthHours(template: ShiftTemplate, rules: GlobalScheduleRules) -> Int {
         guard template.isOvernight else { return template.lengthHours ?? 0 }
         return max(1, (rules.numShiftsRequired * 24) - rules.timeOffHours)
+    }
+
+    private static func resolveEndDate(
+        startDate: Date,
+        template: ShiftTemplate,
+        calendar: Calendar,
+        rules: GlobalScheduleRules
+    ) -> Date? {
+        if let endTime = template.endTime {
+            var endComponents = calendar.dateComponents([.year, .month, .day], from: startDate)
+            endComponents.hour = endTime.hour
+            endComponents.minute = endTime.minute
+            endComponents.second = 0
+            guard let sameDayEnd = calendar.date(from: endComponents) else { return nil }
+            if sameDayEnd > startDate {
+                return sameDayEnd
+            }
+            return calendar.date(byAdding: .day, value: 1, to: sameDayEnd)
+        }
+
+        let lengthHours = template.lengthHours ?? defaultLengthHours(template: template, rules: rules)
+        guard lengthHours > 0 else { return nil }
+        return calendar.date(byAdding: .hour, value: lengthHours, to: startDate)
     }
 
     private static func isoString(_ date: Date) -> String {

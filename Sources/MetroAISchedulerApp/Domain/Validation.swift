@@ -43,17 +43,23 @@ enum ProjectValidator {
                 issues.append(.init(field: "template.\(template.id).location", message: "Template location is required."))
             }
 
-            if let hours = template.lengthHours {
-                if hours <= 0 {
-                    issues.append(.init(field: "template.\(template.id).lengthHours", message: "Template \(template.name): lengthHours must be > 0."))
+            if let end = template.endTime {
+                if end.hour < 0 || end.hour > 23 || end.minute < 0 || end.minute > 59 {
+                    issues.append(.init(field: "template.\(template.id).endTime", message: "Template \(template.name): endTime is invalid."))
                 }
             } else {
-                if !template.isOvernight {
-                    issues.append(.init(field: "template.\(template.id).lengthHours", message: "Template \(template.name): non-overnight shifts require lengthHours."))
-                }
-                let defaultHours = ShiftExpansion.defaultLengthHours(template: template, rules: project.rules)
-                if defaultHours <= 0 {
-                    issues.append(.init(field: "template.\(template.id).defaultLength", message: "Template \(template.name): default length must be > 0."))
+                if let hours = template.lengthHours {
+                    if hours <= 0 {
+                        issues.append(.init(field: "template.\(template.id).lengthHours", message: "Template \(template.name): lengthHours must be > 0."))
+                    }
+                } else {
+                    if !template.isOvernight {
+                        issues.append(.init(field: "template.\(template.id).timing", message: "Template \(template.name): set an end time."))
+                    }
+                    let defaultHours = ShiftExpansion.defaultLengthHours(template: template, rules: project.rules)
+                    if defaultHours <= 0 {
+                        issues.append(.init(field: "template.\(template.id).defaultLength", message: "Template \(template.name): default length must be > 0."))
+                    }
                 }
             }
         }
