@@ -9,6 +9,7 @@ Metro AI Scheduler is a macOS desktop app that builds student schedules with con
 - Deployment target: `macOS 26.0`
 - Swift sources: `Sources/MetroAISchedulerApp/**`
 - Bundled solver script resource: `Sources/MetroAISchedulerApp/Resources/ortools_solver.py`
+- UI layout: tabbed main view (no sidebar)
 
 Open in Xcode:
 
@@ -63,6 +64,10 @@ Coverage includes:
 ## Sample Data
 
 - Example project JSON: `Examples/sample_project.json`
+- Shift template bundles are stored in `templateLibrary`; each bundle contains multiple shifts.
+- The app includes a Metro preset derived from `solve.py` for:
+  - `Trauma`, `Overnight`, `Acute`, `West`, `Community`, `MLF`
+  - CCF shifts are intentionally excluded.
 
 ## Modeling Decisions
 

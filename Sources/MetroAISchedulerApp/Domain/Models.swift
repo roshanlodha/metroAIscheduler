@@ -75,6 +75,18 @@ struct ShiftTemplate: Identifiable, Codable, Equatable {
     }
 }
 
+struct ShiftBundleTemplate: Identifiable, Codable, Equatable {
+    var id: UUID
+    var name: String
+    var shifts: [ShiftTemplate]
+
+    init(id: UUID = UUID(), name: String, shifts: [ShiftTemplate]) {
+        self.id = id
+        self.name = name
+        self.shifts = shifts
+    }
+}
+
 struct GlobalScheduleRules: Codable, Equatable {
     var timeOffHours: Int
     var numShiftsRequired: Int
@@ -137,27 +149,112 @@ struct ScheduleTemplateProject: Codable, Equatable {
     var schemaVersion: Int
     var name: String
     var shiftTemplates: [ShiftTemplate]
+    var templateLibrary: [ShiftBundleTemplate]
     var students: [Student]
     var rules: GlobalScheduleRules
     var blockWindow: BlockWindow
+
+    enum CodingKeys: String, CodingKey {
+        case schemaVersion
+        case name
+        case shiftTemplates
+        case templateLibrary
+        case students
+        case rules
+        case blockWindow
+    }
+
+    init(
+        schemaVersion: Int,
+        name: String,
+        shiftTemplates: [ShiftTemplate],
+        templateLibrary: [ShiftBundleTemplate],
+        students: [Student],
+        rules: GlobalScheduleRules,
+        blockWindow: BlockWindow
+    ) {
+        self.schemaVersion = schemaVersion
+        self.name = name
+        self.shiftTemplates = shiftTemplates
+        self.templateLibrary = templateLibrary
+        self.students = students
+        self.rules = rules
+        self.blockWindow = blockWindow
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        schemaVersion = try container.decode(Int.self, forKey: .schemaVersion)
+        name = try container.decode(String.self, forKey: .name)
+        shiftTemplates = try container.decodeIfPresent([ShiftTemplate].self, forKey: .shiftTemplates) ?? []
+        templateLibrary = try container.decodeIfPresent([ShiftBundleTemplate].self, forKey: .templateLibrary) ?? []
+        students = try container.decodeIfPresent([Student].self, forKey: .students) ?? []
+        rules = try container.decodeIfPresent(GlobalScheduleRules.self, forKey: .rules) ?? .default
+        blockWindow = try container.decode(BlockWindow.self, forKey: .blockWindow)
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(schemaVersion, forKey: .schemaVersion)
+        try container.encode(name, forKey: .name)
+        try container.encode(shiftTemplates, forKey: .shiftTemplates)
+        try container.encode(templateLibrary, forKey: .templateLibrary)
+        try container.encode(students, forKey: .students)
+        try container.encode(rules, forKey: .rules)
+        try container.encode(blockWindow, forKey: .blockWindow)
+    }
+
+    static func empty(now: Date = Date()) -> ScheduleTemplateProject {
+        let cal = Calendar(identifier: .gregorian)
+        let start = cal.startOfDay(for: now)
+        let end = cal.date(byAdding: .day, value: 13, to: start) ?? start
+        return ScheduleTemplateProject(
+            schemaVersion: 2,
+            name: "Untitled Project",
+            shiftTemplates: [],
+            templateLibrary: [MetroPresetFactory.metroEDTemplate()],
+            students: [],
+            rules: .default,
+            blockWindow: BlockWindow(startDate: start, endDate: end)
+        )
+    }
 
     static func sample(now: Date = Date()) -> ScheduleTemplateProject {
         let cal = Calendar(identifier: .gregorian)
         let start = cal.startOfDay(for: now)
         let end = cal.date(byAdding: .day, value: 13, to: start) ?? start
+        let metroTemplate = MetroPresetFactory.metroEDTemplate()
         return ScheduleTemplateProject(
-            schemaVersion: 1,
+            schemaVersion: 2,
             name: "Sample Metro Project",
-            shiftTemplates: [
-                ShiftTemplate(name: "Morning Dispatch", location: "Central", isOvernight: false, minShifts: 0, maxShifts: 3, startTime: LocalTime(hour: 8, minute: 0), lengthHours: 8, daysOffered: [.monday, .tuesday, .wednesday, .thursday, .friday], active: true),
-                ShiftTemplate(name: "Overnight Ops", location: "North Yard", isOvernight: true, minShifts: 0, maxShifts: 2, startTime: LocalTime(hour: 20, minute: 0), lengthHours: 12, daysOffered: [.wednesday, .thursday, .friday, .saturday], active: true)
-            ],
+            shiftTemplates: metroTemplate.shifts,
+            templateLibrary: [metroTemplate],
             students: [
                 Student(firstName: "Alex", lastName: "Kim", email: "alex@example.edu"),
                 Student(firstName: "Jordan", lastName: "Patel", email: "jordan@example.edu")
             ],
             rules: .default,
             blockWindow: BlockWindow(startDate: start, endDate: end)
+        )
+    }
+}
+
+enum MetroPresetFactory {
+    static func metroEDTemplate() -> ShiftBundleTemplate {
+        let regularDays: Set<Weekday> = [.monday, .tuesday, .thursday, .friday, .saturday, .sunday]
+        let overnightDays: Set<Weekday> = [.monday, .thursday, .friday, .saturday, .sunday]
+        return ShiftBundleTemplate(
+            name: "Metro ED (from solve.py)",
+            shifts: [
+                ShiftTemplate(name: "West", location: "Metro", isOvernight: false, minShifts: nil, maxShifts: nil, startTime: LocalTime(hour: 7, minute: 0), lengthHours: 8, daysOffered: regularDays, active: true),
+                ShiftTemplate(name: "Acute", location: "Metro", isOvernight: false, minShifts: nil, maxShifts: nil, startTime: LocalTime(hour: 7, minute: 0), lengthHours: 10, daysOffered: regularDays, active: true),
+                ShiftTemplate(name: "Trauma", location: "Metro", isOvernight: false, minShifts: nil, maxShifts: nil, startTime: LocalTime(hour: 14, minute: 0), lengthHours: 10, daysOffered: regularDays, active: true),
+                ShiftTemplate(name: "Overnight", location: "Metro", isOvernight: true, minShifts: nil, maxShifts: nil, startTime: LocalTime(hour: 21, minute: 0), lengthHours: 48, daysOffered: overnightDays, active: true),
+                ShiftTemplate(name: "Community Parma", location: "Parma", isOvernight: false, minShifts: nil, maxShifts: nil, startTime: LocalTime(hour: 7, minute: 0), lengthHours: 8, daysOffered: regularDays, active: true),
+                ShiftTemplate(name: "Community Brecksville", location: "Brecksville", isOvernight: false, minShifts: nil, maxShifts: nil, startTime: LocalTime(hour: 7, minute: 0), lengthHours: 8, daysOffered: regularDays, active: true),
+                ShiftTemplate(name: "MLF Wayne", location: "Wayne", isOvernight: false, minShifts: nil, maxShifts: nil, startTime: LocalTime(hour: 7, minute: 0), lengthHours: 10, daysOffered: regularDays, active: true),
+                ShiftTemplate(name: "MLF Lorain", location: "Lorain", isOvernight: false, minShifts: nil, maxShifts: nil, startTime: LocalTime(hour: 7, minute: 0), lengthHours: 10, daysOffered: regularDays, active: true)
+            ]
         )
     }
 }

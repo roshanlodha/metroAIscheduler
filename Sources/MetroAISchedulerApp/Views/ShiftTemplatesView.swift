@@ -1,104 +1,170 @@
 import SwiftUI
 
 struct ShiftTemplatesView: View {
-    @Binding var project: ScheduleTemplateProject
-    var onChanged: () -> Void
-    @State private var selectedTemplateID: UUID?
+    @ObservedObject var viewModel: AppViewModel
+
+    @State private var selectedShiftID: UUID?
+    @State private var selectedBundleID: UUID?
+    @State private var newBundleName: String = ""
 
     var body: some View {
         HStack(spacing: 16) {
-            VStack(alignment: .leading) {
-                HStack {
-                    Text("Shift Templates")
-                        .font(.title2)
-                    Spacer()
-                    Button("Add Template") {
-                        let newTemplate = ShiftTemplate()
-                        project.shiftTemplates.append(newTemplate)
-                        selectedTemplateID = newTemplate.id
-                        onChanged()
-                    }
-                }
-                List(selection: $selectedTemplateID) {
-                    ForEach(project.shiftTemplates) { template in
-                        Text(template.name.isEmpty ? "Untitled Template" : template.name)
-                            .tag(template.id)
-                    }
-                }
-            }
-            .frame(minWidth: 260, maxWidth: 320)
-
+            templateLibraryPane
             Divider()
-
-            if let templateBinding = selectedTemplateBinding {
-                Form {
-                    Section("Template Fields") {
-                        TextField("Name", text: templateBinding.name)
-                        TextField("Location", text: templateBinding.location)
-                        Toggle("Overnight", isOn: templateBinding.isOvernight)
-                        Toggle("Active", isOn: templateBinding.active)
-                    }
-
-                    Section("Shift Limits Per Student") {
-                        TextField("Min shifts", value: templateBinding.minShifts, format: .number)
-                        TextField("Max shifts", value: templateBinding.maxShifts, format: .number)
-                    }
-
-                    Section("Timing") {
-                        Stepper(value: templateBinding.startTime.hour, in: 0...23) {
-                            Text("Start hour: \(templateBinding.startTime.hour.wrappedValue)")
-                        }
-                        Stepper(value: templateBinding.startTime.minute, in: 0...59) {
-                            Text("Start minute: \(templateBinding.startTime.minute.wrappedValue)")
-                        }
-                        TextField("Length hours (optional for overnight)", value: templateBinding.lengthHours, format: .number)
-                    }
-
-                    Section("Days Offered") {
-                        WeekdayPicker(title: "", selected: templateBinding.daysOffered)
-                    }
-
-                    Button(role: .destructive) {
-                        if let selectedTemplateID {
-                            project.shiftTemplates.removeAll { $0.id == selectedTemplateID }
-                            self.selectedTemplateID = project.shiftTemplates.first?.id
-                        }
-                        onChanged()
-                    } label: {
-                        Text("Delete Template")
-                    }
-                }
-            } else {
-                ContentUnavailableView("Select a template", systemImage: "clock.badge.questionmark")
-            }
+            activeShiftsPane
         }
         .padding()
         .onAppear {
-            if selectedTemplateID == nil {
-                selectedTemplateID = project.shiftTemplates.first?.id
+            if selectedShiftID == nil {
+                selectedShiftID = viewModel.project.shiftTemplates.first?.id
+            }
+            if selectedBundleID == nil {
+                selectedBundleID = viewModel.project.templateLibrary.first?.id
             }
         }
-        .onChange(of: project.shiftTemplates) { _, _ in
-            onChanged()
-            if let selectedTemplateID, !project.shiftTemplates.contains(where: { $0.id == selectedTemplateID }) {
-                self.selectedTemplateID = project.shiftTemplates.first?.id
+        .onChange(of: viewModel.project.shiftTemplates) { _, _ in
+            viewModel.validate()
+            if let selectedShiftID, !viewModel.project.shiftTemplates.contains(where: { $0.id == selectedShiftID }) {
+                self.selectedShiftID = viewModel.project.shiftTemplates.first?.id
             }
         }
     }
 
-    private func binding(for template: ShiftTemplate) -> Binding<ShiftTemplate> {
-        guard let idx = project.shiftTemplates.firstIndex(where: { $0.id == template.id }) else {
-            return .constant(template)
+    private var templateLibraryPane: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Saved Templates")
+                .font(.title3)
+
+            List(selection: $selectedBundleID) {
+                ForEach(viewModel.project.templateLibrary) { bundle in
+                    HStack {
+                        Text(bundle.name)
+                        Spacer()
+                        Text("\(bundle.shifts.count) shifts")
+                            .foregroundStyle(.secondary)
+                    }
+                    .tag(bundle.id)
+                }
+            }
+
+            HStack {
+                Button("Load Selected") {
+                    guard let bundle = selectedBundle else { return }
+                    viewModel.loadShiftBundle(bundle)
+                    selectedShiftID = viewModel.project.shiftTemplates.first?.id
+                }
+                .disabled(selectedBundle == nil)
+
+                Button("Delete") {
+                    guard let selectedBundleID else { return }
+                    viewModel.project.templateLibrary.removeAll { $0.id == selectedBundleID }
+                    self.selectedBundleID = viewModel.project.templateLibrary.first?.id
+                }
+                .disabled(selectedBundle == nil)
+            }
+
+            Divider()
+
+            TextField("New template name", text: $newBundleName)
+            Button("Save Current Shifts as Template") {
+                viewModel.saveCurrentShiftsAsTemplate(named: newBundleName)
+                newBundleName = ""
+                selectedBundleID = viewModel.project.templateLibrary.last?.id
+            }
+            .disabled(viewModel.project.shiftTemplates.isEmpty)
+
+            Button("Load Metro Preset (Trauma/Overnight/Acute/West/Community/MLF)") {
+                viewModel.loadMetroPresetIntoCurrentShifts()
+                selectedShiftID = viewModel.project.shiftTemplates.first?.id
+                selectedBundleID = viewModel.project.templateLibrary.first(where: { $0.name == "Metro ED (from solve.py)" })?.id
+            }
         }
-        return $project.shiftTemplates[idx]
+        .frame(minWidth: 350, maxWidth: 420)
     }
 
-    private var selectedTemplateBinding: Binding<ShiftTemplate>? {
-        guard let selectedTemplateID,
-              let template = project.shiftTemplates.first(where: { $0.id == selectedTemplateID }) else {
+    private var activeShiftsPane: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Text("Active Template Shifts")
+                    .font(.title3)
+                Spacer()
+                Button("Add Shift") {
+                    let shift = ShiftTemplate(daysOffered: [.monday, .tuesday, .thursday, .friday, .saturday, .sunday])
+                    viewModel.project.shiftTemplates.append(shift)
+                    selectedShiftID = shift.id
+                }
+            }
+
+            HStack(spacing: 16) {
+                List(selection: $selectedShiftID) {
+                    ForEach(viewModel.project.shiftTemplates) { shift in
+                        VStack(alignment: .leading) {
+                            Text(shift.name.isEmpty ? "Untitled Shift" : shift.name)
+                            Text("\(shift.location) • \(shift.startTime.display)")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                        .tag(shift.id)
+                    }
+                }
+                .frame(minWidth: 260, maxWidth: 320)
+
+                if let shiftBinding = selectedShiftBinding {
+                    Form {
+                        Section("Shift") {
+                            TextField("Name", text: shiftBinding.name)
+                            TextField("Location", text: shiftBinding.location)
+                            Toggle("Overnight", isOn: shiftBinding.isOvernight)
+                            Toggle("Active", isOn: shiftBinding.active)
+                        }
+
+                        Section("Per Student Limits") {
+                            TextField("Min shifts", value: shiftBinding.minShifts, format: .number)
+                            TextField("Max shifts", value: shiftBinding.maxShifts, format: .number)
+                        }
+
+                        Section("Timing") {
+                            Stepper(value: shiftBinding.startTime.hour, in: 0...23) {
+                                Text("Start hour: \(shiftBinding.startTime.hour.wrappedValue)")
+                            }
+                            Stepper(value: shiftBinding.startTime.minute, in: 0...59) {
+                                Text("Start minute: \(shiftBinding.startTime.minute.wrappedValue)")
+                            }
+                            TextField("Length hours (optional for overnight)", value: shiftBinding.lengthHours, format: .number)
+                        }
+
+                        Section("Days Offered") {
+                            WeekdayPicker(title: "", selected: shiftBinding.daysOffered)
+                        }
+
+                        Button(role: .destructive) {
+                            if let selectedShiftID {
+                                viewModel.project.shiftTemplates.removeAll { $0.id == selectedShiftID }
+                                self.selectedShiftID = viewModel.project.shiftTemplates.first?.id
+                            }
+                        } label: {
+                            Text("Delete Shift")
+                        }
+                    }
+                } else {
+                    ContentUnavailableView("Select a shift", systemImage: "clock.badge.questionmark")
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
+            }
+        }
+    }
+
+    private var selectedBundle: ShiftBundleTemplate? {
+        guard let selectedBundleID else { return nil }
+        return viewModel.project.templateLibrary.first(where: { $0.id == selectedBundleID })
+    }
+
+    private var selectedShiftBinding: Binding<ShiftTemplate>? {
+        guard let selectedShiftID,
+              let idx = viewModel.project.shiftTemplates.firstIndex(where: { $0.id == selectedShiftID }) else {
             return nil
         }
-        return binding(for: template)
+        return $viewModel.project.shiftTemplates[idx]
     }
 }
 

@@ -13,7 +13,7 @@ final class AppViewModel: ObservableObject {
     private let solver: SolverAdapter
 
     init(solver: SolverAdapter = PythonSolverAdapter()) {
-        self.project = ScheduleTemplateProject.sample()
+        self.project = ScheduleTemplateProject.empty()
         self.solver = solver
         validate()
     }
@@ -113,5 +113,40 @@ final class AppViewModel: ObservableObject {
         } catch {
             statusMessage = "ICS export failed: \(error.localizedDescription)"
         }
+    }
+
+    func loadShiftBundle(_ bundle: ShiftBundleTemplate) {
+        project.shiftTemplates = bundle.shifts.map { shift in
+            var copy = shift
+            copy.id = UUID()
+            return copy
+        }
+        statusMessage = "Loaded template: \(bundle.name)"
+        validate()
+    }
+
+    func saveCurrentShiftsAsTemplate(named name: String) {
+        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else {
+            statusMessage = "Template name is required."
+            return
+        }
+        let bundle = ShiftBundleTemplate(name: trimmed, shifts: project.shiftTemplates)
+        project.templateLibrary.append(bundle)
+        statusMessage = "Saved template: \(trimmed)"
+    }
+
+    func loadMetroPresetIntoCurrentShifts() {
+        let preset = MetroPresetFactory.metroEDTemplate()
+        project.shiftTemplates = preset.shifts.map { shift in
+            var copy = shift
+            copy.id = UUID()
+            return copy
+        }
+        if !project.templateLibrary.contains(where: { $0.name == preset.name }) {
+            project.templateLibrary.append(preset)
+        }
+        statusMessage = "Loaded Metro preset shifts."
+        validate()
     }
 }
