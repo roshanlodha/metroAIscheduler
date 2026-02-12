@@ -96,6 +96,7 @@ struct ContentView: View {
 
 private struct ActionsAndRulesPane: View {
     @ObservedObject var viewModel: AppViewModel
+    private let weekdayOrder: [Weekday] = [.sunday, .monday, .tuesday, .wednesday, .thursday, .friday, .saturday]
 
     var body: some View {
         ScrollView {
@@ -156,7 +157,15 @@ private struct ActionsAndRulesPane: View {
                         )
 
                         Toggle("No double booking", isOn: $viewModel.project.rules.noDoubleBooking)
-                        Toggle("Allow overnight before Wednesday", isOn: $viewModel.project.rules.allowOvernightBeforeWednesday)
+                        styledRow("Conference Day") {
+                            Picker("", selection: $viewModel.project.rules.conferenceDay) {
+                                ForEach(weekdayOrder) { day in
+                                    Text(day.fullName).tag(day)
+                                }
+                            }
+                            .labelsHidden()
+                            .frame(maxWidth: 180)
+                        }
                     }
                 }
 

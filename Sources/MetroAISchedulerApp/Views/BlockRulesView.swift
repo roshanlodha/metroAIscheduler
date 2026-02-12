@@ -3,6 +3,7 @@ import SwiftUI
 struct BlockRulesView: View {
     @Binding var project: ScheduleTemplateProject
     var onChanged: () -> Void
+    private let weekdayOrder: [Weekday] = [.sunday, .monday, .tuesday, .wednesday, .thursday, .friday, .saturday]
 
     var body: some View {
         Form {
@@ -26,7 +27,11 @@ struct BlockRulesView: View {
                     Text("Solver time limit (sec): \(project.rules.solverTimeLimitSeconds)")
                 }
                 Toggle("No double booking", isOn: $project.rules.noDoubleBooking)
-                Toggle("Allow overnight before Wednesday", isOn: $project.rules.allowOvernightBeforeWednesday)
+                Picker("Conference Day", selection: $project.rules.conferenceDay) {
+                    ForEach(weekdayOrder) { day in
+                        Text(day.fullName).tag(day)
+                    }
+                }
             }
         }
         .padding()

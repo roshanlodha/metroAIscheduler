@@ -22,6 +22,18 @@ enum Weekday: Int, Codable, CaseIterable, Identifiable {
         case .sunday: return "Sun"
         }
     }
+
+    var fullName: String {
+        switch self {
+        case .monday: return "Monday"
+        case .tuesday: return "Tuesday"
+        case .wednesday: return "Wednesday"
+        case .thursday: return "Thursday"
+        case .friday: return "Friday"
+        case .saturday: return "Saturday"
+        case .sunday: return "Sunday"
+        }
+    }
 }
 
 struct LocalTime: Codable, Hashable {
@@ -95,7 +107,7 @@ struct GlobalScheduleRules: Codable, Equatable {
     var numShiftsRequired: Int
     var timezone: String
     var noDoubleBooking: Bool
-    var allowOvernightBeforeWednesday: Bool
+    var conferenceDay: Weekday
     var solverTimeLimitSeconds: Int
     var overnightShiftWeight: Int
 
@@ -105,10 +117,67 @@ struct GlobalScheduleRules: Codable, Equatable {
             numShiftsRequired: 13,
             timezone: "America/New_York",
             noDoubleBooking: true,
-            allowOvernightBeforeWednesday: false,
+            conferenceDay: .wednesday,
             solverTimeLimitSeconds: 20,
             overnightShiftWeight: 1
         )
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case timeOffHours
+        case numShiftsRequired
+        case timezone
+        case noDoubleBooking
+        case conferenceDay
+        case solverTimeLimitSeconds
+        case overnightShiftWeight
+        case allowOvernightBeforeWednesday
+    }
+
+    init(
+        timeOffHours: Int,
+        numShiftsRequired: Int,
+        timezone: String,
+        noDoubleBooking: Bool,
+        conferenceDay: Weekday,
+        solverTimeLimitSeconds: Int,
+        overnightShiftWeight: Int
+    ) {
+        self.timeOffHours = timeOffHours
+        self.numShiftsRequired = numShiftsRequired
+        self.timezone = timezone
+        self.noDoubleBooking = noDoubleBooking
+        self.conferenceDay = conferenceDay
+        self.solverTimeLimitSeconds = solverTimeLimitSeconds
+        self.overnightShiftWeight = overnightShiftWeight
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        timeOffHours = try container.decode(Int.self, forKey: .timeOffHours)
+        numShiftsRequired = try container.decode(Int.self, forKey: .numShiftsRequired)
+        timezone = try container.decode(String.self, forKey: .timezone)
+        noDoubleBooking = try container.decode(Bool.self, forKey: .noDoubleBooking)
+        solverTimeLimitSeconds = try container.decode(Int.self, forKey: .solverTimeLimitSeconds)
+        overnightShiftWeight = try container.decode(Int.self, forKey: .overnightShiftWeight)
+
+        if let conferenceDay = try container.decodeIfPresent(Weekday.self, forKey: .conferenceDay) {
+            self.conferenceDay = conferenceDay
+        } else {
+            let legacyAllow = try container.decodeIfPresent(Bool.self, forKey: .allowOvernightBeforeWednesday) ?? false
+            self.conferenceDay = legacyAllow ? .sunday : .wednesday
+        }
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(timeOffHours, forKey: .timeOffHours)
+        try container.encode(numShiftsRequired, forKey: .numShiftsRequired)
+        try container.encode(timezone, forKey: .timezone)
+        try container.encode(noDoubleBooking, forKey: .noDoubleBooking)
+        try container.encode(conferenceDay, forKey: .conferenceDay)
+        try container.encode(solverTimeLimitSeconds, forKey: .solverTimeLimitSeconds)
+        try container.encode(overnightShiftWeight, forKey: .overnightShiftWeight)
     }
 }
 

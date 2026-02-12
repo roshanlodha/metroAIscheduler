@@ -18,8 +18,7 @@ enum ShiftExpansion {
 
             for template in project.shiftTemplates {
                 guard let weekday, template.daysOffered.contains(weekday) else { continue }
-                if template.isOvernight, !project.rules.allowOvernightBeforeWednesday,
-                   weekday == .monday || weekday == .tuesday {
+                if template.isOvernight, isBeforeConferenceDay(weekday: weekday, conferenceDay: project.rules.conferenceDay) {
                     continue
                 }
 
@@ -88,6 +87,15 @@ enum ShiftExpansion {
         let formatter = ISO8601DateFormatter()
         formatter.formatOptions = [.withInternetDateTime]
         return formatter.string(from: date)
+    }
+
+    private static func isBeforeConferenceDay(weekday: Weekday, conferenceDay: Weekday) -> Bool {
+        let order: [Weekday] = [.sunday, .monday, .tuesday, .wednesday, .thursday, .friday, .saturday]
+        guard let weekdayIndex = order.firstIndex(of: weekday),
+              let conferenceIndex = order.firstIndex(of: conferenceDay) else {
+            return false
+        }
+        return weekdayIndex < conferenceIndex
     }
 }
 
