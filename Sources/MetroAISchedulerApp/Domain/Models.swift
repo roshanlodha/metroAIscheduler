@@ -98,13 +98,62 @@ struct ShiftType: Identifiable, Codable, Equatable {
     var name: String
     var minShifts: Int?
     var maxShifts: Int?
+    var color: ShiftTypeColor
 
-    init(id: UUID = UUID(), name: String, minShifts: Int? = nil, maxShifts: Int? = nil) {
+    enum CodingKeys: String, CodingKey {
+        case id
+        case name
+        case minShifts
+        case maxShifts
+        case color
+    }
+
+    init(
+        id: UUID = UUID(),
+        name: String,
+        minShifts: Int? = nil,
+        maxShifts: Int? = nil,
+        color: ShiftTypeColor = .blue
+    ) {
         self.id = id
         self.name = name
         self.minShifts = minShifts
         self.maxShifts = maxShifts
+        self.color = color
     }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        name = try container.decode(String.self, forKey: .name)
+        minShifts = try container.decodeIfPresent(Int.self, forKey: .minShifts)
+        maxShifts = try container.decodeIfPresent(Int.self, forKey: .maxShifts)
+        color = try container.decodeIfPresent(ShiftTypeColor.self, forKey: .color) ?? .blue
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(name, forKey: .name)
+        try container.encodeIfPresent(minShifts, forKey: .minShifts)
+        try container.encodeIfPresent(maxShifts, forKey: .maxShifts)
+        try container.encode(color, forKey: .color)
+    }
+}
+
+enum ShiftTypeColor: String, Codable, CaseIterable, Identifiable {
+    case red
+    case orange
+    case yellow
+    case green
+    case teal
+    case blue
+    case indigo
+    case purple
+    case pink
+    case brown
+
+    var id: String { rawValue }
 }
 
 struct ShiftBundleTemplate: Identifiable, Codable, Equatable {
@@ -132,7 +181,7 @@ struct GlobalScheduleRules: Codable, Equatable {
     static var `default`: GlobalScheduleRules {
         GlobalScheduleRules(
             timeOffHours: 10,
-            numShiftsRequired: 13,
+            numShiftsRequired: 14,
             timezone: "America/New_York",
             noDoubleBooking: true,
             conferenceDay: .wednesday,
@@ -341,12 +390,12 @@ struct ScheduleTemplateProject: Codable, Equatable {
 enum MetroPresetFactory {
     static func metroShiftTypes() -> [ShiftType] {
         [
-            ShiftType(name: "West", minShifts: 1, maxShifts: nil),
-            ShiftType(name: "Acute", minShifts: 2, maxShifts: nil),
-            ShiftType(name: "Trauma", minShifts: nil, maxShifts: nil),
-            ShiftType(name: "Overnight", minShifts: 1, maxShifts: nil),
-            ShiftType(name: "Community", minShifts: nil, maxShifts: 1),
-            ShiftType(name: "MLF", minShifts: nil, maxShifts: 1)
+            ShiftType(name: "West", minShifts: 1, maxShifts: nil, color: .blue),
+            ShiftType(name: "Acute", minShifts: 2, maxShifts: nil, color: .teal),
+            ShiftType(name: "Trauma", minShifts: nil, maxShifts: nil, color: .orange),
+            ShiftType(name: "Overnight", minShifts: 1, maxShifts: nil, color: .indigo),
+            ShiftType(name: "Community", minShifts: nil, maxShifts: 1, color: .pink),
+            ShiftType(name: "MLF", minShifts: nil, maxShifts: 1, color: .green)
         ]
     }
 

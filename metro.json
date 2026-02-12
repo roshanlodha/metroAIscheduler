@@ -1,39 +1,46 @@
 {
   "id": "a17f84c8-bdbc-4f82-86a4-9ab317a95eed",
   "name": "Metro ED (no CCF)",
+  "numShiftsRequired": 14,
   "shiftTypes": [
     {
       "id": "2f99ffdf-b085-4d3a-a83d-50a9dd04f2f2",
+      "color": "blue",
       "name": "West",
       "minShifts": 1,
       "maxShifts": null
     },
     {
       "id": "d8a06c71-327f-4c59-9b17-bb95abb03456",
+      "color": "teal",
       "name": "Acute",
       "minShifts": 2,
       "maxShifts": null
     },
     {
       "id": "f18f102e-3214-44d8-93e3-c47a72ce15c4",
+      "color": "orange",
       "name": "Trauma",
       "minShifts": 1,
       "maxShifts": null
     },
     {
       "id": "25799f58-af95-46bf-b17f-ec571ec88ddf",
+      "color": "indigo",
       "name": "Overnight",
       "minShifts": 2,
       "maxShifts": null
     },
     {
       "id": "2c9af7c3-cc65-4095-b31c-cc3831fbf1cf",
+      "color": "pink",
       "name": "Community",
       "minShifts": 1,
       "maxShifts": 1
     },
     {
       "id": "14e2403d-35e3-419e-849f-9d866cf8d26b",
+      "color": "green",
       "name": "MLF",
       "minShifts": 1,
       "maxShifts": 1

@@ -5,6 +5,8 @@ struct MonthlyCalendarPage: View {
     @Binding var result: ScheduleResult
     let students: [Student]
     let timezoneIdentifier: String
+    let shiftTemplates: [ShiftTemplate]
+    let shiftTypes: [ShiftType]
 
     @Environment(\.dismiss) private var dismiss
     @State private var focusedMonth: Date = Date()
@@ -32,31 +34,18 @@ struct MonthlyCalendarPage: View {
         return map
     }
 
-    private var orderedStudents: [Student] {
-        students.sorted {
-            let left = $0.displayName.isEmpty ? $0.email : $0.displayName
-            let right = $1.displayName.isEmpty ? $1.email : $1.displayName
-            return left.localizedCaseInsensitiveCompare(right) == .orderedAscending
-        }
+    private var shiftTypeByID: [UUID: ShiftType] {
+        Dictionary(uniqueKeysWithValues: shiftTypes.map { ($0.id, $0) })
     }
 
-    private var studentColorByID: [UUID: Color] {
-        let palette: [Color] = [
-            Color(red: 0.16, green: 0.46, blue: 0.80),
-            Color(red: 0.12, green: 0.66, blue: 0.47),
-            Color(red: 0.88, green: 0.41, blue: 0.18),
-            Color(red: 0.64, green: 0.29, blue: 0.74),
-            Color(red: 0.82, green: 0.21, blue: 0.35),
-            Color(red: 0.20, green: 0.62, blue: 0.72),
-            Color(red: 0.58, green: 0.52, blue: 0.20),
-            Color(red: 0.36, green: 0.41, blue: 0.89)
-        ]
+    private var shiftTemplateByID: [UUID: ShiftTemplate] {
+        Dictionary(uniqueKeysWithValues: shiftTemplates.map { ($0.id, $0) })
+    }
 
-        var map: [UUID: Color] = [:]
-        for (index, student) in orderedStudents.enumerated() {
-            map[student.id] = palette[index % palette.count]
+    private var orderedShiftTypes: [ShiftType] {
+        shiftTypes.sorted {
+            $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
         }
-        return map
     }
 
     var body: some View {
@@ -127,10 +116,10 @@ struct MonthlyCalendarPage: View {
     private var legend: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 10) {
-                ForEach(orderedStudents) { student in
+                ForEach(orderedShiftTypes) { type in
                     LegendChip(
-                        name: student.displayName.isEmpty ? student.email : student.displayName,
-                        color: studentColorByID[student.id] ?? .gray
+                        name: type.name,
+                        color: type.color.swatchColor
                     )
                 }
             }
@@ -207,13 +196,18 @@ struct MonthlyCalendarPage: View {
             .sorted { $0.startDateTime < $1.startDateTime }
             .compactMap { instance in
                 guard let student = assignedStudentByShiftID[instance.id] else { return nil }
+                let template = shiftTemplateByID[instance.templateId]
+                let typeColor = template
+                    .flatMap { $0.shiftTypeId }
+                    .flatMap { shiftTypeByID[$0] }
+                    .map { $0.color.swatchColor } ?? .gray
                 return CalendarShift(
                     id: instance.id,
                     shiftName: instance.name,
                     start: instance.startDateTime,
                     end: instance.endDateTime,
                     studentName: student.displayName.isEmpty ? student.email : student.displayName,
-                    color: studentColorByID[student.id] ?? .gray
+                    color: typeColor
                 )
             }
     }

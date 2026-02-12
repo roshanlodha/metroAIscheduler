@@ -60,7 +60,9 @@ struct ContentView: View {
                 MonthlyCalendarPage(
                     result: resultBinding,
                     students: viewModel.project.students,
-                    timezoneIdentifier: viewModel.project.rules.timezone
+                    timezoneIdentifier: viewModel.project.rules.timezone,
+                    shiftTemplates: viewModel.project.shiftTemplates,
+                    shiftTypes: viewModel.project.shiftTypes
                 )
             }
         }
@@ -101,6 +103,52 @@ private struct ActionsAndRulesPane: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 12) {
+                GroupBox {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("Block Window")
+                            .font(.headline)
+                        HStack(spacing: 16) {
+                            styledRow("Block Start Day") {
+                                DatePicker("", selection: $viewModel.project.blockWindow.startDate, displayedComponents: .date)
+                                    .labelsHidden()
+                            }
+                            styledRow("End Day") {
+                                DatePicker("", selection: $viewModel.project.blockWindow.endDate, displayedComponents: .date)
+                                    .labelsHidden()
+                            }
+                            styledRow("Conference Day") {
+                                Picker("", selection: $viewModel.project.rules.conferenceDay) {
+                                    ForEach(weekdayOrder) { day in
+                                        Text(day.fullName).tag(day)
+                                    }
+                                }
+                                .labelsHidden()
+                                .frame(maxWidth: 180)
+                            }
+                        }
+                    }
+                }
+
+                GroupBox {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("General Rules")
+                            .font(.headline)
+
+                        HStack(spacing: 12) {
+                            styledStepperRow(
+                                title: "Time Off (hours)",
+                                value: $viewModel.project.rules.timeOffHours,
+                                in: 0...72
+                            )
+                            styledStepperRow(
+                                title: "Required Number of Shifts",
+                                value: $viewModel.project.rules.numShiftsRequired,
+                                in: 0...100
+                            )
+                        }
+                    }
+                }
+
                 HStack {
                     Button(action: viewModel.createSchedule) {
                         if viewModel.isSolving {
@@ -117,52 +165,6 @@ private struct ActionsAndRulesPane: View {
                     if viewModel.result != nil {
                         Button("Export JSON") { exportJSON() }
                         Button("Export CSV") { exportCSV() }
-                    }
-                }
-
-                GroupBox {
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text("Block Window")
-                            .font(.headline)
-                        HStack(spacing: 16) {
-                            styledRow("Start Date") {
-                                DatePicker("", selection: $viewModel.project.blockWindow.startDate, displayedComponents: .date)
-                                    .labelsHidden()
-                            }
-                            styledRow("End Date") {
-                                DatePicker("", selection: $viewModel.project.blockWindow.endDate, displayedComponents: .date)
-                                    .labelsHidden()
-                            }
-                        }
-                        styledRow("Conference Day") {
-                            Picker("", selection: $viewModel.project.rules.conferenceDay) {
-                                ForEach(weekdayOrder) { day in
-                                    Text(day.fullName).tag(day)
-                                }
-                            }
-                            .labelsHidden()
-                            .frame(maxWidth: 180)
-                        }
-                    }
-                }
-
-                GroupBox {
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text("General Rules")
-                            .font(.headline)
-
-                        styledStepperRow(
-                            title: "Minimum rest hours",
-                            value: $viewModel.project.rules.timeOffHours,
-                            in: 0...72
-                        )
-                        styledStepperRow(
-                            title: "Required Number of Shifts",
-                            value: $viewModel.project.rules.numShiftsRequired,
-                            in: 0...100
-                        )
-
-                        Toggle("No double booking", isOn: $viewModel.project.rules.noDoubleBooking)
                     }
                 }
 
@@ -227,7 +229,7 @@ private struct ActionsAndRulesPane: View {
         HStack(spacing: 10) {
             Text("\(title):")
                 .fontWeight(.medium)
-                .frame(width: 190, alignment: .leading)
+                .frame(width: 170, alignment: .leading)
             Stepper(value: value, in: range) {
                 Text("\(value.wrappedValue)")
                     .monospacedDigit()
@@ -235,7 +237,11 @@ private struct ActionsAndRulesPane: View {
         }
         .padding(.vertical, 4)
         .padding(.horizontal, 10)
-        .background(Color(nsColor: .underPageBackgroundColor))
+        .background(Color(nsColor: .windowBackgroundColor))
+        .overlay(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .stroke(Color.primary.opacity(0.08), lineWidth: 1)
+        )
         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
     }
 }

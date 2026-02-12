@@ -15,6 +15,20 @@ struct ShiftTemplatesView: View {
                 VStack(spacing: 8) {
                     ForEach($viewModel.project.shiftTypes) { $type in
                         HStack(spacing: 10) {
+                            Picker("", selection: $type.color) {
+                                ForEach(ShiftTypeColor.allCases) { option in
+                                    HStack(spacing: 6) {
+                                        Circle()
+                                            .fill(option.swatchColor)
+                                            .frame(width: 10, height: 10)
+                                        Text(option.displayName)
+                                    }
+                                    .tag(option)
+                                }
+                            }
+                            .labelsHidden()
+                            .frame(width: 110)
+
                             TextField("Type name", text: $type.name)
                                 .frame(minWidth: 130)
                             optionalStepperInline(title: "Min", value: $type.minShifts, range: 0...40)
@@ -92,11 +106,13 @@ struct ShiftTemplatesView: View {
                         .foregroundStyle(.secondary)
                 }
                 Spacer()
+                let shiftTypeColor = typeColor(for: shift.wrappedValue.shiftTypeId)
                 Text(typeName(for: shift.wrappedValue.shiftTypeId))
                     .font(.caption)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 3)
-                    .background(Color(nsColor: .controlBackgroundColor))
+                    .foregroundStyle(shiftTypeColor.onSwatchColor)
+                    .background(shiftTypeColor.swatchColor.opacity(0.95))
                     .clipShape(Capsule())
                 Button(role: .destructive) {
                     deleteShift(id: shift.wrappedValue.id)
@@ -113,7 +129,11 @@ struct ShiftTemplatesView: View {
             }
         }
         .padding(10)
-        .background(isSelected ? Color.accentColor.opacity(0.18) : Color(nsColor: .underPageBackgroundColor))
+        .background(isSelected ? Color.accentColor.opacity(0.14) : Color(nsColor: .windowBackgroundColor))
+        .overlay(
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .stroke(Color.primary.opacity(0.08), lineWidth: 1)
+        )
         .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
         .contentShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
         .onTapGesture {
@@ -225,6 +245,13 @@ struct ShiftTemplatesView: View {
         return type.name
     }
 
+    private func typeColor(for id: UUID?) -> ShiftTypeColor {
+        guard let id, let type = viewModel.project.shiftTypes.first(where: { $0.id == id }) else {
+            return .blue
+        }
+        return type.color
+    }
+
     private func importSchedule() {
         let panel = NSOpenPanel()
         panel.allowedContentTypes = [.json]
@@ -326,5 +353,35 @@ struct ShiftTemplatesView: View {
         .padding(.vertical, 4)
         .background(Color(nsColor: .underPageBackgroundColor))
         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+    }
+}
+
+extension ShiftTypeColor {
+    var displayName: String {
+        rawValue.capitalized
+    }
+
+    var swatchColor: Color {
+        switch self {
+        case .red: return .red
+        case .orange: return .orange
+        case .yellow: return .yellow
+        case .green: return .green
+        case .teal: return .teal
+        case .blue: return .blue
+        case .indigo: return .indigo
+        case .purple: return .purple
+        case .pink: return .pink
+        case .brown: return .brown
+        }
+    }
+
+    var onSwatchColor: Color {
+        switch self {
+        case .yellow:
+            return .black
+        default:
+            return .white
+        }
     }
 }

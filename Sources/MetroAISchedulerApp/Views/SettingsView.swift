@@ -11,6 +11,8 @@ struct SettingsView: View {
                 Stepper(value: $viewModel.project.rules.solverTimeLimitSeconds, in: 1...300) {
                     Text("Solver time limit (sec): \(viewModel.project.rules.solverTimeLimitSeconds)")
                 }
+
+                Toggle("No double booking", isOn: $viewModel.project.rules.noDoubleBooking)
             }
 
             Section {
@@ -25,6 +27,9 @@ struct SettingsView: View {
             viewModel.validate()
         }
         .onChange(of: viewModel.project.rules.solverTimeLimitSeconds) { _, _ in
+            viewModel.validate()
+        }
+        .onChange(of: viewModel.project.rules.noDoubleBooking) { _, _ in
             viewModel.validate()
         }
     }
