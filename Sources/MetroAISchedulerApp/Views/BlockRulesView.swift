@@ -23,6 +23,9 @@ struct BlockRulesView: View {
                 Stepper(value: $project.rules.overnightShiftWeight, in: 1...10) {
                     Text("Overnight shift weight: \(project.rules.overnightShiftWeight)")
                 }
+                Stepper(value: $project.rules.overnightBlockCount, in: 1...7) {
+                    Text("Overnight block days: \(project.rules.overnightBlockCount)")
+                }
                 Stepper(value: $project.rules.solverTimeLimitSeconds, in: 1...300) {
                     Text("Solver time limit (sec): \(project.rules.solverTimeLimitSeconds)")
                 }

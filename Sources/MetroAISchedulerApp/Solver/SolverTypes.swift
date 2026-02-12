@@ -41,6 +41,8 @@ struct DeterministicFixtureSolver: SolverAdapter {
         var usedByStudent: [UUID: [GeneratedShiftInstance]] = [:]
         var shiftTaken: Set<String> = []
 
+        let assignmentTarget = max(0, project.rules.numShiftsRequired - project.rules.overnightBlockCount + 1)
+
         for student in sortedStudents {
             var score = 0
             for shift in sortedShifts {
@@ -52,7 +54,7 @@ struct DeterministicFixtureSolver: SolverAdapter {
                 usedByStudent[student.id, default: []].append(shift)
                 shiftTaken.insert(shift.id)
                 score += shift.isOvernight ? project.rules.overnightShiftWeight : 1
-                if score >= project.rules.numShiftsRequired { break }
+                if score >= assignmentTarget { break }
             }
         }
 

@@ -22,11 +22,27 @@ enum ProjectValidator {
         if project.rules.overnightShiftWeight <= 0 {
             issues.append(.init(field: "rules.overnightShiftWeight", message: "Overnight shift weight must be > 0."))
         }
+        if project.rules.overnightBlockCount <= 0 {
+            issues.append(.init(field: "rules.overnightBlockCount", message: "Overnight block count must be > 0."))
+        }
         if project.shiftTemplates.isEmpty {
             issues.append(.init(field: "shiftTemplates", message: "Add at least one shift to the active template."))
         }
+        if project.shiftTypes.isEmpty {
+            issues.append(.init(field: "shiftTypes", message: "Define at least one shift type."))
+        }
         if TimeZone(identifier: project.rules.timezone) == nil {
             issues.append(.init(field: "rules.timezone", message: "Timezone must be a valid IANA identifier."))
+        }
+
+        let typeIDs = Set(project.shiftTypes.map(\.id))
+        for type in project.shiftTypes {
+            if type.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                issues.append(.init(field: "shiftType.\(type.id).name", message: "Shift type name is required."))
+            }
+            if let min = type.minShifts, let max = type.maxShifts, min > max {
+                issues.append(.init(field: "shiftType.\(type.id).minMax", message: "Shift type \(type.name): min must be <= max."))
+            }
         }
 
         for template in project.shiftTemplates {
@@ -41,6 +57,13 @@ enum ProjectValidator {
             }
             if template.location.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 issues.append(.init(field: "template.\(template.id).location", message: "Template location is required."))
+            }
+            if let typeID = template.shiftTypeId {
+                if !typeIDs.contains(typeID) {
+                    issues.append(.init(field: "template.\(template.id).shiftTypeId", message: "Template \(template.name): choose a valid shift type."))
+                }
+            } else {
+                issues.append(.init(field: "template.\(template.id).shiftTypeId", message: "Template \(template.name): shift type is required."))
             }
 
             if let end = template.endTime {

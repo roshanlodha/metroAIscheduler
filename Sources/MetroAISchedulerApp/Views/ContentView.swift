@@ -155,6 +155,11 @@ private struct ActionsAndRulesPane: View {
                             value: $viewModel.project.rules.overnightShiftWeight,
                             in: 1...10
                         )
+                        styledStepperRow(
+                            title: "Overnight block days",
+                            value: $viewModel.project.rules.overnightBlockCount,
+                            in: 1...7
+                        )
 
                         Toggle("No double booking", isOn: $viewModel.project.rules.noDoubleBooking)
                         styledRow("Conference Day") {

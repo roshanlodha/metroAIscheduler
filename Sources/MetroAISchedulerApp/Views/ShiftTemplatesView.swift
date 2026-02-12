@@ -12,6 +12,36 @@ struct ShiftTemplatesView: View {
             header
 
             GroupBox {
+                VStack(spacing: 8) {
+                    ForEach($viewModel.project.shiftTypes) { $type in
+                        HStack(spacing: 10) {
+                            TextField("Type name", text: $type.name)
+                                .frame(minWidth: 130)
+                            optionalStepperInline(title: "Min", value: $type.minShifts, range: 0...40)
+                            optionalStepperInline(title: "Max", value: $type.maxShifts, range: 0...80)
+                            Button(role: .destructive) {
+                                deleteType(type.id)
+                            } label: {
+                                Image(systemName: "trash")
+                            }
+                            .buttonStyle(.borderless)
+                            .disabled(isTypeUsed(type.id))
+                        }
+                    }
+
+                    HStack {
+                        Spacer()
+                        Button("Add Shift Type") {
+                            viewModel.project.shiftTypes.append(ShiftType(name: "New Type"))
+                        }
+                    }
+                }
+                .padding(.vertical, 4)
+            } label: {
+                Text("Shift Types")
+            }
+
+            GroupBox {
                 ScrollView {
                     LazyVStack(spacing: 8) {
                         ForEach($viewModel.project.shiftTemplates) { $shift in
@@ -62,6 +92,12 @@ struct ShiftTemplatesView: View {
                         .foregroundStyle(.secondary)
                 }
                 Spacer()
+                Text(typeName(for: shift.wrappedValue.shiftTypeId))
+                    .font(.caption)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
+                    .background(Color(nsColor: .controlBackgroundColor))
+                    .clipShape(Capsule())
                 Button(role: .destructive) {
                     deleteShift(id: shift.wrappedValue.id)
                 } label: {
@@ -118,14 +154,23 @@ struct ShiftTemplatesView: View {
                 TextField("Location", text: shift.location)
             }
 
+            labeledRow("Type") {
+                Picker("", selection: Binding<UUID?>(
+                    get: { shift.wrappedValue.shiftTypeId },
+                    set: { shift.wrappedValue.shiftTypeId = $0 }
+                )) {
+                    Text("Unassigned").tag(UUID?.none)
+                    ForEach(viewModel.project.shiftTypes) { type in
+                        Text(type.name).tag(UUID?.some(type.id))
+                    }
+                }
+                .labelsHidden()
+                .frame(maxWidth: 220)
+            }
+
             labeledRow("Overnight") {
                 Toggle("", isOn: shift.isOvernight)
                     .labelsHidden()
-            }
-
-            HStack(spacing: 12) {
-                optionalStepperRow(title: "Min shifts", value: shift.minShifts, range: 1...40)
-                optionalStepperRow(title: "Max shifts", value: shift.maxShifts, range: 1...80)
             }
 
             HStack(spacing: 12) {
@@ -145,6 +190,7 @@ struct ShiftTemplatesView: View {
         let shift = ShiftTemplate(
             minShifts: nil,
             maxShifts: nil,
+            shiftTypeId: viewModel.project.shiftTypes.first?.id,
             startTime: LocalTime(hour: 7, minute: 0),
             endTime: LocalTime(hour: 15, minute: 0),
             daysOffered: [.monday, .tuesday, .thursday, .friday, .saturday, .sunday],
@@ -159,6 +205,22 @@ struct ShiftTemplatesView: View {
         if selectedShiftID == id {
             selectedShiftID = viewModel.project.shiftTemplates.first?.id
         }
+    }
+
+    private func deleteType(_ id: UUID) {
+        guard !isTypeUsed(id) else { return }
+        viewModel.project.shiftTypes.removeAll { $0.id == id }
+    }
+
+    private func isTypeUsed(_ id: UUID) -> Bool {
+        viewModel.project.shiftTemplates.contains(where: { $0.shiftTypeId == id })
+    }
+
+    private func typeName(for id: UUID?) -> String {
+        guard let id, let type = viewModel.project.shiftTypes.first(where: { $0.id == id }) else {
+            return "Unassigned"
+        }
+        return type.name
     }
 
     private func importSchedule() {
@@ -230,10 +292,10 @@ struct ShiftTemplatesView: View {
     }
 
     @ViewBuilder
-    private func optionalStepperRow(title: String, value: Binding<Int?>, range: ClosedRange<Int>) -> some View {
-        HStack(spacing: 10) {
+    private func optionalStepperInline(title: String, value: Binding<Int?>, range: ClosedRange<Int>) -> some View {
+        HStack(spacing: 5) {
             Text("\(title):")
-                .fontWeight(.medium)
+                .font(.caption)
             Button {
                 if let current = value.wrappedValue {
                     let next = current - 1
@@ -246,8 +308,9 @@ struct ShiftTemplatesView: View {
             .disabled(value.wrappedValue == nil)
 
             Text(value.wrappedValue.map(String.init) ?? "None")
+                .font(.caption)
                 .monospacedDigit()
-                .frame(minWidth: 44, alignment: .center)
+                .frame(minWidth: 30)
 
             Button {
                 let current = value.wrappedValue ?? (range.lowerBound - 1)
@@ -256,10 +319,9 @@ struct ShiftTemplatesView: View {
                 Image(systemName: "plus.circle")
             }
             .buttonStyle(.borderless)
-            Spacer(minLength: 0)
         }
+        .padding(.horizontal, 8)
         .padding(.vertical, 4)
-        .padding(.horizontal, 10)
         .background(Color(nsColor: .underPageBackgroundColor))
         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
     }

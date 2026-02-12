@@ -57,7 +57,7 @@ enum ShiftExpansion {
 
     static func defaultLengthHours(template: ShiftTemplate, rules: GlobalScheduleRules) -> Int {
         guard template.isOvernight else { return template.lengthHours ?? 0 }
-        return max(1, (rules.numShiftsRequired * 24) - rules.timeOffHours)
+        return max(1, (rules.overnightBlockCount * 24) - rules.timeOffHours)
     }
 
     private static func resolveEndDate(

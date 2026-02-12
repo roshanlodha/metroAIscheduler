@@ -21,6 +21,7 @@ def main() -> int:
     shifts = payload["shiftInstances"]
     students = project["students"]
     templates = {t["id"]: t for t in project["shiftTemplates"]}
+    shift_types = {t["id"]: t for t in project.get("shiftTypes", [])}
     rules = project["rules"]
 
     try:
@@ -56,7 +57,9 @@ def main() -> int:
             x[(s_idx, sh_idx)] = model.NewBoolVar(f"x_{s_idx}_{sh_idx}")
 
     # Each student must hit required weighted shift total.
-    target = int(rules["numShiftsRequired"])
+    user_target = int(rules["numShiftsRequired"])
+    overnight_block_days = int(rules.get("overnightBlockCount", 2))
+    target = max(0, user_target - overnight_block_days + 1)
     overnight_weight = int(rules.get("overnightShiftWeight", 1))
     for s_idx, _ in enumerate(students):
         terms = []
@@ -92,19 +95,29 @@ def main() -> int:
                 if not rest_ok:
                     model.Add(x[(s_idx, i)] + x[(s_idx, j)] <= 1)
 
-    # Per-template student min/max.
+    # Per-shift-type student min/max.
     shifts_by_template = {}
     for idx, sh in enumerate(shifts):
         shifts_by_template.setdefault(sh["templateId"], []).append(idx)
 
+    shifts_by_type = {}
+    for template_id, shift_indices in shifts_by_template.items():
+        template = templates.get(template_id)
+        if not template:
+            continue
+        type_id = template.get("shiftTypeId")
+        if not type_id:
+            continue
+        shifts_by_type.setdefault(type_id, []).extend(shift_indices)
+
     for s_idx, _ in enumerate(students):
-        for template_id, shift_indices in shifts_by_template.items():
-            template = templates.get(template_id)
-            if not template:
+        for type_id, shift_indices in shifts_by_type.items():
+            shift_type = shift_types.get(type_id)
+            if not shift_type:
                 continue
             expr = sum(x[(s_idx, sh_idx)] for sh_idx in shift_indices)
-            min_shifts = template.get("minShifts")
-            max_shifts = template.get("maxShifts")
+            min_shifts = shift_type.get("minShifts")
+            max_shifts = shift_type.get("maxShifts")
             if min_shifts is not None:
                 model.Add(expr >= int(min_shifts))
             if max_shifts is not None:
@@ -134,10 +147,13 @@ def main() -> int:
         total_required = len(students) * target
         weighted_capacity = sum(overnight_weight if sh["isOvernight"] else 1 for sh in shifts)
         details = [
+            f"User requested shifts/student: {user_target}",
+            f"Overnight block days: {overnight_block_days}",
+            f"Internal target assignments/student: {target}",
             f"Required weighted assignments: {total_required}",
             f"Weighted shift capacity (if all unique): {weighted_capacity}",
             f"Double booking: {'off' if not rules.get('noDoubleBooking', True) else 'on'}",
-            "Check min/max per-template constraints and rest-hour conflicts.",
+            "Check min/max per-shift-type constraints and rest-hour conflicts.",
         ]
         out = {
             "status": "INFEASIBLE",

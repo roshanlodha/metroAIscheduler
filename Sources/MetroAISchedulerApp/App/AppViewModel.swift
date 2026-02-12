@@ -130,7 +130,7 @@ final class AppViewModel: ObservableObject {
     func exportShiftSchedule(to url: URL) {
         do {
             let bundleName = project.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Shift Schedule" : project.name
-            let bundle = ShiftBundleTemplate(name: bundleName, shifts: project.shiftTemplates)
+            let bundle = ShiftBundleTemplate(name: bundleName, shifts: project.shiftTemplates, shiftTypes: project.shiftTypes)
             try ProjectStore.saveShiftBundle(bundle, to: url)
             statusMessage = "Shift schedule exported."
         } catch {
@@ -139,10 +139,18 @@ final class AppViewModel: ObservableObject {
     }
 
     func loadShiftBundle(_ bundle: ShiftBundleTemplate) {
+        if let importedTypes = bundle.shiftTypes, !importedTypes.isEmpty {
+            project.shiftTypes = importedTypes
+        } else if project.shiftTypes.isEmpty {
+            project.shiftTypes = MetroPresetFactory.metroShiftTypes()
+        }
         project.shiftTemplates = bundle.shifts.map { shift in
             var copy = shift
             copy.id = UUID()
             copy.active = true
+            if copy.shiftTypeId == nil {
+                copy.shiftTypeId = inferredTypeID(for: copy.name)
+            }
             return copy
         }
         statusMessage = "Loaded template: \(bundle.name)"
@@ -155,13 +163,14 @@ final class AppViewModel: ObservableObject {
             statusMessage = "Template name is required."
             return
         }
-        let bundle = ShiftBundleTemplate(name: trimmed, shifts: project.shiftTemplates)
+        let bundle = ShiftBundleTemplate(name: trimmed, shifts: project.shiftTemplates, shiftTypes: project.shiftTypes)
         project.templateLibrary.append(bundle)
         statusMessage = "Saved template: \(trimmed)"
     }
 
     func loadMetroPresetIntoCurrentShifts() {
         let preset = MetroPresetFactory.metroEDTemplate()
+        project.shiftTypes = MetroPresetFactory.metroShiftTypes()
         project.shiftTemplates = preset.shifts.map { shift in
             var copy = shift
             copy.id = UUID()
@@ -181,16 +190,37 @@ final class AppViewModel: ObservableObject {
             student.lastName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
             student.email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
         }
+        normalizeShiftTypes()
         project.shiftTemplates = project.shiftTemplates.map { shift in
             var copy = shift
             copy.active = true
-            if copy.minShifts == nil {
-                copy.minShifts = 1
-            }
-            if copy.maxShifts == nil {
-                copy.maxShifts = copy.minShifts
+            if copy.shiftTypeId == nil {
+                copy.shiftTypeId = inferredTypeID(for: copy.name)
             }
             return copy
         }
+    }
+
+    private func normalizeShiftTypes() {
+        if project.shiftTypes.isEmpty {
+            let inferredNames = Set(project.shiftTemplates.map { inferredTypeName(for: $0.name) })
+            project.shiftTypes = inferredNames.sorted().map { ShiftType(name: $0, minShifts: nil, maxShifts: nil) }
+        }
+    }
+
+    private func inferredTypeID(for shiftName: String) -> UUID? {
+        let name = inferredTypeName(for: shiftName)
+        return project.shiftTypes.first(where: { $0.name.caseInsensitiveCompare(name) == .orderedSame })?.id
+    }
+
+    private func inferredTypeName(for shiftName: String) -> String {
+        let lower = shiftName.lowercased()
+        if lower.contains("community") { return "Community" }
+        if lower.contains("mlf") { return "MLF" }
+        if lower.contains("overnight") || lower.contains("night") { return "Overnight" }
+        if lower.contains("acute") { return "Acute" }
+        if lower.contains("west") { return "West" }
+        if lower.contains("trauma") { return "Trauma" }
+        return shiftName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "General" : shiftName
     }
 }
