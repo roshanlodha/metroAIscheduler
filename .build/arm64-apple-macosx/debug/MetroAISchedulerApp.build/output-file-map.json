@@ -86,12 +86,26 @@
     "swift-dependencies": "/Users/roshanlodha/Documents/metroAIscheduler/.build/arm64-apple-macosx/debug/MetroAISchedulerApp.build/GenerateView.swiftdeps",
     "diagnostics": "/Users/roshanlodha/Documents/metroAIscheduler/.build/arm64-apple-macosx/debug/MetroAISchedulerApp.build/GenerateView.dia"
   },
+  "/Users/roshanlodha/Documents/metroAIscheduler/Sources/MetroAISchedulerApp/Views/MonthlyCalendarPage.swift": {
+    "dependencies": "/Users/roshanlodha/Documents/metroAIscheduler/.build/arm64-apple-macosx/debug/MetroAISchedulerApp.build/MonthlyCalendarPage.d",
+    "object": "/Users/roshanlodha/Documents/metroAIscheduler/.build/arm64-apple-macosx/debug/MetroAISchedulerApp.build/MonthlyCalendarPage.swift.o",
+    "swiftmodule": "/Users/roshanlodha/Documents/metroAIscheduler/.build/arm64-apple-macosx/debug/MetroAISchedulerApp.build/MonthlyCalendarPage~partial.swiftmodule",
+    "swift-dependencies": "/Users/roshanlodha/Documents/metroAIscheduler/.build/arm64-apple-macosx/debug/MetroAISchedulerApp.build/MonthlyCalendarPage.swiftdeps",
+    "diagnostics": "/Users/roshanlodha/Documents/metroAIscheduler/.build/arm64-apple-macosx/debug/MetroAISchedulerApp.build/MonthlyCalendarPage.dia"
+  },
   "/Users/roshanlodha/Documents/metroAIscheduler/Sources/MetroAISchedulerApp/Views/ResultsView.swift": {
     "dependencies": "/Users/roshanlodha/Documents/metroAIscheduler/.build/arm64-apple-macosx/debug/MetroAISchedulerApp.build/ResultsView.d",
     "object": "/Users/roshanlodha/Documents/metroAIscheduler/.build/arm64-apple-macosx/debug/MetroAISchedulerApp.build/ResultsView.swift.o",
     "swiftmodule": "/Users/roshanlodha/Documents/metroAIscheduler/.build/arm64-apple-macosx/debug/MetroAISchedulerApp.build/ResultsView~partial.swiftmodule",
     "swift-dependencies": "/Users/roshanlodha/Documents/metroAIscheduler/.build/arm64-apple-macosx/debug/MetroAISchedulerApp.build/ResultsView.swiftdeps",
     "diagnostics": "/Users/roshanlodha/Documents/metroAIscheduler/.build/arm64-apple-macosx/debug/MetroAISchedulerApp.build/ResultsView.dia"
+  },
+  "/Users/roshanlodha/Documents/metroAIscheduler/Sources/MetroAISchedulerApp/Views/SettingsView.swift": {
+    "dependencies": "/Users/roshanlodha/Documents/metroAIscheduler/.build/arm64-apple-macosx/debug/MetroAISchedulerApp.build/SettingsView.d",
+    "object": "/Users/roshanlodha/Documents/metroAIscheduler/.build/arm64-apple-macosx/debug/MetroAISchedulerApp.build/SettingsView.swift.o",
+    "swiftmodule": "/Users/roshanlodha/Documents/metroAIscheduler/.build/arm64-apple-macosx/debug/MetroAISchedulerApp.build/SettingsView~partial.swiftmodule",
+    "swift-dependencies": "/Users/roshanlodha/Documents/metroAIscheduler/.build/arm64-apple-macosx/debug/MetroAISchedulerApp.build/SettingsView.swiftdeps",
+    "diagnostics": "/Users/roshanlodha/Documents/metroAIscheduler/.build/arm64-apple-macosx/debug/MetroAISchedulerApp.build/SettingsView.dia"
   },
   "/Users/roshanlodha/Documents/metroAIscheduler/Sources/MetroAISchedulerApp/Views/ShiftTemplatesView.swift": {
     "dependencies": "/Users/roshanlodha/Documents/metroAIscheduler/.build/arm64-apple-macosx/debug/MetroAISchedulerApp.build/ShiftTemplatesView.d",

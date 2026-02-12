@@ -89,7 +89,15 @@
         },
         {
           "kind" : "file",
+          "name" : "/Users/roshanlodha/Documents/metroAIscheduler/Sources/MetroAISchedulerApp/Views/MonthlyCalendarPage.swift"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/roshanlodha/Documents/metroAIscheduler/Sources/MetroAISchedulerApp/Views/ResultsView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/roshanlodha/Documents/metroAIscheduler/Sources/MetroAISchedulerApp/Views/SettingsView.swift"
         },
         {
           "kind" : "file",
@@ -132,7 +140,9 @@
         "/Users/roshanlodha/Documents/metroAIscheduler/.build/arm64-apple-macosx/debug/MetroAISchedulerApp.build/BlockRulesView.swift.o",
         "/Users/roshanlodha/Documents/metroAIscheduler/.build/arm64-apple-macosx/debug/MetroAISchedulerApp.build/ContentView.swift.o",
         "/Users/roshanlodha/Documents/metroAIscheduler/.build/arm64-apple-macosx/debug/MetroAISchedulerApp.build/GenerateView.swift.o",
+        "/Users/roshanlodha/Documents/metroAIscheduler/.build/arm64-apple-macosx/debug/MetroAISchedulerApp.build/MonthlyCalendarPage.swift.o",
         "/Users/roshanlodha/Documents/metroAIscheduler/.build/arm64-apple-macosx/debug/MetroAISchedulerApp.build/ResultsView.swift.o",
+        "/Users/roshanlodha/Documents/metroAIscheduler/.build/arm64-apple-macosx/debug/MetroAISchedulerApp.build/SettingsView.swift.o",
         "/Users/roshanlodha/Documents/metroAIscheduler/.build/arm64-apple-macosx/debug/MetroAISchedulerApp.build/ShiftTemplatesView.swift.o",
         "/Users/roshanlodha/Documents/metroAIscheduler/.build/arm64-apple-macosx/debug/MetroAISchedulerApp.build/StudentsView.swift.o",
         "/Users/roshanlodha/Documents/metroAIscheduler/.build/arm64-apple-macosx/debug/MetroAISchedulerApp.build/resource_bundle_accessor.swift.o"
@@ -244,7 +254,15 @@
         },
         {
           "kind" : "file",
+          "name" : "/Users/roshanlodha/Documents/metroAIscheduler/.build/arm64-apple-macosx/debug/MetroAISchedulerApp.build/MonthlyCalendarPage.swift.o"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/roshanlodha/Documents/metroAIscheduler/.build/arm64-apple-macosx/debug/MetroAISchedulerApp.build/ResultsView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/roshanlodha/Documents/metroAIscheduler/.build/arm64-apple-macosx/debug/MetroAISchedulerApp.build/SettingsView.swift.o"
         },
         {
           "kind" : "file",
@@ -277,7 +295,9 @@
         "/Users/roshanlodha/Documents/metroAIscheduler/Sources/MetroAISchedulerApp/Views/BlockRulesView.swift",
         "/Users/roshanlodha/Documents/metroAIscheduler/Sources/MetroAISchedulerApp/Views/ContentView.swift",
         "/Users/roshanlodha/Documents/metroAIscheduler/Sources/MetroAISchedulerApp/Views/GenerateView.swift",
+        "/Users/roshanlodha/Documents/metroAIscheduler/Sources/MetroAISchedulerApp/Views/MonthlyCalendarPage.swift",
         "/Users/roshanlodha/Documents/metroAIscheduler/Sources/MetroAISchedulerApp/Views/ResultsView.swift",
+        "/Users/roshanlodha/Documents/metroAIscheduler/Sources/MetroAISchedulerApp/Views/SettingsView.swift",
         "/Users/roshanlodha/Documents/metroAIscheduler/Sources/MetroAISchedulerApp/Views/ShiftTemplatesView.swift",
         "/Users/roshanlodha/Documents/metroAIscheduler/Sources/MetroAISchedulerApp/Views/StudentsView.swift",
         "/Users/roshanlodha/Documents/metroAIscheduler/.build/arm64-apple-macosx/debug/MetroAISchedulerApp.build/DerivedSources/resource_bundle_accessor.swift"
@@ -540,7 +560,9 @@
       "/Users/roshanlodha/Documents/metroAIscheduler/Sources/MetroAISchedulerApp/Views/BlockRulesView.swift",
       "/Users/roshanlodha/Documents/metroAIscheduler/Sources/MetroAISchedulerApp/Views/ContentView.swift",
       "/Users/roshanlodha/Documents/metroAIscheduler/Sources/MetroAISchedulerApp/Views/GenerateView.swift",
+      "/Users/roshanlodha/Documents/metroAIscheduler/Sources/MetroAISchedulerApp/Views/MonthlyCalendarPage.swift",
       "/Users/roshanlodha/Documents/metroAIscheduler/Sources/MetroAISchedulerApp/Views/ResultsView.swift",
+      "/Users/roshanlodha/Documents/metroAIscheduler/Sources/MetroAISchedulerApp/Views/SettingsView.swift",
       "/Users/roshanlodha/Documents/metroAIscheduler/Sources/MetroAISchedulerApp/Views/ShiftTemplatesView.swift",
       "/Users/roshanlodha/Documents/metroAIscheduler/Sources/MetroAISchedulerApp/Views/StudentsView.swift",
       "/Users/roshanlodha/Documents/metroAIscheduler/.build/arm64-apple-macosx/debug/MetroAISchedulerApp.build/DerivedSources/resource_bundle_accessor.swift",
@@ -842,7 +864,15 @@
         },
         {
           "kind" : "file",
+          "name" : "/Users/roshanlodha/Documents/metroAIscheduler/Sources/MetroAISchedulerApp/Views/MonthlyCalendarPage.swift"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/roshanlodha/Documents/metroAIscheduler/Sources/MetroAISchedulerApp/Views/ResultsView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/roshanlodha/Documents/metroAIscheduler/Sources/MetroAISchedulerApp/Views/SettingsView.swift"
         },
         {
           "kind" : "file",
@@ -896,6 +926,10 @@
         },
         {
           "kind" : "file",
+          "name" : "/Users/roshanlodha/Documents/metroAIscheduler/.build/arm64-apple-macosx/debug/MetroAISchedulerApp.build/MonthlyCalendarPage.swift.o"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/roshanlodha/Documents/metroAIscheduler/.build/arm64-apple-macosx/debug/MetroAISchedulerApp.build/ProjectStore.swift.o"
         },
         {
@@ -905,6 +939,10 @@
         {
           "kind" : "file",
           "name" : "/Users/roshanlodha/Documents/metroAIscheduler/.build/arm64-apple-macosx/debug/MetroAISchedulerApp.build/ResultsView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/roshanlodha/Documents/metroAIscheduler/.build/arm64-apple-macosx/debug/MetroAISchedulerApp.build/SettingsView.swift.o"
         },
         {
           "kind" : "file",
@@ -984,6 +1022,10 @@
         },
         {
           "kind" : "file",
+          "name" : "/Users/roshanlodha/Documents/metroAIscheduler/.build/arm64-apple-macosx/debug/MetroAISchedulerApp.build/MonthlyCalendarPage.swift.o"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/roshanlodha/Documents/metroAIscheduler/.build/arm64-apple-macosx/debug/MetroAISchedulerApp.build/ProjectStore.swift.o"
         },
         {
@@ -993,6 +1035,10 @@
         {
           "kind" : "file",
           "name" : "/Users/roshanlodha/Documents/metroAIscheduler/.build/arm64-apple-macosx/debug/MetroAISchedulerApp.build/ResultsView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/roshanlodha/Documents/metroAIscheduler/.build/arm64-apple-macosx/debug/MetroAISchedulerApp.build/SettingsView.swift.o"
         },
         {
           "kind" : "file",

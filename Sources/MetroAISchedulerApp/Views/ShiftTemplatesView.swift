@@ -48,7 +48,7 @@ struct ShiftTemplatesView: View {
             }
 
             HStack {
-                Button("Load Selected") {
+                Button("Import Shift Schedule from Template") {
                     guard let bundle = selectedBundle else { return }
                     viewModel.loadShiftBundle(bundle)
                     selectedShiftID = viewModel.project.shiftTemplates.first?.id
@@ -66,7 +66,7 @@ struct ShiftTemplatesView: View {
             Divider()
 
             TextField("New template name", text: $newBundleName)
-            Button("Save Current Shifts as Template") {
+            Button("Save Shift Schedule as Template") {
                 viewModel.saveCurrentShiftsAsTemplate(named: newBundleName)
                 newBundleName = ""
                 selectedBundleID = viewModel.project.templateLibrary.last?.id

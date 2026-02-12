@@ -22,6 +22,8 @@
 		AA0000000000000000000113 /* BlockRulesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000213 /* BlockRulesView.swift */; };
 		AA0000000000000000000114 /* GenerateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000214 /* GenerateView.swift */; };
 		AA0000000000000000000115 /* ResultsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000215 /* ResultsView.swift */; };
+		AA0000000000000000000117 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000217 /* SettingsView.swift */; };
+		AA0000000000000000000118 /* MonthlyCalendarPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000218 /* MonthlyCalendarPage.swift */; };
 		AA0000000000000000000116 /* ortools_solver.py in Resources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000216 /* ortools_solver.py */; };
 /* End PBXBuildFile section */
 
@@ -43,6 +45,8 @@
 		AA0000000000000000000214 /* GenerateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerateView.swift; sourceTree = "<group>"; };
 		AA0000000000000000000215 /* ResultsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultsView.swift; sourceTree = "<group>"; };
 		AA0000000000000000000216 /* ortools_solver.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = ortools_solver.py; sourceTree = "<group>"; };
+		AA0000000000000000000217 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		AA0000000000000000000218 /* MonthlyCalendarPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthlyCalendarPage.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -147,6 +151,8 @@
 				AA0000000000000000000213 /* BlockRulesView.swift */,
 				AA0000000000000000000214 /* GenerateView.swift */,
 				AA0000000000000000000215 /* ResultsView.swift */,
+				AA0000000000000000000217 /* SettingsView.swift */,
+				AA0000000000000000000218 /* MonthlyCalendarPage.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -235,6 +241,8 @@
 				AA0000000000000000000113 /* BlockRulesView.swift in Sources */,
 				AA0000000000000000000114 /* GenerateView.swift in Sources */,
 				AA0000000000000000000115 /* ResultsView.swift in Sources */,
+				AA0000000000000000000117 /* SettingsView.swift in Sources */,
+				AA0000000000000000000118 /* MonthlyCalendarPage.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

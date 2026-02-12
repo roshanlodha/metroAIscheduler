@@ -99,10 +99,10 @@ struct GlobalScheduleRules: Codable, Equatable {
     static var `default`: GlobalScheduleRules {
         GlobalScheduleRules(
             timeOffHours: 10,
-            numShiftsRequired: 4,
+            numShiftsRequired: 13,
             timezone: "America/New_York",
             noDoubleBooking: true,
-            allowOvernightBeforeWednesday: true,
+            allowOvernightBeforeWednesday: false,
             solverTimeLimitSeconds: 20,
             overnightShiftWeight: 1
         )
@@ -204,10 +204,8 @@ struct ScheduleTemplateProject: Codable, Equatable {
         try container.encode(blockWindow, forKey: .blockWindow)
     }
 
-    static func empty(now: Date = Date()) -> ScheduleTemplateProject {
-        let cal = Calendar(identifier: .gregorian)
-        let start = cal.startOfDay(for: now)
-        let end = cal.date(byAdding: .day, value: 13, to: start) ?? start
+    static func empty(now _: Date = Date()) -> ScheduleTemplateProject {
+        let blockWindow = defaultBlockWindow()
         return ScheduleTemplateProject(
             schemaVersion: 2,
             name: "Untitled Project",
@@ -215,14 +213,12 @@ struct ScheduleTemplateProject: Codable, Equatable {
             templateLibrary: [MetroPresetFactory.metroEDTemplate()],
             students: [],
             rules: .default,
-            blockWindow: BlockWindow(startDate: start, endDate: end)
+            blockWindow: blockWindow
         )
     }
 
-    static func sample(now: Date = Date()) -> ScheduleTemplateProject {
-        let cal = Calendar(identifier: .gregorian)
-        let start = cal.startOfDay(for: now)
-        let end = cal.date(byAdding: .day, value: 13, to: start) ?? start
+    static func sample(now _: Date = Date()) -> ScheduleTemplateProject {
+        let blockWindow = defaultBlockWindow()
         let metroTemplate = MetroPresetFactory.metroEDTemplate()
         return ScheduleTemplateProject(
             schemaVersion: 2,
@@ -234,8 +230,16 @@ struct ScheduleTemplateProject: Codable, Equatable {
                 Student(firstName: "Jordan", lastName: "Patel", email: "jordan@example.edu")
             ],
             rules: .default,
-            blockWindow: BlockWindow(startDate: start, endDate: end)
+            blockWindow: blockWindow
         )
+    }
+
+    private static func defaultBlockWindow() -> BlockWindow {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: GlobalScheduleRules.default.timezone) ?? .current
+        let start = calendar.date(from: DateComponents(year: 2026, month: 2, day: 5)) ?? Date()
+        let end = calendar.date(from: DateComponents(year: 2026, month: 2, day: 27)) ?? start
+        return BlockWindow(startDate: start, endDate: end)
     }
 }
 
