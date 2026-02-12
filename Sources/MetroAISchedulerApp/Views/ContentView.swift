@@ -10,6 +10,7 @@ struct ContentView: View {
                 BentoCard {
                     ShiftTemplatesView(viewModel: viewModel)
                 }
+                .frame(minWidth: 640, maxWidth: .infinity, maxHeight: .infinity)
 
                 VStack(spacing: 12) {
                     BentoCard {
@@ -22,8 +23,9 @@ struct ContentView: View {
                     }
                     .frame(minHeight: 360)
                 }
-                .frame(width: 520)
+                .frame(minWidth: 480, idealWidth: 540, maxWidth: 620, maxHeight: .infinity)
             }
+            .frame(maxHeight: .infinity)
 
             Divider()
             HStack {

@@ -115,6 +115,26 @@ final class AppViewModel: ObservableObject {
         }
     }
 
+    func importShiftSchedule(from url: URL) {
+        do {
+            let bundle = try ProjectStore.loadShiftBundle(from: url)
+            loadShiftBundle(bundle)
+        } catch {
+            statusMessage = "Import failed: \(error.localizedDescription)"
+        }
+    }
+
+    func exportShiftSchedule(to url: URL) {
+        do {
+            let bundleName = project.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Shift Schedule" : project.name
+            let bundle = ShiftBundleTemplate(name: bundleName, shifts: project.shiftTemplates)
+            try ProjectStore.saveShiftBundle(bundle, to: url)
+            statusMessage = "Shift schedule exported."
+        } catch {
+            statusMessage = "Export failed: \(error.localizedDescription)"
+        }
+    }
+
     func loadShiftBundle(_ bundle: ShiftBundleTemplate) {
         project.shiftTemplates = bundle.shifts.map { shift in
             var copy = shift
