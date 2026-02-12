@@ -109,7 +109,7 @@
       "shiftTypeId": "25799f58-af95-46bf-b17f-ec571ec88ddf",
       "startTime": { "hour": 21, "minute": 0 },
       "endTime": { "hour": 7, "minute": 0 },
-      "daysOffered": [2, 5, 6, 7, 1],
+      "daysOffered": [2, 4, 5, 6, 7, 1],
       "active": true
     },
     {
@@ -122,7 +122,7 @@
       "shiftTypeId": "25799f58-af95-46bf-b17f-ec571ec88ddf",
       "startTime": { "hour": 21, "minute": 0 },
       "endTime": { "hour": 7, "minute": 0 },
-      "daysOffered": [2, 5, 6, 7, 1],
+      "daysOffered": [2, 4, 5, 6, 7, 1],
       "active": true
     },
     {

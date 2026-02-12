@@ -203,6 +203,8 @@ struct GlobalScheduleRules: Codable, Equatable {
     var timezone: String
     var noDoubleBooking: Bool
     var conferenceDay: Weekday
+    var conferenceStartTime: LocalTime
+    var conferenceEndTime: LocalTime
     var solverTimeLimitSeconds: Int
 
     static var `default`: GlobalScheduleRules {
@@ -212,6 +214,8 @@ struct GlobalScheduleRules: Codable, Equatable {
             timezone: "America/New_York",
             noDoubleBooking: true,
             conferenceDay: .wednesday,
+            conferenceStartTime: LocalTime(hour: 8, minute: 0),
+            conferenceEndTime: LocalTime(hour: 12, minute: 0),
             solverTimeLimitSeconds: 20
         )
     }
@@ -222,6 +226,8 @@ struct GlobalScheduleRules: Codable, Equatable {
         case timezone
         case noDoubleBooking
         case conferenceDay
+        case conferenceStartTime
+        case conferenceEndTime
         case solverTimeLimitSeconds
         case allowOvernightBeforeWednesday
     }
@@ -232,6 +238,8 @@ struct GlobalScheduleRules: Codable, Equatable {
         timezone: String,
         noDoubleBooking: Bool,
         conferenceDay: Weekday,
+        conferenceStartTime: LocalTime,
+        conferenceEndTime: LocalTime,
         solverTimeLimitSeconds: Int
     ) {
         self.timeOffHours = timeOffHours
@@ -239,6 +247,8 @@ struct GlobalScheduleRules: Codable, Equatable {
         self.timezone = timezone
         self.noDoubleBooking = noDoubleBooking
         self.conferenceDay = conferenceDay
+        self.conferenceStartTime = conferenceStartTime
+        self.conferenceEndTime = conferenceEndTime
         self.solverTimeLimitSeconds = solverTimeLimitSeconds
     }
 
@@ -256,6 +266,8 @@ struct GlobalScheduleRules: Codable, Equatable {
             let legacyAllow = try container.decodeIfPresent(Bool.self, forKey: .allowOvernightBeforeWednesday) ?? false
             self.conferenceDay = legacyAllow ? .sunday : .wednesday
         }
+        conferenceStartTime = try container.decodeIfPresent(LocalTime.self, forKey: .conferenceStartTime) ?? LocalTime(hour: 8, minute: 0)
+        conferenceEndTime = try container.decodeIfPresent(LocalTime.self, forKey: .conferenceEndTime) ?? LocalTime(hour: 12, minute: 0)
     }
 
     func encode(to encoder: Encoder) throws {
@@ -265,6 +277,8 @@ struct GlobalScheduleRules: Codable, Equatable {
         try container.encode(timezone, forKey: .timezone)
         try container.encode(noDoubleBooking, forKey: .noDoubleBooking)
         try container.encode(conferenceDay, forKey: .conferenceDay)
+        try container.encode(conferenceStartTime, forKey: .conferenceStartTime)
+        try container.encode(conferenceEndTime, forKey: .conferenceEndTime)
         try container.encode(solverTimeLimitSeconds, forKey: .solverTimeLimitSeconds)
     }
 }

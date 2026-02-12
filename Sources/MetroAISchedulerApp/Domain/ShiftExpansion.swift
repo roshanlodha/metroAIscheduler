@@ -18,7 +18,7 @@ enum ShiftExpansion {
 
             for template in project.shiftTemplates {
                 guard let weekday, template.daysOffered.contains(weekday) else { continue }
-                if template.isOvernight, isBeforeConferenceDay(weekday: weekday, conferenceDay: project.rules.conferenceDay) {
+                if template.isOvernight, isDayBeforeConferenceDay(weekday: weekday, conferenceDay: project.rules.conferenceDay) {
                     continue
                 }
 
@@ -30,6 +30,15 @@ enum ShiftExpansion {
 
                 guard let startDate = calendar.date(from: components) else { continue }
                 guard let endDate = resolveEndDate(startDate: startDate, template: template, calendar: calendar, rules: project.rules) else {
+                    continue
+                }
+                if overlapsConferenceWindow(
+                    startDate: startDate,
+                    endDate: endDate,
+                    calendar: calendar,
+                    rules: project.rules,
+                    timezone: timezone
+                ) {
                     continue
                 }
                 let overnight = template.isOvernight || !calendar.isDate(startDate, inSameDayAs: endDate)
@@ -89,13 +98,61 @@ enum ShiftExpansion {
         return formatter.string(from: date)
     }
 
-    private static func isBeforeConferenceDay(weekday: Weekday, conferenceDay: Weekday) -> Bool {
+    private static func isDayBeforeConferenceDay(weekday: Weekday, conferenceDay: Weekday) -> Bool {
         let order: [Weekday] = [.sunday, .monday, .tuesday, .wednesday, .thursday, .friday, .saturday]
         guard let weekdayIndex = order.firstIndex(of: weekday),
               let conferenceIndex = order.firstIndex(of: conferenceDay) else {
             return false
         }
-        return weekdayIndex < conferenceIndex
+        return (weekdayIndex + 1) % order.count == conferenceIndex
+    }
+
+    private static func overlapsConferenceWindow(
+        startDate: Date,
+        endDate: Date,
+        calendar: Calendar,
+        rules: GlobalScheduleRules,
+        timezone: TimeZone
+    ) -> Bool {
+        var day = calendar.startOfDay(for: startDate)
+        let endDay = calendar.startOfDay(for: endDate)
+
+        while day <= endDay {
+            if Weekday(rawValue: calendar.component(.weekday, from: day)) == rules.conferenceDay {
+                var startComponents = calendar.dateComponents([.year, .month, .day], from: day)
+                startComponents.hour = rules.conferenceStartTime.hour
+                startComponents.minute = rules.conferenceStartTime.minute
+                startComponents.second = 0
+                startComponents.timeZone = timezone
+
+                var endComponents = calendar.dateComponents([.year, .month, .day], from: day)
+                endComponents.hour = rules.conferenceEndTime.hour
+                endComponents.minute = rules.conferenceEndTime.minute
+                endComponents.second = 0
+                endComponents.timeZone = timezone
+
+                guard let conferenceStart = calendar.date(from: startComponents),
+                      let rawConferenceEnd = calendar.date(from: endComponents) else {
+                    return false
+                }
+
+                let conferenceEnd: Date
+                if rawConferenceEnd > conferenceStart {
+                    conferenceEnd = rawConferenceEnd
+                } else {
+                    conferenceEnd = calendar.date(byAdding: .day, value: 1, to: rawConferenceEnd) ?? rawConferenceEnd
+                }
+
+                if startDate < conferenceEnd && conferenceStart < endDate {
+                    return true
+                }
+            }
+
+            guard let next = calendar.date(byAdding: .day, value: 1, to: day) else { break }
+            day = next
+        }
+
+        return false
     }
 }
 

@@ -41,8 +41,13 @@ final class AppViewModel: ObservableObject {
             do {
                 let solved = try solverRef.solve(project: projectSnapshot, shiftInstances: instances)
                 await MainActor.run {
-                    self.result = solved
-                    self.statusMessage = "Schedule generated with \(solved.assignments.count) assignments."
+                    let (sanitized, removed) = self.sanitizeAssignments(project: projectSnapshot, result: solved)
+                    self.result = sanitized
+                    if removed > 0 {
+                        self.statusMessage = "Schedule generated with \(sanitized.assignments.count) assignments (\(removed) invalid assignments removed)."
+                    } else {
+                        self.statusMessage = "Schedule generated with \(sanitized.assignments.count) assignments."
+                    }
                     self.isSolving = false
                 }
             } catch let error as SolverError {
@@ -222,5 +227,100 @@ final class AppViewModel: ObservableObject {
         if lower.contains("west") { return "West" }
         if lower.contains("trauma") { return "Trauma" }
         return shiftName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "General" : shiftName
+    }
+
+    private func sanitizeAssignments(project: ScheduleTemplateProject, result: ScheduleResult) -> (ScheduleResult, Int) {
+        guard let timezone = TimeZone(identifier: project.rules.timezone) else {
+            return (result, 0)
+        }
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = timezone
+
+        let shiftByID = Dictionary(uniqueKeysWithValues: result.shiftInstances.map { ($0.id, $0) })
+        let templateByID = Dictionary(uniqueKeysWithValues: project.shiftTemplates.map { ($0.id, $0) })
+
+        let filtered = result.assignments.filter { assignment in
+            guard let shift = shiftByID[assignment.shiftInstanceId],
+                  let template = templateByID[shift.templateId] else {
+                return false
+            }
+            let weekdayValue = calendar.component(.weekday, from: shift.startDateTime)
+            guard let weekday = Weekday(rawValue: weekdayValue),
+                  template.daysOffered.contains(weekday) else {
+                return false
+            }
+            if shift.isOvernight && isDayBeforeConference(weekday: weekday, conferenceDay: project.rules.conferenceDay) {
+                return false
+            }
+            if overlapsConference(shift: shift, calendar: calendar, rules: project.rules, timezone: timezone) {
+                return false
+            }
+            return true
+        }
+
+        let removed = result.assignments.count - filtered.count
+        return (
+            ScheduleResult(
+                generatedAt: result.generatedAt,
+                shiftInstances: result.shiftInstances,
+                assignments: filtered
+            ),
+            removed
+        )
+    }
+
+    private func isDayBeforeConference(weekday: Weekday, conferenceDay: Weekday) -> Bool {
+        let order: [Weekday] = [.sunday, .monday, .tuesday, .wednesday, .thursday, .friday, .saturday]
+        guard let weekdayIndex = order.firstIndex(of: weekday),
+              let conferenceIndex = order.firstIndex(of: conferenceDay) else {
+            return false
+        }
+        return (weekdayIndex + 1) % order.count == conferenceIndex
+    }
+
+    private func overlapsConference(
+        shift: GeneratedShiftInstance,
+        calendar: Calendar,
+        rules: GlobalScheduleRules,
+        timezone: TimeZone
+    ) -> Bool {
+        var day = calendar.startOfDay(for: shift.startDateTime)
+        let endDay = calendar.startOfDay(for: shift.endDateTime)
+
+        while day <= endDay {
+            if Weekday(rawValue: calendar.component(.weekday, from: day)) == rules.conferenceDay {
+                var startComponents = calendar.dateComponents([.year, .month, .day], from: day)
+                startComponents.hour = rules.conferenceStartTime.hour
+                startComponents.minute = rules.conferenceStartTime.minute
+                startComponents.second = 0
+                startComponents.timeZone = timezone
+
+                var endComponents = calendar.dateComponents([.year, .month, .day], from: day)
+                endComponents.hour = rules.conferenceEndTime.hour
+                endComponents.minute = rules.conferenceEndTime.minute
+                endComponents.second = 0
+                endComponents.timeZone = timezone
+
+                guard let conferenceStart = calendar.date(from: startComponents),
+                      let rawConferenceEnd = calendar.date(from: endComponents) else {
+                    return false
+                }
+
+                let conferenceEnd: Date
+                if rawConferenceEnd > conferenceStart {
+                    conferenceEnd = rawConferenceEnd
+                } else {
+                    conferenceEnd = calendar.date(byAdding: .day, value: 1, to: rawConferenceEnd) ?? rawConferenceEnd
+                }
+
+                if shift.startDateTime < conferenceEnd && conferenceStart < shift.endDateTime {
+                    return true
+                }
+            }
+
+            guard let next = calendar.date(byAdding: .day, value: 1, to: day) else { break }
+            day = next
+        }
+        return false
     }
 }

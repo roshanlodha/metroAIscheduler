@@ -28,6 +28,10 @@ enum ProjectValidator {
         if TimeZone(identifier: project.rules.timezone) == nil {
             issues.append(.init(field: "rules.timezone", message: "Timezone must be a valid IANA identifier."))
         }
+        if project.rules.conferenceStartTime.hour == project.rules.conferenceEndTime.hour &&
+            project.rules.conferenceStartTime.minute == project.rules.conferenceEndTime.minute {
+            issues.append(.init(field: "rules.conferenceTime", message: "Conference start and end time cannot be equal."))
+        }
 
         let typeIDs = Set(project.shiftTypes.map(\.id))
         for type in project.shiftTypes {

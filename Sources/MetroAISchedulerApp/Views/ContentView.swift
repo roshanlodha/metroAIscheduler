@@ -61,6 +61,7 @@ struct ContentView: View {
                     result: resultBinding,
                     students: viewModel.project.students,
                     timezoneIdentifier: viewModel.project.rules.timezone,
+                    rules: viewModel.project.rules,
                     shiftTemplates: viewModel.project.shiftTemplates,
                     shiftTypes: viewModel.project.shiftTypes
                 )
@@ -118,7 +119,16 @@ private struct ActionsAndRulesPane: View {
                                     .labelsHidden()
                                     .frame(maxWidth: .infinity, alignment: .leading)
                             }
-                            blockField("Conference Day") {
+                        }
+                    }
+                }
+
+                GroupBox {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("Conference")
+                            .font(.headline)
+                        HStack(spacing: 16) {
+                            blockField("Day") {
                                 Picker("", selection: $viewModel.project.rules.conferenceDay) {
                                     ForEach(weekdayOrder) { day in
                                         Text(day.fullName).tag(day)
@@ -126,6 +136,24 @@ private struct ActionsAndRulesPane: View {
                                 }
                                 .labelsHidden()
                                 .frame(minWidth: 140, maxWidth: .infinity, alignment: .leading)
+                            }
+                            blockField("Start Time") {
+                                DatePicker(
+                                    "",
+                                    selection: localTimeBinding($viewModel.project.rules.conferenceStartTime),
+                                    displayedComponents: .hourAndMinute
+                                )
+                                .labelsHidden()
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            }
+                            blockField("End Time") {
+                                DatePicker(
+                                    "",
+                                    selection: localTimeBinding($viewModel.project.rules.conferenceEndTime),
+                                    displayedComponents: .hourAndMinute
+                                )
+                                .labelsHidden()
+                                .frame(maxWidth: .infinity, alignment: .leading)
                             }
                         }
                     }
@@ -244,6 +272,27 @@ private struct ActionsAndRulesPane: View {
                 .stroke(Color.primary.opacity(0.08), lineWidth: 1)
         )
         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+    }
+
+    private func localTimeBinding(_ localTime: Binding<LocalTime>) -> Binding<Date> {
+        Binding(
+            get: {
+                var calendar = Calendar(identifier: .gregorian)
+                calendar.timeZone = TimeZone.current
+                let now = Date()
+                var components = calendar.dateComponents([.year, .month, .day], from: now)
+                components.hour = localTime.wrappedValue.hour
+                components.minute = localTime.wrappedValue.minute
+                components.second = 0
+                return calendar.date(from: components) ?? now
+            },
+            set: { newValue in
+                var calendar = Calendar(identifier: .gregorian)
+                calendar.timeZone = TimeZone.current
+                let components = calendar.dateComponents([.hour, .minute], from: newValue)
+                localTime.wrappedValue = LocalTime(hour: components.hour ?? 0, minute: components.minute ?? 0)
+            }
+        )
     }
 }
 

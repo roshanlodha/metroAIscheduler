@@ -1,13 +1,46 @@
 #!/usr/bin/env python3
 import json
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 
 
 def parse_dt(v: str) -> datetime:
     if v.endswith("Z"):
         return datetime.fromisoformat(v.replace("Z", "+00:00"))
-    return datetime.fromisoformat(v)
+    dt = datetime.fromisoformat(v)
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=ZoneInfo("UTC"))
+    return dt
+
+
+def conference_overlap(shift_start: datetime, shift_end: datetime, rules: dict, local_tz: ZoneInfo) -> bool:
+    conference_day = int(rules.get("conferenceDay", 4))
+    conference_start = rules.get("conferenceStartTime", {"hour": 8, "minute": 0})
+    conference_end = rules.get("conferenceEndTime", {"hour": 12, "minute": 0})
+    start_hour = int(conference_start.get("hour", 8))
+    start_minute = int(conference_start.get("minute", 0))
+    end_hour = int(conference_end.get("hour", 12))
+    end_minute = int(conference_end.get("minute", 0))
+
+    local_shift_start = shift_start.astimezone(local_tz)
+    local_shift_end = shift_end.astimezone(local_tz)
+
+    day = local_shift_start.date()
+    end_day = local_shift_end.date()
+
+    while day <= end_day:
+        weekday = ((day.weekday() + 1) % 7) + 1  # python monday=0 -> swift sunday=1
+        if weekday == conference_day:
+            conf_start = datetime(day.year, day.month, day.day, start_hour, start_minute, tzinfo=local_tz)
+            conf_end = datetime(day.year, day.month, day.day, end_hour, end_minute, tzinfo=local_tz)
+            if conf_end <= conf_start:
+                conf_end = conf_end + timedelta(days=1)
+            if local_shift_start < conf_end and conf_start < local_shift_end:
+                return True
+        day += timedelta(days=1)
+
+    return False
 
 
 def main() -> int:
@@ -23,6 +56,11 @@ def main() -> int:
     templates = {t["id"]: t for t in project["shiftTemplates"]}
     shift_types = {t["id"]: t for t in project.get("shiftTypes", [])}
     rules = project["rules"]
+    timezone_name = rules.get("timezone", "UTC")
+    try:
+        local_tz = ZoneInfo(timezone_name)
+    except Exception:
+        local_tz = ZoneInfo("UTC")
 
     try:
         from ortools.sat.python import cp_model
@@ -64,6 +102,9 @@ def main() -> int:
             break
 
     overnight_shift_indices = []
+    overnight_before_conference_indices = []
+    conference_day = int(rules.get("conferenceDay", 4))
+    day_before_conference = 7 if conference_day == 1 else conference_day - 1
     for idx, sh in enumerate(shifts):
         template = templates.get(sh["templateId"], {})
         template_type_id = template.get("shiftTypeId")
@@ -71,6 +112,18 @@ def main() -> int:
         is_overnight_shift = template_type_id in overnight_type_ids
         if is_overnight_shift:
             overnight_shift_indices.append(idx)
+            shift_start = parse_dt(sh["startDateTime"]).astimezone(local_tz)
+            shift_weekday = ((shift_start.weekday() + 1) % 7) + 1
+            if shift_weekday == day_before_conference:
+                overnight_before_conference_indices.append(idx)
+
+    # Conference window is a hard blackout interval for all students.
+    conference_blocked_shift_indices = []
+    for idx, sh in enumerate(shifts):
+        start_dt = parse_dt(sh["startDateTime"])
+        end_dt = parse_dt(sh["endDateTime"])
+        if conference_overlap(start_dt, end_dt, rules, local_tz):
+            conference_blocked_shift_indices.append(idx)
 
     # Each student must hit required shift count, collapsing an overnight block to one unit.
     user_target = int(rules["numShiftsRequired"])
@@ -151,6 +204,16 @@ def main() -> int:
     if rules.get("noDoubleBooking", True):
         for sh_idx, _ in enumerate(shifts):
             model.Add(sum(x[(s_idx, sh_idx)] for s_idx, _ in enumerate(students)) <= 1)
+
+    # No assignments may overlap conference window.
+    for sh_idx in conference_blocked_shift_indices:
+        for s_idx, _ in enumerate(students):
+            model.Add(x[(s_idx, sh_idx)] == 0)
+
+    # Overnight starts on the day before conference are disallowed.
+    for sh_idx in overnight_before_conference_indices:
+        for s_idx, _ in enumerate(students):
+            model.Add(x[(s_idx, sh_idx)] == 0)
 
     # Rest and overlap constraints per student.
     min_rest_seconds = int(rules.get("timeOffHours", 0)) * 3600

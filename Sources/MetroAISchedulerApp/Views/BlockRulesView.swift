@@ -29,9 +29,40 @@ struct BlockRulesView: View {
                         Text(day.fullName).tag(day)
                     }
                 }
+                DatePicker(
+                    "Conference Start",
+                    selection: localTimeBinding($project.rules.conferenceStartTime),
+                    displayedComponents: .hourAndMinute
+                )
+                DatePicker(
+                    "Conference End",
+                    selection: localTimeBinding($project.rules.conferenceEndTime),
+                    displayedComponents: .hourAndMinute
+                )
             }
         }
         .padding()
         .onChange(of: project) { _, _ in onChanged() }
+    }
+
+    private func localTimeBinding(_ localTime: Binding<LocalTime>) -> Binding<Date> {
+        Binding(
+            get: {
+                var calendar = Calendar(identifier: .gregorian)
+                calendar.timeZone = .current
+                let now = Date()
+                var components = calendar.dateComponents([.year, .month, .day], from: now)
+                components.hour = localTime.wrappedValue.hour
+                components.minute = localTime.wrappedValue.minute
+                components.second = 0
+                return calendar.date(from: components) ?? now
+            },
+            set: { newValue in
+                var calendar = Calendar(identifier: .gregorian)
+                calendar.timeZone = .current
+                let components = calendar.dateComponents([.hour, .minute], from: newValue)
+                localTime.wrappedValue = LocalTime(hour: components.hour ?? 0, minute: components.minute ?? 0)
+            }
+        )
     }
 }
