@@ -39,7 +39,7 @@ enum ICSExporter {
         var lines: [String] = [
             "BEGIN:VCALENDAR",
             "VERSION:2.0",
-            "PRODID:-//Metro AI Scheduler//EN",
+            "PRODID:-//EM Shift Scheduler//EN",
             "CALSCALE:GREGORIAN"
         ]
 
@@ -52,7 +52,7 @@ enum ICSExporter {
             lines.append("DTEND;TZID=\(tz):\(localICSDate(shift.endDateTime, timezone: tz))")
             lines.append("SUMMARY:\(escapeICS(shift.name))")
             lines.append("LOCATION:\(escapeICS(shift.location))")
-            lines.append("DESCRIPTION:Assigned by Metro AI Scheduler")
+            lines.append("DESCRIPTION:Assigned by EM Shift Scheduler")
             lines.append("END:VEVENT")
         }
 

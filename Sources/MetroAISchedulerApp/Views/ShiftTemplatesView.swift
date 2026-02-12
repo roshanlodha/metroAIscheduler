@@ -4,6 +4,7 @@ struct ShiftTemplatesView: View {
     @ObservedObject var viewModel: AppViewModel
 
     @State private var selectedShiftID: UUID?
+    @State private var colorPickerTypeID: UUID?
 
     private let dayOrder: [Weekday] = [.sunday, .monday, .tuesday, .wednesday, .thursday, .friday, .saturday]
 
@@ -14,33 +15,7 @@ struct ShiftTemplatesView: View {
             GroupBox {
                 VStack(spacing: 8) {
                     ForEach($viewModel.project.shiftTypes) { $type in
-                        HStack(spacing: 10) {
-                            Picker("", selection: $type.color) {
-                                ForEach(ShiftTypeColor.allCases) { option in
-                                    HStack(spacing: 6) {
-                                        Circle()
-                                            .fill(option.swatchColor)
-                                            .frame(width: 10, height: 10)
-                                        Text(option.displayName)
-                                    }
-                                    .tag(option)
-                                }
-                            }
-                            .labelsHidden()
-                            .frame(width: 110)
-
-                            TextField("Type name", text: $type.name)
-                                .frame(minWidth: 130)
-                            optionalStepperInline(title: "Min", value: $type.minShifts, range: 0...40)
-                            optionalStepperInline(title: "Max", value: $type.maxShifts, range: 0...80)
-                            Button(role: .destructive) {
-                                deleteType(type.id)
-                            } label: {
-                                Image(systemName: "trash")
-                            }
-                            .buttonStyle(.borderless)
-                            .disabled(isTypeUsed(type.id))
-                        }
+                        shiftTypeRow(type: $type)
                     }
 
                     HStack {
@@ -141,6 +116,54 @@ struct ShiftTemplatesView: View {
                 selectedShiftID = (selectedShiftID == shift.wrappedValue.id) ? nil : shift.wrappedValue.id
             }
         }
+    }
+
+    private func shiftTypeRow(type: Binding<ShiftType>) -> some View {
+        HStack(spacing: 10) {
+            TextField("Type name", text: type.name)
+                .frame(minWidth: 130)
+            shiftTypeColorButton(type: type)
+            optionalStepperInline(title: "Min", value: type.minShifts, range: 0...40)
+            optionalStepperInline(title: "Max", value: type.maxShifts, range: 0...80)
+            Button(role: .destructive) {
+                deleteType(type.wrappedValue.id)
+            } label: {
+                Image(systemName: "trash")
+            }
+            .buttonStyle(.borderless)
+            .disabled(isTypeUsed(type.wrappedValue.id))
+        }
+    }
+
+    private func shiftTypeColorButton(type: Binding<ShiftType>) -> some View {
+        Button {
+            colorPickerTypeID = type.wrappedValue.id
+        } label: {
+            Circle()
+                .fill(type.wrappedValue.color.swatchColor)
+                .frame(width: 16, height: 16)
+                .overlay(
+                    Circle()
+                        .stroke(Color.primary.opacity(0.18), lineWidth: 1)
+                )
+        }
+        .buttonStyle(.plain)
+        .popover(isPresented: isColorPickerPresented(for: type.wrappedValue.id), arrowEdge: .bottom) {
+            ShiftTypeColorPalette(selectedColor: type.color) {
+                colorPickerTypeID = nil
+            }
+        }
+    }
+
+    private func isColorPickerPresented(for id: UUID) -> Binding<Bool> {
+        Binding(
+            get: { colorPickerTypeID == id },
+            set: { isPresented in
+                if !isPresented && colorPickerTypeID == id {
+                    colorPickerTypeID = nil
+                }
+            }
+        )
     }
 
     @ViewBuilder
@@ -367,11 +390,8 @@ extension ShiftTypeColor {
         case .orange: return .orange
         case .yellow: return .yellow
         case .green: return .green
-        case .teal: return .teal
         case .blue: return .blue
-        case .indigo: return .indigo
         case .purple: return .purple
-        case .pink: return .pink
         case .brown: return .brown
         }
     }
@@ -383,5 +403,31 @@ extension ShiftTypeColor {
         default:
             return .white
         }
+    }
+}
+
+private struct ShiftTypeColorPalette: View {
+    @Binding var selectedColor: ShiftTypeColor
+    var onSelected: () -> Void
+
+    var body: some View {
+        HStack(spacing: 12) {
+            ForEach(ShiftTypeColor.allCases) { option in
+                Button {
+                    selectedColor = option
+                    onSelected()
+                } label: {
+                    Circle()
+                        .fill(option.swatchColor)
+                        .frame(width: 22, height: 22)
+                        .overlay(
+                            Circle()
+                                .stroke(Color.primary.opacity(selectedColor == option ? 0.9 : 0.2), lineWidth: selectedColor == option ? 2 : 1)
+                        )
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(12)
     }
 }

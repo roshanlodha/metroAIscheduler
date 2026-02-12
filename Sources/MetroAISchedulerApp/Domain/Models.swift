@@ -146,14 +146,41 @@ enum ShiftTypeColor: String, Codable, CaseIterable, Identifiable {
     case orange
     case yellow
     case green
-    case teal
     case blue
-    case indigo
     case purple
-    case pink
     case brown
 
     var id: String { rawValue }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let rawValue = (try? container.decode(String.self))?.lowercased() ?? "blue"
+        switch rawValue {
+        case "red":
+            self = .red
+        case "orange":
+            self = .orange
+        case "yellow":
+            self = .yellow
+        case "green":
+            self = .green
+        case "blue", "teal":
+            self = .blue
+        case "purple", "indigo":
+            self = .purple
+        case "brown":
+            self = .brown
+        case "pink":
+            self = .red
+        default:
+            self = .blue
+        }
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(rawValue)
+    }
 }
 
 struct ShiftBundleTemplate: Identifiable, Codable, Equatable {
@@ -391,11 +418,11 @@ enum MetroPresetFactory {
     static func metroShiftTypes() -> [ShiftType] {
         [
             ShiftType(name: "West", minShifts: 1, maxShifts: nil, color: .blue),
-            ShiftType(name: "Acute", minShifts: 2, maxShifts: nil, color: .teal),
+            ShiftType(name: "Acute", minShifts: 2, maxShifts: nil, color: .green),
             ShiftType(name: "Trauma", minShifts: nil, maxShifts: nil, color: .orange),
-            ShiftType(name: "Overnight", minShifts: 1, maxShifts: nil, color: .indigo),
-            ShiftType(name: "Community", minShifts: nil, maxShifts: 1, color: .pink),
-            ShiftType(name: "MLF", minShifts: nil, maxShifts: 1, color: .green)
+            ShiftType(name: "Overnight", minShifts: 1, maxShifts: nil, color: .purple),
+            ShiftType(name: "Community", minShifts: nil, maxShifts: 1, color: .red),
+            ShiftType(name: "MLF", minShifts: nil, maxShifts: 1, color: .brown)
         ]
     }
 

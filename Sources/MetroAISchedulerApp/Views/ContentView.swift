@@ -108,22 +108,24 @@ private struct ActionsAndRulesPane: View {
                         Text("Block Window")
                             .font(.headline)
                         HStack(spacing: 16) {
-                            styledRow("Block Start Day") {
+                            blockField("Block Start Day") {
                                 DatePicker("", selection: $viewModel.project.blockWindow.startDate, displayedComponents: .date)
                                     .labelsHidden()
+                                    .frame(maxWidth: .infinity, alignment: .leading)
                             }
-                            styledRow("End Day") {
+                            blockField("End Day") {
                                 DatePicker("", selection: $viewModel.project.blockWindow.endDate, displayedComponents: .date)
                                     .labelsHidden()
+                                    .frame(maxWidth: .infinity, alignment: .leading)
                             }
-                            styledRow("Conference Day") {
+                            blockField("Conference Day") {
                                 Picker("", selection: $viewModel.project.rules.conferenceDay) {
                                     ForEach(weekdayOrder) { day in
                                         Text(day.fullName).tag(day)
                                     }
                                 }
                                 .labelsHidden()
-                                .frame(maxWidth: 180)
+                                .frame(minWidth: 140, maxWidth: .infinity, alignment: .leading)
                             }
                         }
                     }
@@ -214,14 +216,13 @@ private struct ActionsAndRulesPane: View {
     }
 
     @ViewBuilder
-    private func styledRow<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {
-        HStack(spacing: 10) {
-            Text("\(title):")
+    private func blockField<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(title)
                 .fontWeight(.medium)
-                .frame(width: 110, alignment: .leading)
             content()
-            Spacer(minLength: 0)
         }
+        .frame(minWidth: 150, maxWidth: .infinity, alignment: .leading)
     }
 
     @ViewBuilder

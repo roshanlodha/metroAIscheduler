@@ -12,7 +12,7 @@
     },
     {
       "id": "d8a06c71-327f-4c59-9b17-bb95abb03456",
-      "color": "teal",
+      "color": "green",
       "name": "Acute",
       "minShifts": 2,
       "maxShifts": null
@@ -26,21 +26,21 @@
     },
     {
       "id": "25799f58-af95-46bf-b17f-ec571ec88ddf",
-      "color": "indigo",
+      "color": "purple",
       "name": "Overnight",
       "minShifts": 2,
       "maxShifts": null
     },
     {
       "id": "2c9af7c3-cc65-4095-b31c-cc3831fbf1cf",
-      "color": "pink",
+      "color": "red",
       "name": "Community",
       "minShifts": 1,
       "maxShifts": 1
     },
     {
       "id": "14e2403d-35e3-419e-849f-9d866cf8d26b",
-      "color": "green",
+      "color": "brown",
       "name": "MLF",
       "minShifts": 1,
       "maxShifts": 1
