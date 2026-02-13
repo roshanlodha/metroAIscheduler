@@ -38,12 +38,12 @@
     {
       "active" : true,
       "daysOffered" : [
-        5,
-        2,
-        1,
         3,
+        7,
+        2,
+        5,
         6,
-        7
+        1
       ],
       "endTime" : {
         "hour" : 15,
@@ -62,9 +62,9 @@
     {
       "active" : true,
       "daysOffered" : [
-        2,
         1,
         5,
+        2,
         7,
         3,
         6
@@ -86,11 +86,11 @@
     {
       "active" : true,
       "daysOffered" : [
+        2,
+        1,
         3,
         5,
-        1,
         6,
-        2,
         7
       ],
       "endTime" : {
@@ -110,12 +110,12 @@
     {
       "active" : true,
       "daysOffered" : [
-        3,
         6,
         7,
+        2,
+        3,
         5,
-        1,
-        2
+        1
       ],
       "endTime" : {
         "hour" : 0,
@@ -134,12 +134,12 @@
     {
       "active" : true,
       "daysOffered" : [
-        1,
         6,
         5,
+        1,
         7,
-        2,
-        4
+        4,
+        2
       ],
       "endTime" : {
         "hour" : 7,
@@ -158,12 +158,12 @@
     {
       "active" : true,
       "daysOffered" : [
-        6,
         5,
-        3,
         7,
+        1,
         2,
-        1
+        3,
+        6
       ],
       "endTime" : {
         "hour" : 15,
@@ -182,11 +182,11 @@
     {
       "active" : true,
       "daysOffered" : [
-        5,
         7,
-        6,
-        1,
         3,
+        5,
+        1,
+        6,
         2
       ],
       "endTime" : {
@@ -206,12 +206,12 @@
     {
       "active" : true,
       "daysOffered" : [
-        3,
-        2,
+        5,
         6,
-        7,
+        2,
+        3,
         1,
-        5
+        7
       ],
       "endTime" : {
         "hour" : 17,
@@ -231,11 +231,11 @@
       "active" : true,
       "daysOffered" : [
         1,
-        5,
-        2,
+        6,
         7,
+        2,
         3,
-        6
+        5
       ],
       "endTime" : {
         "hour" : 17,
@@ -293,48 +293,7 @@
     }
   ],
   "students" : [
-    {
-      "email" : "",
-      "firstName" : "Alice",
-      "id" : "D8AB2967-2A9A-410C-B456-D330E85BFF18",
-      "lastName" : ""
-    },
-    {
-      "email" : "",
-      "firstName" : "Bob",
-      "id" : "DD933D10-90D5-4F16-B907-67105E859F08",
-      "lastName" : ""
-    },
-    {
-      "email" : "",
-      "firstName" : "Charlie",
-      "id" : "BB2989E1-0E5C-46E9-80B6-8C47040F78A0",
-      "lastName" : ""
-    },
-    {
-      "email" : "",
-      "firstName" : "Derrick",
-      "id" : "B7376DD2-D28D-42A9-A93A-C48B1156DE63",
-      "lastName" : ""
-    },
-    {
-      "email" : "",
-      "firstName" : "Evelyn",
-      "id" : "6276D3A3-B8DC-4542-88BD-CAFA4F202A57",
-      "lastName" : ""
-    },
-    {
-      "email" : "",
-      "firstName" : "Gerald",
-      "id" : "253A7718-6F87-4871-B859-673D22AA8CC8",
-      "lastName" : ""
-    },
-    {
-      "email" : "",
-      "firstName" : "Henry",
-      "id" : "6832B10F-B642-4EFE-9538-F7BCFD6E29D2",
-      "lastName" : ""
-    }
+
   ],
   "templateLibrary" : [
     {
@@ -346,10 +305,10 @@
           "daysOffered" : [
             3,
             5,
-            1,
             7,
+            6,
             2,
-            6
+            1
           ],
           "endTime" : {
             "hour" : 15,
@@ -368,10 +327,10 @@
         {
           "active" : true,
           "daysOffered" : [
-            5,
-            6,
-            2,
             3,
+            5,
+            2,
+            6,
             7,
             1
           ],
@@ -392,12 +351,12 @@
         {
           "active" : true,
           "daysOffered" : [
-            1,
-            3,
             7,
+            3,
             2,
+            6,
             5,
-            6
+            1
           ],
           "endTime" : {
             "hour" : 0,
@@ -416,11 +375,11 @@
         {
           "active" : true,
           "daysOffered" : [
+            5,
             6,
-            7,
             2,
-            1,
-            5
+            7,
+            1
           ],
           "endTime" : {
             "hour" : 7,
@@ -439,9 +398,9 @@
         {
           "active" : true,
           "daysOffered" : [
-            1,
-            2,
             7,
+            2,
+            1,
             3,
             6,
             5
@@ -463,12 +422,12 @@
         {
           "active" : true,
           "daysOffered" : [
+            5,
             1,
-            3,
             7,
-            2,
             6,
-            5
+            2,
+            3
           ],
           "endTime" : {
             "hour" : 15,
@@ -487,12 +446,12 @@
         {
           "active" : true,
           "daysOffered" : [
-            7,
             3,
             5,
             6,
             2,
-            1
+            1,
+            7
           ],
           "endTime" : {
             "hour" : 17,
@@ -513,9 +472,9 @@
           "daysOffered" : [
             3,
             5,
-            1,
             7,
             2,
+            1,
             6
           ],
           "endTime" : {
