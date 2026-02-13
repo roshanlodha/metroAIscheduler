@@ -1,5 +1,5 @@
 import XCTest
-@testable import MetroAISchedulerApp
+@testable import EMShiftSchedulerApp
 
 final class ShiftExpansionTests: XCTestCase {
     func testExpansionRespectsWeekdaysAndDeterministicID() {

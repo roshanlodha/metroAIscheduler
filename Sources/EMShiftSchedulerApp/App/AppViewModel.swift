@@ -165,7 +165,7 @@ final class AppViewModel: ObservableObject {
 
             guard process.terminationStatus == 0 else {
                 throw NSError(
-                    domain: "MetroAIScheduler.ZipExport",
+                    domain: "EMShiftScheduler.ZipExport",
                     code: Int(process.terminationStatus),
                     userInfo: [NSLocalizedDescriptionKey: "zip command failed with code \(process.terminationStatus)"]
                 )

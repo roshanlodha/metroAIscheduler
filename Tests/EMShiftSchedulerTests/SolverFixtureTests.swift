@@ -1,5 +1,5 @@
 import XCTest
-@testable import MetroAISchedulerApp
+@testable import EMShiftSchedulerApp
 
 final class SolverFixtureTests: XCTestCase {
     func testDeterministicFixtureSolverProducesStableAssignments() throws {

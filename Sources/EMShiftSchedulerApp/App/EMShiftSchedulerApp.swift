@@ -2,7 +2,7 @@ import SwiftUI
 import AppKit
 
 @main
-struct MetroAISchedulerApp: App {
+struct EMShiftSchedulerApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @StateObject private var viewModel = AppViewModel()
 
@@ -14,7 +14,7 @@ struct MetroAISchedulerApp: App {
         .windowResizability(.automatic)
         .commands {
             CommandGroup(replacing: .appTermination) {
-                Button("Quit MetroAIScheduler") {
+                Button("Quit EM Shift Scheduler") {
                     NSApplication.shared.terminate(nil)
                 }
                 .keyboardShortcut("q", modifiers: [.command])

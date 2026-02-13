@@ -2,23 +2,23 @@
 import PackageDescription
 
 let package = Package(
-    name: "MetroAIScheduler",
+    name: "EMShiftScheduler",
     platforms: [
         .macOS(.v14)
     ],
     products: [
-        .executable(name: "MetroAISchedulerApp", targets: ["MetroAISchedulerApp"])
+        .executable(name: "EMShiftSchedulerApp", targets: ["EMShiftSchedulerApp"])
     ],
     targets: [
         .executableTarget(
-            name: "MetroAISchedulerApp",
+            name: "EMShiftSchedulerApp",
             resources: [
                 .process("Resources")
             ]
         ),
         .testTarget(
-            name: "MetroAISchedulerTests",
-            dependencies: ["MetroAISchedulerApp"]
+            name: "EMShiftSchedulerTests",
+            dependencies: ["EMShiftSchedulerApp"]
         )
     ]
 )

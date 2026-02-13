@@ -1,20 +1,20 @@
-# EM Scheduler
+# EM Shift Scheduler
 
 EM Shift Scheduler is a macOS desktop app that builds student schedules for EM Acting Internships with constraint programming. `metro.json` is provided as an example project. 
 
 ## Xcode Structure
 
-- `MetroAIScheduler.xcodeproj` (native macOS app project)
-- Target: `MetroAIScheduler`
+- `EMShiftScheduler.xcodeproj` (native macOS app project)
+- Target: `EMShiftScheduler`
 - Deployment target: `macOS 26.0`
-- Swift sources: `Sources/MetroAISchedulerApp/**`
-- Bundled solver script resource: `Sources/MetroAISchedulerApp/Resources/ortools_solver.py`
+- Swift sources: `Sources/EMShiftSchedulerApp/**`
+- Bundled solver script resource: `Sources/EMShiftSchedulerApp/Resources/ortools_solver.py`
 - UI layout: tabbed main view (no sidebar)
 
 Open in Xcode:
 
 ```bash
-open MetroAIScheduler.xcodeproj
+open EMShiftScheduler.xcodeproj
 ```
 
 Run with `Cmd+R`.
@@ -29,15 +29,15 @@ Use:
 
 This script:
 
-1. Builds `MetroAIScheduler.app` in Release mode via `xcodebuild`.
+1. Builds `EM Shift Scheduler.app` in Release mode via `xcodebuild`.
 2. Extracts bundled CPython runtime from:
    - `cpython-3.12.12+20260127-aarch64-apple-darwin-install_only.tar`
 3. Copies Python packages (including OR-Tools) from:
    - `env/lib/python3.12/site-packages`
 4. Embeds both into:
-   - `MetroAIScheduler.app/Contents/Resources/python`
+   - `EM Shift Scheduler.app/Contents/Resources/python`
 5. Outputs distributable app at:
-   - `dist/MetroAIScheduler.app`
+   - `dist/EM Shift Scheduler.app`
 
 No Python or pip installation is required on end-user machines.
 
