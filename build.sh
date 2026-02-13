@@ -8,8 +8,10 @@ CONFIGURATION="Release"
 DERIVED_DATA_BASE="$ROOT_DIR/build/DerivedData"
 DERIVED_DATA_PATH="$DERIVED_DATA_BASE/run-$(date +%Y%m%d-%H%M%S)"
 DIST_DIR="$ROOT_DIR/dist"
-DIST_APP_PATH="$DIST_DIR/EM Shift Scheduler.app"
+DIST_APP_PATH="$DIST_DIR/EMShiftScheduler.app"
 DIST_DMG_PATH="$DIST_DIR/EMShiftScheduler.dmg"
+LEGACY_DIST_APP_PATH_ONE="$DIST_DIR/EM Shift Scheduler.app"
+LEGACY_DIST_APP_PATH_TWO="$DIST_DIR/MetroAIScheduler.app"
 
 PYTHON_TAR="$ROOT_DIR/cpython-3.12.12+20260127-aarch64-apple-darwin-install_only.tar"
 VENV_SITE_PACKAGES="$ROOT_DIR/env/lib/python3.12/site-packages"
@@ -31,10 +33,11 @@ fi
 echo "[0/6] Clearing local build caches"
 # Best-effort cleanup: macOS indexing can repopulate folders during deletion.
 rm -rf "$DERIVED_DATA_BASE" "$ROOT_DIR/.build" "$DIST_APP_PATH" "$PY_STAGING_DIR" 2>/dev/null || true
+rm -rf "$LEGACY_DIST_APP_PATH_ONE" "$LEGACY_DIST_APP_PATH_TWO" 2>/dev/null || true
 rm -f "$DIST_DMG_PATH" 2>/dev/null || true
 mkdir -p "$DERIVED_DATA_BASE"
 
-echo "[1/6] Building EM Shift Scheduler.app (Release)"
+echo "[1/6] Building $SCHEME.app (Release)"
 xcodebuild \
   -project "$PROJECT_PATH" \
   -scheme "$SCHEME" \
@@ -43,9 +46,10 @@ xcodebuild \
   -destination "generic/platform=macOS" \
   build >/tmp/metro_ai_scheduler_xcodebuild.log
 
-APP_PATH="$DERIVED_DATA_PATH/Build/Products/$CONFIGURATION/EM Shift Scheduler.app"
-if [[ ! -d "$APP_PATH" ]]; then
-  echo "Build succeeded but app bundle was not found at: $APP_PATH" >&2
+PRODUCTS_DIR="$DERIVED_DATA_PATH/Build/Products/$CONFIGURATION"
+APP_PATH="$(find "$PRODUCTS_DIR" -maxdepth 1 -type d -name "*.app" | sort | head -n 1)"
+if [[ -z "$APP_PATH" ]]; then
+  echo "Build succeeded but no .app bundle was found in: $PRODUCTS_DIR" >&2
   echo "See /tmp/metro_ai_scheduler_xcodebuild.log" >&2
   exit 1
 fi
@@ -79,7 +83,7 @@ codesign --force --deep --sign - "$DIST_APP_PATH" >/dev/null 2>&1 || true
 
 echo "[6/6] Packaging .dmg for distribution"
 hdiutil create \
-  -volname "EM Shift Scheduler" \
+  -volname "EMShiftScheduler" \
   -srcfolder "$DIST_APP_PATH" \
   -ov \
   -format UDZO \

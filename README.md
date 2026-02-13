@@ -1,6 +1,6 @@
 # EM Shift Scheduler
 
-EM Shift Scheduler is a macOS desktop app that builds student schedules for EM Acting Internships with constraint programming. `metro.json` is provided as an example project. 
+EM Shift Scheduler is a macOS desktop app that builds student schedules for EM Acting Internships with constraint programming. A sample project is available at `templates/metroAI.json`.
 
 ## Xcode Structure
 
@@ -9,7 +9,7 @@ EM Shift Scheduler is a macOS desktop app that builds student schedules for EM A
 - Deployment target: `macOS 26.0`
 - Swift sources: `Sources/EMShiftSchedulerApp/**`
 - Bundled solver script resource: `Sources/EMShiftSchedulerApp/Resources/ortools_solver.py`
-- UI layout: tabbed main view (no sidebar)
+- UI layout: single main workspace (shift templates on the left, students + scheduling controls on the right)
 
 Open in Xcode:
 
@@ -63,7 +63,7 @@ Coverage includes:
 
 ## Sample Data
 
-- Example project JSON: `Examples/sample_project.json`
+- Example project JSON: `templates/metroAI.json`
 - Shift template bundles are stored in `templateLibrary`; each bundle contains multiple shifts.
 - The app includes a Metro preset derived from `solve.py` for:
   - `Trauma`, `Overnight`, `Acute`, `West`, `Community`, `MLF`

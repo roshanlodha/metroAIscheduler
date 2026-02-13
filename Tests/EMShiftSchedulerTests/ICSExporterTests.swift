@@ -11,7 +11,7 @@ final class ICSExporterTests: XCTestCase {
         project.blockWindow.startDate = localDate(year: 2026, month: 2, day: 9, timezone: project.rules.timezone)
         project.blockWindow.endDate = localDate(year: 2026, month: 2, day: 22, timezone: project.rules.timezone)
 
-        let student = Student(firstName: "Taylor", lastName: "Lee", email: "taylor@example.edu")
+        let student = Student(name: "Taylor Lee", email: "taylor@example.edu")
         project.students = [student]
         let result = ScheduleResult(generatedAt: Date(), shiftInstances: [], assignments: [])
 

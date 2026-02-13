@@ -49,9 +49,6 @@ struct ContentView: View {
             ToolbarItemGroup(placement: .primaryAction) {
                 Button("Load Project") { loadProject() }
                 Button("Save Project") { saveProject() }
-                SettingsLink {
-                    Label("Settings", systemImage: "gearshape")
-                }
             }
         }
         .onChange(of: viewModel.result) { _, newValue in
@@ -136,129 +133,132 @@ private struct ActionsAndRulesPane: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 12) {
-                GroupBox {
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text("Block Window")
-                            .font(.headline)
-                        HStack(spacing: 16) {
-                            blockField("Block Start Day") {
-                                DatePicker("", selection: dateOnlyBinding($viewModel.project.blockWindow.startDate), displayedComponents: .date)
-                                    .environment(\.timeZone, projectTimeZone)
-                                    .labelsHidden()
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                            }
-                            blockField("End Day") {
-                                DatePicker("", selection: dateOnlyBinding($viewModel.project.blockWindow.endDate), displayedComponents: .date)
-                                    .environment(\.timeZone, projectTimeZone)
-                                    .labelsHidden()
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                            }
-                        }
+                sectionTitle("Block Settings")
+                HStack(spacing: 16) {
+                    blockField("Start Date") {
+                        DatePicker("", selection: dateOnlyBinding($viewModel.project.blockWindow.startDate), displayedComponents: .date)
+                            .environment(\.timeZone, projectTimeZone)
+                            .labelsHidden()
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    blockField("End Date") {
+                        DatePicker("", selection: dateOnlyBinding($viewModel.project.blockWindow.endDate), displayedComponents: .date)
+                            .environment(\.timeZone, projectTimeZone)
+                            .labelsHidden()
+                            .frame(maxWidth: .infinity, alignment: .leading)
                     }
                 }
 
-                GroupBox {
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text("Orientation")
-                            .font(.headline)
-                        HStack(spacing: 16) {
-                            blockField("Start Day") {
-                                DatePicker("", selection: dateOnlyBinding($viewModel.project.orientation.startDate), displayedComponents: .date)
-                                    .environment(\.timeZone, projectTimeZone)
-                                    .labelsHidden()
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                            }
-                            blockField("Start Time") {
-                                DatePicker(
-                                    "",
-                                    selection: localTimeBinding($viewModel.project.orientation.startTime),
-                                    displayedComponents: .hourAndMinute
-                                )
-                                .labelsHidden()
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                            }
-                            blockField("End Time") {
-                                DatePicker(
-                                    "",
-                                    selection: localTimeBinding($viewModel.project.orientation.endTime),
-                                    displayedComponents: .hourAndMinute
-                                )
-                                .labelsHidden()
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                            }
-                        }
+                Divider()
+
+                sectionTitle("Orientation")
+                HStack(spacing: 16) {
+                    blockField("Date") {
+                        DatePicker("", selection: dateOnlyBinding($viewModel.project.orientation.startDate), displayedComponents: .date)
+                            .environment(\.timeZone, projectTimeZone)
+                            .labelsHidden()
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    blockField("Start Time") {
+                        DatePicker(
+                            "",
+                            selection: localTimeBinding($viewModel.project.orientation.startTime),
+                            displayedComponents: .hourAndMinute
+                        )
+                        .labelsHidden()
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    blockField("End Time") {
+                        DatePicker(
+                            "",
+                            selection: localTimeBinding($viewModel.project.orientation.endTime),
+                            displayedComponents: .hourAndMinute
+                        )
+                        .labelsHidden()
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     }
                 }
 
-                GroupBox {
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text("Conference")
-                            .font(.headline)
-                        HStack(spacing: 16) {
-                            blockField("Day") {
-                                Picker("", selection: $viewModel.project.rules.conferenceDay) {
-                                    ForEach(weekdayOrder) { day in
-                                        Text(day.fullName).tag(day)
-                                    }
-                                }
-                                .labelsHidden()
-                                .frame(minWidth: 140, maxWidth: .infinity, alignment: .leading)
-                            }
-                            blockField("Start Time") {
-                                DatePicker(
-                                    "",
-                                    selection: localTimeBinding($viewModel.project.rules.conferenceStartTime),
-                                    displayedComponents: .hourAndMinute
-                                )
-                                .labelsHidden()
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                            }
-                            blockField("End Time") {
-                                DatePicker(
-                                    "",
-                                    selection: localTimeBinding($viewModel.project.rules.conferenceEndTime),
-                                    displayedComponents: .hourAndMinute
-                                )
-                                .labelsHidden()
-                                .frame(maxWidth: .infinity, alignment: .leading)
+                Divider()
+
+                sectionTitle("Conference")
+                HStack(spacing: 16) {
+                    blockField("Day") {
+                        Picker("", selection: $viewModel.project.rules.conferenceDay) {
+                            ForEach(weekdayOrder) { day in
+                                Text(day.fullName).tag(day)
                             }
                         }
+                        .labelsHidden()
+                        .frame(minWidth: 140, maxWidth: .infinity, alignment: .leading)
+                    }
+                    blockField("Start Time") {
+                        DatePicker(
+                            "",
+                            selection: localTimeBinding($viewModel.project.rules.conferenceStartTime),
+                            displayedComponents: .hourAndMinute
+                        )
+                        .labelsHidden()
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    blockField("End Time") {
+                        DatePicker(
+                            "",
+                            selection: localTimeBinding($viewModel.project.rules.conferenceEndTime),
+                            displayedComponents: .hourAndMinute
+                        )
+                        .labelsHidden()
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     }
                 }
 
-                GroupBox {
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text("General Rules")
-                            .font(.headline)
+                Divider()
 
-                        HStack(spacing: 12) {
-                            styledStepperRow(
-                                title: "Time Off (hours)",
-                                value: $viewModel.project.rules.timeOffHours,
-                                in: 0...72
-                            )
-                            styledStepperRow(
-                                title: "Required Number of Shifts",
-                                value: $viewModel.project.rules.numShiftsRequired,
-                                in: 0...100
-                            )
-                        }
-                    }
+                sectionTitle("Requirements")
+                HStack(spacing: 12) {
+                    styledStepperRow(
+                        title: "Time Off (hrs)",
+                        value: $viewModel.project.rules.timeOffHours,
+                        in: 0...72
+                    )
+                    styledStepperRow(
+                        title: "Required Shift Count",
+                        value: $viewModel.project.rules.numShiftsRequired,
+                        in: 0...100
+                    )
                 }
 
-                HStack {
+                Divider()
+
+                sectionTitle("Advanced")
+                HStack(spacing: 12) {
+                    styledStepperRow(
+                        title: "Solver Time (s)",
+                        value: $viewModel.project.rules.solverTimeLimitSeconds,
+                        in: 1...300
+                    )
+                    Toggle("Double Booking", isOn: doubleBookingBinding)
+                        .toggleStyle(.checkbox)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+
+                Divider()
+
+                HStack(alignment: .center) {
                     Button(action: viewModel.createSchedule) {
                         if viewModel.isSolving {
                             ProgressView()
+                                .controlSize(.small)
                         } else {
-                            Text("Generate Schedule")
+                            Image(systemName: "play.fill")
+                                .font(.title3)
                         }
                     }
                     .buttonStyle(.borderedProminent)
+                    .controlSize(.large)
+                    .help("Generate schedule")
                     .disabled(viewModel.isSolving)
-
                     Spacer()
-
                     if viewModel.result != nil {
                         Button("Export JSON") { exportJSON() }
                         Button("Export CSV") { exportCSV() }
@@ -314,31 +314,48 @@ private struct ActionsAndRulesPane: View {
     private func blockField<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(title)
-                .fontWeight(.medium)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.secondary)
             content()
         }
         .frame(minWidth: 150, maxWidth: .infinity, alignment: .leading)
     }
 
     @ViewBuilder
+    private func sectionTitle(_ title: String) -> some View {
+        Text(title)
+            .font(.title3.weight(.semibold))
+            .padding(.top, 2)
+    }
+
+    @ViewBuilder
     private func styledStepperRow(title: String, value: Binding<Int>, in range: ClosedRange<Int>) -> some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 8) {
             Text("\(title):")
-                .fontWeight(.medium)
-                .frame(width: 170, alignment: .leading)
+                .font(.subheadline.weight(.semibold))
+                .lineLimit(1)
+                .frame(minWidth: 120, alignment: .leading)
             Stepper(value: value, in: range) {
                 Text("\(value.wrappedValue)")
                     .monospacedDigit()
+                    .font(.headline.weight(.semibold))
             }
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, 6)
         .padding(.horizontal, 10)
-        .background(Color(nsColor: .windowBackgroundColor))
+        .background(Color(nsColor: .windowBackgroundColor).opacity(0.65))
         .overlay(
             RoundedRectangle(cornerRadius: 8, style: .continuous)
                 .stroke(Color.primary.opacity(0.08), lineWidth: 1)
         )
         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+    }
+
+    private var doubleBookingBinding: Binding<Bool> {
+        Binding(
+            get: { !viewModel.project.rules.noDoubleBooking },
+            set: { viewModel.project.rules.noDoubleBooking = !$0 }
+        )
     }
 
     private func localTimeBinding(_ localTime: Binding<LocalTime>) -> Binding<Date> {

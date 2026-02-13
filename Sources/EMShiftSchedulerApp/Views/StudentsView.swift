@@ -21,26 +21,16 @@ struct StudentsView: View {
         }
         .padding()
         .onAppear {
-            seedDefaultStudentsIfNeeded()
             ensureTrailingEmptyRow()
         }
         .onChange(of: project.students) { _, _ in
-            ensureTrailingEmptyRow()
-        }
-        .onChange(of: project.defaultStudentCount) { oldValue, newValue in
-            guard newValue != oldValue else { return }
-            seedDefaultStudentsIfNeeded()
             ensureTrailingEmptyRow()
         }
     }
 
     private var headerRow: some View {
         HStack(spacing: 10) {
-            Text("First")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .frame(maxWidth: .infinity, alignment: .leading)
-            Text("Last")
+            Text("Name")
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -58,9 +48,7 @@ struct StudentsView: View {
     private func studentRow(for student: Student) -> some View {
         let rowBinding = binding(for: student)
         HStack(spacing: 10) {
-            TextField("First", text: rowBinding.firstName)
-                .textFieldStyle(.roundedBorder)
-            TextField("Last", text: rowBinding.lastName)
+            TextField("Name", text: rowBinding.name)
                 .textFieldStyle(.roundedBorder)
             TextField("Email", text: rowBinding.email)
                 .textFieldStyle(.roundedBorder)
@@ -97,21 +85,8 @@ struct StudentsView: View {
         }
     }
 
-    private func seedDefaultStudentsIfNeeded() {
-        let nonEmpty = project.students.filter { !isEmpty($0) }
-        guard nonEmpty.isEmpty, project.students.count <= 1, project.defaultStudentCount > 0 else {
-            return
-        }
-
-        let seeded = (1...project.defaultStudentCount).map { index in
-            Student(firstName: "Student \(index)")
-        }
-        project.students = seeded + [Student()]
-    }
-
     private func isEmpty(_ student: Student) -> Bool {
-        student.firstName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
-        student.lastName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
+        student.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
         student.email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 }

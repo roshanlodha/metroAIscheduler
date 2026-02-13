@@ -212,7 +212,7 @@ struct GlobalScheduleRules: Codable, Equatable {
         GlobalScheduleRules(
             timeOffHours: 10,
             numShiftsRequired: 14,
-            timezone: "America/New_York",
+            timezone: TimeZone.current.identifier,
             noDoubleBooking: true,
             blockStartDay: .monday,
             conferenceDay: .wednesday,
@@ -261,9 +261,10 @@ struct GlobalScheduleRules: Codable, Equatable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         timeOffHours = try container.decode(Int.self, forKey: .timeOffHours)
         numShiftsRequired = try container.decode(Int.self, forKey: .numShiftsRequired)
-        timezone = try container.decode(String.self, forKey: .timezone)
+        timezone = TimeZone.current.identifier
         noDoubleBooking = try container.decode(Bool.self, forKey: .noDoubleBooking)
-        blockStartDay = try container.decodeIfPresent(Weekday.self, forKey: .blockStartDay) ?? .monday
+        _ = try container.decodeIfPresent(Weekday.self, forKey: .blockStartDay)
+        blockStartDay = .monday
         solverTimeLimitSeconds = try container.decode(Int.self, forKey: .solverTimeLimitSeconds)
 
         if let conferenceDay = try container.decodeIfPresent(Weekday.self, forKey: .conferenceDay) {
@@ -292,18 +293,48 @@ struct GlobalScheduleRules: Codable, Equatable {
 
 struct Student: Identifiable, Codable, Equatable {
     var id: UUID
-    var firstName: String
-    var lastName: String
+    var name: String
     var email: String
 
-    init(id: UUID = UUID(), firstName: String = "", lastName: String = "", email: String = "") {
+    enum CodingKeys: String, CodingKey {
+        case id
+        case name
+        case email
+        case firstName
+        case lastName
+    }
+
+    init(id: UUID = UUID(), name: String = "", email: String = "") {
         self.id = id
-        self.firstName = firstName
-        self.lastName = lastName
+        self.name = name
         self.email = email
     }
 
-    var displayName: String { "\(firstName) \(lastName)".trimmingCharacters(in: .whitespaces) }
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
+        email = try container.decodeIfPresent(String.self, forKey: .email) ?? ""
+
+        if let decodedName = try container.decodeIfPresent(String.self, forKey: .name) {
+            name = decodedName
+        } else {
+            let first = try container.decodeIfPresent(String.self, forKey: .firstName) ?? ""
+            let last = try container.decodeIfPresent(String.self, forKey: .lastName) ?? ""
+            name = "\(first) \(last)".trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(name, forKey: .name)
+        try container.encode(email, forKey: .email)
+    }
+
+    var displayName: String {
+        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? "Unnamed Student" : trimmed
+    }
 }
 
 struct BlockWindow: Codable, Equatable {
@@ -443,8 +474,8 @@ struct ScheduleTemplateProject: Codable, Equatable {
             shiftTypes: MetroPresetFactory.metroShiftTypes(),
             templateLibrary: [metroTemplate],
             students: [
-                Student(firstName: "Alex", lastName: "Kim", email: "alex@example.edu"),
-                Student(firstName: "Jordan", lastName: "Patel", email: "jordan@example.edu")
+                Student(name: "Alex Kim", email: "alex@example.edu"),
+                Student(name: "Jordan Patel", email: "jordan@example.edu")
             ],
             defaultStudentCount: 2,
             orientation: .default(startDate: blockWindow.startDate),
@@ -458,12 +489,25 @@ struct ScheduleTemplateProject: Codable, Equatable {
         calendar.timeZone = TimeZone(identifier: GlobalScheduleRules.default.timezone) ?? .current
         calendar.firstWeekday = 2
 
-        let weekStart = calendar.dateInterval(of: .weekOfYear, for: now)?.start ?? calendar.startOfDay(for: now)
+        let today = calendar.startOfDay(for: now)
+        let weekStart = calendar.dateInterval(of: .weekOfYear, for: today)?.start ?? today
         let dayOrder: [Weekday] = [.monday, .tuesday, .wednesday, .thursday, .friday, .saturday, .sunday]
         let offset = dayOrder.firstIndex(of: blockStartDay) ?? 0
-        let start = calendar.date(byAdding: .day, value: offset, to: weekStart) ?? weekStart
-        let end = calendar.date(byAdding: .day, value: 22, to: start) ?? start
-        return BlockWindow(startDate: start, endDate: end)
+        var start = calendar.date(byAdding: .day, value: offset, to: weekStart) ?? weekStart
+        if start <= today {
+            start = calendar.date(byAdding: .day, value: 7, to: start) ?? start
+        }
+        let end = calendar.date(byAdding: .day, value: 25, to: start) ?? start
+        return BlockWindow(startDate: noon(start, calendar: calendar), endDate: noon(end, calendar: calendar))
+    }
+
+    private static func noon(_ date: Date, calendar: Calendar) -> Date {
+        var components = calendar.dateComponents([.year, .month, .day], from: date)
+        components.hour = 12
+        components.minute = 0
+        components.second = 0
+        components.timeZone = calendar.timeZone
+        return calendar.date(from: components) ?? date
     }
 }
 

@@ -20,10 +20,6 @@ struct EMShiftSchedulerApp: App {
                 .keyboardShortcut("q", modifiers: [.command])
             }
         }
-
-        Settings {
-            SettingsView(viewModel: viewModel)
-        }
     }
 }
 

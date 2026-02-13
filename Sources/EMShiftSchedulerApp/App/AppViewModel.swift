@@ -246,9 +246,9 @@ final class AppViewModel: ObservableObject {
     }
 
     private func normalizeProject() {
+        project.rules.timezone = TimeZone.current.identifier
         project.students.removeAll { student in
-            student.firstName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
-            student.lastName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
+            student.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
             student.email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
         }
         normalizeShiftTypes()
@@ -286,7 +286,7 @@ final class AppViewModel: ObservableObject {
     }
 
     private func sanitizedICSName(for student: Student, fallbackIndex: Int) -> String {
-        let baseRaw = "\(student.firstName)_\(student.lastName)"
+        let baseRaw = student.name
         let trimmed = baseRaw
             .trimmingCharacters(in: .whitespacesAndNewlines)
             .replacingOccurrences(of: " ", with: "_")
@@ -302,8 +302,7 @@ final class AppViewModel: ObservableObject {
     }
 
     private func isBlankStudent(_ student: Student) -> Bool {
-        student.firstName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
-        student.lastName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
+        student.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
         student.email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
