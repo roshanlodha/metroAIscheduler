@@ -2,22 +2,35 @@ import SwiftUI
 
 struct StudentsView: View {
     @Binding var project: ScheduleTemplateProject
+    private let actionColumnWidth: CGFloat = 34
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("Students")
                 .font(.title3)
 
-            headerRow
-
-            ScrollView {
-                LazyVStack(spacing: 8) {
-                    ForEach(project.students) { student in
-                        studentRow(for: student)
+            VStack(spacing: 0) {
+                headerRow
+                Divider()
+                ScrollView {
+                    LazyVStack(spacing: 0) {
+                        ForEach(Array(project.students.enumerated()), id: \.element.id) { index, student in
+                            studentRow(for: student, index: index)
+                            if index < project.students.count - 1 {
+                                Divider()
+                            }
+                        }
                     }
                 }
-                .padding(.top, 2)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             }
+            .background(Color(nsColor: .windowBackgroundColor))
+            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .stroke(Color.primary.opacity(0.12), lineWidth: 1)
+            )
+            .frame(maxHeight: .infinity, alignment: .top)
         }
         .padding()
         .onAppear {
@@ -29,43 +42,54 @@ struct StudentsView: View {
     }
 
     private var headerRow: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 0) {
             Text("Name")
-                .font(.caption)
-                .foregroundStyle(.secondary)
+                .font(.headline.weight(.semibold))
                 .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 10)
+            Divider()
             Text("Email")
-                .font(.caption)
-                .foregroundStyle(.secondary)
+                .font(.headline.weight(.semibold))
                 .frame(maxWidth: .infinity, alignment: .leading)
-            Spacer()
-                .frame(width: 24)
+                .padding(.horizontal, 10)
+            Divider()
+            Text("")
+                .frame(width: actionColumnWidth)
         }
-        .padding(.horizontal, 6)
+        .frame(height: 32)
+        .foregroundStyle(.secondary)
+        .background(Color.primary.opacity(0.05))
     }
 
     @ViewBuilder
-    private func studentRow(for student: Student) -> some View {
+    private func studentRow(for student: Student, index: Int) -> some View {
         let rowBinding = binding(for: student)
-        HStack(spacing: 10) {
-            TextField("Name", text: rowBinding.name)
-                .textFieldStyle(.roundedBorder)
-            TextField("Email", text: rowBinding.email)
-                .textFieldStyle(.roundedBorder)
+        HStack(spacing: 0) {
+            TextField("Example Student", text: rowBinding.name)
+                .textFieldStyle(.plain)
+                .padding(.horizontal, 10)
+                .frame(maxWidth: .infinity, minHeight: 30, alignment: .leading)
+            Divider()
+            TextField("student@example.com", text: rowBinding.email)
+                .textFieldStyle(.plain)
+                .padding(.horizontal, 10)
+                .frame(maxWidth: .infinity, minHeight: 30, alignment: .leading)
+            Divider()
 
             if !isEmpty(student) {
                 Button(role: .destructive) {
                     project.students.removeAll { $0.id == student.id }
                 } label: {
                     Image(systemName: "trash")
+                        .frame(width: actionColumnWidth)
                 }
                 .buttonStyle(.borderless)
             } else {
-                Spacer()
-                    .frame(width: 24)
+                Color.clear
+                    .frame(width: actionColumnWidth, height: 30)
             }
         }
-        .padding(.horizontal, 6)
+        .background(index.isMultiple(of: 2) ? Color.clear : Color.primary.opacity(0.045))
     }
 
     private func binding(for student: Student) -> Binding<Student> {

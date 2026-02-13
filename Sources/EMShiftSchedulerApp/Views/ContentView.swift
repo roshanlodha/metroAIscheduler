@@ -33,8 +33,15 @@ struct ContentView: View {
 
             Divider()
             HStack {
-                Text(viewModel.statusMessage)
-                    .foregroundStyle(.secondary)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(viewModel.statusMessage)
+                    if let statusDetailText {
+                        Text(statusDetailText)
+                            .font(.footnote)
+                    }
+                }
+                .foregroundStyle(.secondary)
+                .lineLimit(2)
                 Spacer()
             }
             .padding(.horizontal, 8)
@@ -65,6 +72,8 @@ struct ContentView: View {
                     rules: viewModel.project.rules,
                     shiftTemplates: viewModel.project.shiftTemplates,
                     shiftTypes: viewModel.project.shiftTypes,
+                    onExportJSON: exportResultJSON,
+                    onExportCSV: exportResultCSV,
                     onExportAllICS: exportAllICS
                 )
             }
@@ -76,13 +85,23 @@ struct ContentView: View {
             BentoCard {
                 StudentsView(project: $viewModel.project)
             }
-            .frame(minHeight: 280)
+            .frame(minHeight: 220, idealHeight: 280, maxHeight: .infinity)
 
             BentoCard {
                 ActionsAndRulesPane(viewModel: viewModel)
             }
-            .frame(minHeight: 360)
+            .frame(minHeight: 300, idealHeight: 380, maxHeight: .infinity)
         }
+    }
+
+    private var statusDetailText: String? {
+        if let diagnostic = viewModel.solverDiagnostic {
+            let details = ([diagnostic.message] + diagnostic.details)
+                .filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+            return details.isEmpty ? nil : details.joined(separator: " • ")
+        }
+        let issueMessages = viewModel.validationIssues.map(\.message)
+        return issueMessages.isEmpty ? nil : issueMessages.joined(separator: " • ")
     }
 
     private var resultBinding: Binding<ScheduleResult>? {
@@ -121,178 +140,9 @@ struct ContentView: View {
             viewModel.saveAllICSArchive(to: url)
         }
     }
-}
 
-private struct ActionsAndRulesPane: View {
-    @ObservedObject var viewModel: AppViewModel
-    private let weekdayOrder: [Weekday] = [.sunday, .monday, .tuesday, .wednesday, .thursday, .friday, .saturday]
-    private var projectTimeZone: TimeZone {
-        TimeZone(identifier: viewModel.project.rules.timezone) ?? .current
-    }
-
-    var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 12) {
-                sectionTitle("Block Settings")
-                HStack(spacing: 16) {
-                    blockField("Start Date") {
-                        DatePicker("", selection: dateOnlyBinding($viewModel.project.blockWindow.startDate), displayedComponents: .date)
-                            .environment(\.timeZone, projectTimeZone)
-                            .labelsHidden()
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                    }
-                    blockField("End Date") {
-                        DatePicker("", selection: dateOnlyBinding($viewModel.project.blockWindow.endDate), displayedComponents: .date)
-                            .environment(\.timeZone, projectTimeZone)
-                            .labelsHidden()
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                    }
-                }
-
-                Divider()
-
-                sectionTitle("Orientation")
-                HStack(spacing: 16) {
-                    blockField("Date") {
-                        DatePicker("", selection: dateOnlyBinding($viewModel.project.orientation.startDate), displayedComponents: .date)
-                            .environment(\.timeZone, projectTimeZone)
-                            .labelsHidden()
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                    }
-                    blockField("Start Time") {
-                        DatePicker(
-                            "",
-                            selection: localTimeBinding($viewModel.project.orientation.startTime),
-                            displayedComponents: .hourAndMinute
-                        )
-                        .labelsHidden()
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    }
-                    blockField("End Time") {
-                        DatePicker(
-                            "",
-                            selection: localTimeBinding($viewModel.project.orientation.endTime),
-                            displayedComponents: .hourAndMinute
-                        )
-                        .labelsHidden()
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    }
-                }
-
-                Divider()
-
-                sectionTitle("Conference")
-                HStack(spacing: 16) {
-                    blockField("Day") {
-                        Picker("", selection: $viewModel.project.rules.conferenceDay) {
-                            ForEach(weekdayOrder) { day in
-                                Text(day.fullName).tag(day)
-                            }
-                        }
-                        .labelsHidden()
-                        .frame(minWidth: 140, maxWidth: .infinity, alignment: .leading)
-                    }
-                    blockField("Start Time") {
-                        DatePicker(
-                            "",
-                            selection: localTimeBinding($viewModel.project.rules.conferenceStartTime),
-                            displayedComponents: .hourAndMinute
-                        )
-                        .labelsHidden()
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    }
-                    blockField("End Time") {
-                        DatePicker(
-                            "",
-                            selection: localTimeBinding($viewModel.project.rules.conferenceEndTime),
-                            displayedComponents: .hourAndMinute
-                        )
-                        .labelsHidden()
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    }
-                }
-
-                Divider()
-
-                sectionTitle("Requirements")
-                HStack(spacing: 12) {
-                    styledStepperRow(
-                        title: "Time Off (hrs)",
-                        value: $viewModel.project.rules.timeOffHours,
-                        in: 0...72
-                    )
-                    styledStepperRow(
-                        title: "Required Shift Count",
-                        value: $viewModel.project.rules.numShiftsRequired,
-                        in: 0...100
-                    )
-                }
-
-                Divider()
-
-                sectionTitle("Advanced")
-                HStack(spacing: 12) {
-                    styledStepperRow(
-                        title: "Solver Time (s)",
-                        value: $viewModel.project.rules.solverTimeLimitSeconds,
-                        in: 1...300
-                    )
-                    Toggle("Double Booking", isOn: doubleBookingBinding)
-                        .toggleStyle(.checkbox)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                }
-
-                Divider()
-
-                HStack(alignment: .center) {
-                    Button(action: viewModel.createSchedule) {
-                        if viewModel.isSolving {
-                            ProgressView()
-                                .controlSize(.small)
-                        } else {
-                            Image(systemName: "play.fill")
-                                .font(.title3)
-                        }
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .controlSize(.large)
-                    .help("Generate schedule")
-                    .disabled(viewModel.isSolving)
-                    Spacer()
-                    if viewModel.result != nil {
-                        Button("Export JSON") { exportJSON() }
-                        Button("Export CSV") { exportCSV() }
-                    }
-                }
-
-                if !viewModel.validationIssues.isEmpty {
-                    GroupBox("Validation") {
-                        ForEach(viewModel.validationIssues) { issue in
-                            Text("• \(issue.message)")
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-                    }
-                }
-
-                if let diagnostic = viewModel.solverDiagnostic {
-                    GroupBox("Solver Diagnostics") {
-                        Text(diagnostic.message)
-                            .font(.headline)
-                        ForEach(diagnostic.details, id: \.self) { detail in
-                            Text("• \(detail)")
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-                    }
-                }
-            }
-            .padding(12)
-        }
-        .onChange(of: viewModel.project) { _, _ in
-            viewModel.validate()
-        }
-    }
-
-    private func exportJSON() {
+    private func exportResultJSON() {
+        guard viewModel.result != nil else { return }
         let panel = NSSavePanel()
         panel.allowedContentTypes = [.json]
         panel.nameFieldStringValue = "schedule-result.json"
@@ -301,7 +151,8 @@ private struct ActionsAndRulesPane: View {
         }
     }
 
-    private func exportCSV() {
+    private func exportResultCSV() {
+        guard viewModel.result != nil else { return }
         let panel = NSSavePanel()
         panel.allowedContentTypes = [.commaSeparatedText]
         panel.nameFieldStringValue = "schedule.csv"
@@ -309,46 +160,212 @@ private struct ActionsAndRulesPane: View {
             viewModel.saveCSV(to: url)
         }
     }
+}
+
+private struct ActionsAndRulesPane: View {
+    @ObservedObject var viewModel: AppViewModel
+    @State private var isAdvancedExpanded = false
+    private let weekdayOrder: [Weekday] = [.sunday, .monday, .tuesday, .wednesday, .thursday, .friday, .saturday]
+    private var projectTimeZone: TimeZone {
+        TimeZone(identifier: viewModel.project.rules.timezone) ?? .current
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 12) {
+                    formSection("Block Settings") {
+                        HStack(spacing: 16) {
+                            inlineField("Start Date") {
+                                DatePicker("", selection: dateOnlyBinding($viewModel.project.blockWindow.startDate), displayedComponents: .date)
+                                    .environment(\.timeZone, projectTimeZone)
+                                    .labelsHidden()
+                            }
+                            inlineField("End Date") {
+                                DatePicker("", selection: dateOnlyBinding($viewModel.project.blockWindow.endDate), displayedComponents: .date)
+                                    .environment(\.timeZone, projectTimeZone)
+                                    .labelsHidden()
+                            }
+                        }
+                    }
+
+                    formSection("Orientation") {
+                        HStack(spacing: 16) {
+                            inlineField("Date") {
+                                DatePicker("", selection: dateOnlyBinding($viewModel.project.orientation.startDate), displayedComponents: .date)
+                                    .environment(\.timeZone, projectTimeZone)
+                                    .labelsHidden()
+                            }
+                            inlineField("Start Time") {
+                                DatePicker(
+                                    "",
+                                    selection: localTimeBinding($viewModel.project.orientation.startTime),
+                                    displayedComponents: .hourAndMinute
+                                )
+                                .labelsHidden()
+                            }
+                            inlineField("End Time") {
+                                DatePicker(
+                                    "",
+                                    selection: localTimeBinding($viewModel.project.orientation.endTime),
+                                    displayedComponents: .hourAndMinute
+                                )
+                                .labelsHidden()
+                            }
+                        }
+                    }
+
+                    formSection("Conference") {
+                        HStack(spacing: 16) {
+                            inlineField("Day") {
+                                Picker("", selection: $viewModel.project.rules.conferenceDay) {
+                                    ForEach(weekdayOrder) { day in
+                                        Text(day.fullName).tag(day)
+                                    }
+                                }
+                                .labelsHidden()
+                                .frame(minWidth: 120, alignment: .leading)
+                            }
+                            inlineField("Start Time") {
+                                DatePicker(
+                                    "",
+                                    selection: localTimeBinding($viewModel.project.rules.conferenceStartTime),
+                                    displayedComponents: .hourAndMinute
+                                )
+                                .labelsHidden()
+                            }
+                            inlineField("End Time") {
+                                DatePicker(
+                                    "",
+                                    selection: localTimeBinding($viewModel.project.rules.conferenceEndTime),
+                                    displayedComponents: .hourAndMinute
+                                )
+                                .labelsHidden()
+                            }
+                        }
+                    }
+
+                    formSection("Requirements") {
+                        HStack(spacing: 16) {
+                            inlineStepperField(
+                                title: "Time Off (hrs)",
+                                value: $viewModel.project.rules.timeOffHours,
+                                in: 0...72
+                            )
+                            inlineStepperField(
+                                title: "Required Shift Count",
+                                value: $viewModel.project.rules.numShiftsRequired,
+                                in: 0...100
+                            )
+                        }
+                    }
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        DisclosureGroup(isExpanded: $isAdvancedExpanded) {
+                            HStack(spacing: 16) {
+                                inlineStepperField(
+                                    title: "Solver Time (s)",
+                                    value: $viewModel.project.rules.solverTimeLimitSeconds,
+                                    in: 1...300
+                                )
+                                inlineToggleField(title: "Double Booking", isOn: doubleBookingBinding)
+                            }
+                            .padding(.top, 6)
+                        } label: {
+                            sectionTitle("Advanced Settings")
+                        }
+
+                        Divider()
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+
+            Divider()
+
+            Button(action: viewModel.createSchedule) {
+                if viewModel.isSolving {
+                    ProgressView()
+                        .controlSize(.small)
+                        .frame(maxWidth: .infinity)
+                } else {
+                    Text("Generate Schedule")
+                        .font(.headline.weight(.semibold))
+                        .frame(maxWidth: .infinity)
+                }
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(.green)
+            .controlSize(.large)
+            .help("Generate schedule")
+            .disabled(viewModel.isSolving)
+
+        }
+        .padding(16)
+        .frame(maxHeight: .infinity, alignment: .top)
+        .onChange(of: viewModel.project) { _, _ in
+            viewModel.validate()
+        }
+    }
 
     @ViewBuilder
-    private func blockField<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text(title)
+    private func inlineField<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {
+        HStack(spacing: 6) {
+            Text("\(title):")
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(.secondary)
+                .lineLimit(1)
+                .frame(minWidth: 76, alignment: .leading)
             content()
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .frame(minWidth: 150, maxWidth: .infinity, alignment: .leading)
+        .frame(maxWidth: .infinity, minHeight: 30, alignment: .leading)
     }
 
     @ViewBuilder
     private func sectionTitle(_ title: String) -> some View {
         Text(title)
             .font(.title3.weight(.semibold))
-            .padding(.top, 2)
+            .padding(.top, 1)
     }
 
     @ViewBuilder
-    private func styledStepperRow(title: String, value: Binding<Int>, in range: ClosedRange<Int>) -> some View {
-        HStack(spacing: 8) {
+    private func inlineStepperField(title: String, value: Binding<Int>, in range: ClosedRange<Int>) -> some View {
+        HStack(spacing: 6) {
             Text("\(title):")
                 .font(.subheadline.weight(.semibold))
                 .lineLimit(1)
-                .frame(minWidth: 120, alignment: .leading)
-            Stepper(value: value, in: range) {
-                Text("\(value.wrappedValue)")
-                    .monospacedDigit()
-                    .font(.headline.weight(.semibold))
-            }
+                .frame(minWidth: 108, alignment: .leading)
+            Text("\(value.wrappedValue)")
+                .monospacedDigit()
+                .font(.headline.weight(.semibold))
+            Stepper("", value: value, in: range)
+                .labelsHidden()
         }
-        .padding(.vertical, 6)
-        .padding(.horizontal, 10)
-        .background(Color(nsColor: .windowBackgroundColor).opacity(0.65))
-        .overlay(
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                .stroke(Color.primary.opacity(0.08), lineWidth: 1)
-        )
-        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .frame(maxWidth: .infinity, minHeight: 30, alignment: .leading)
+    }
+
+    @ViewBuilder
+    private func inlineToggleField(title: String, isOn: Binding<Bool>) -> some View {
+        HStack(spacing: 6) {
+            Text("\(title):")
+                .font(.subheadline.weight(.semibold))
+                .lineLimit(1)
+                .frame(minWidth: 108, alignment: .leading)
+            Toggle("", isOn: isOn)
+                .labelsHidden()
+                .toggleStyle(.checkbox)
+        }
+        .frame(maxWidth: .infinity, minHeight: 30, alignment: .leading)
+    }
+
+    @ViewBuilder
+    private func formSection<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            sectionTitle(title)
+            content()
+            Divider()
+        }
     }
 
     private var doubleBookingBinding: Binding<Bool> {
@@ -407,10 +424,10 @@ private struct BentoCard<Content: View>: View {
 
     var body: some View {
         content
-            .background(Color(nsColor: .controlBackgroundColor))
-            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .background(Color(nsColor: .windowBackgroundColor))
+            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
             .overlay(
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
                     .stroke(Color.primary.opacity(0.08), lineWidth: 1)
             )
     }

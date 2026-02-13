@@ -8,6 +8,8 @@ struct MonthlyCalendarPage: View {
     let rules: GlobalScheduleRules
     let shiftTemplates: [ShiftTemplate]
     let shiftTypes: [ShiftType]
+    let onExportJSON: () -> Void
+    let onExportCSV: () -> Void
     let onExportAllICS: () -> Void
 
     @Environment(\.dismiss) private var dismiss
@@ -119,13 +121,7 @@ struct MonthlyCalendarPage: View {
                 )
             }
 
-            HStack {
-                Button("Download All ICS") {
-                    onExportAllICS()
-                }
-                Spacer()
-                Button("Done") { dismiss() }
-            }
+            calendarActionsBar
         }
         .padding(18)
         .frame(minWidth: 1080, minHeight: 640)
@@ -149,22 +145,6 @@ struct MonthlyCalendarPage: View {
             Spacer()
 
             Button {
-                undoLastReschedule()
-            } label: {
-                Image(systemName: "arrow.uturn.backward")
-            }
-            .disabled(!canUndo)
-            .help("Undo")
-
-            Button {
-                redoLastReschedule()
-            } label: {
-                Image(systemName: "arrow.uturn.forward")
-            }
-            .disabled(!canRedo)
-            .help("Redo")
-
-            Button {
                 if let previous = calendar.date(byAdding: .day, value: -7, to: focusedWeekStart) {
                     focusedWeekStart = previous
                 }
@@ -182,6 +162,38 @@ struct MonthlyCalendarPage: View {
                 }
             } label: {
                 Image(systemName: "chevron.right")
+            }
+
+            Button("Done") { dismiss() }
+        }
+    }
+
+    private var calendarActionsBar: some View {
+        HStack {
+            HStack(spacing: 8) {
+                Button {
+                    undoLastReschedule()
+                } label: {
+                    Image(systemName: "arrow.uturn.backward")
+                }
+                .disabled(!canUndo)
+                .help("Undo")
+
+                Button {
+                    redoLastReschedule()
+                } label: {
+                    Image(systemName: "arrow.uturn.forward")
+                }
+                .disabled(!canRedo)
+                .help("Redo")
+            }
+
+            Spacer()
+
+            HStack(spacing: 8) {
+                Button("Export JSON") { onExportJSON() }
+                Button("Export CSV") { onExportCSV() }
+                Button("Download All ICS") { onExportAllICS() }
             }
         }
     }
@@ -346,7 +358,7 @@ struct MonthlyCalendarPage: View {
         let sourceCandidates = rescheduleCandidates(for: sourceShiftInstanceID)
         if let sourceAssignment = assignmentByShiftID[sourceShiftInstanceID],
            let sourceInstance = shiftInstanceByID[sourceShiftInstanceID] {
-            VStack(alignment: .leading, spacing: 14) {
+            VStack(alignment: .leading, spacing: 16) {
                 HStack(alignment: .firstTextBaseline) {
                     Text("Reschedule Shift")
                         .font(.title3.weight(.semibold))
@@ -358,7 +370,7 @@ struct MonthlyCalendarPage: View {
                         .background(Color.accentColor.opacity(0.15))
                         .clipShape(Capsule())
                 }
-                .padding(.bottom, 2)
+                .padding(.bottom, 4)
 
                 VStack(alignment: .leading, spacing: 6) {
                     studentBadge(for: sourceAssignment.studentId)
@@ -369,7 +381,7 @@ struct MonthlyCalendarPage: View {
                         .font(.caption2)
                         .foregroundStyle(.secondary)
                 }
-                .padding(12)
+                .padding(14)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(Color(nsColor: .controlBackgroundColor))
                 .overlay(
@@ -378,7 +390,7 @@ struct MonthlyCalendarPage: View {
                 )
                 .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
 
-                HStack(alignment: .top, spacing: 16) {
+                HStack(alignment: .top, spacing: 14) {
                     rescheduleCandidateColumn(
                         title: "Available Shifts (\(sourceCandidates.available.count))",
                         actionLabel: "Move",
@@ -404,9 +416,10 @@ struct MonthlyCalendarPage: View {
                     Spacer()
                     Button("Close") { rescheduleContext = nil }
                 }
+                .padding(.top, 2)
             }
-            .padding(18)
-            .frame(minWidth: 840, minHeight: 520)
+            .padding(22)
+            .frame(minWidth: 860, minHeight: 560)
             .background(Color(nsColor: .windowBackgroundColor))
         } else {
             VStack(spacing: 12) {
@@ -424,9 +437,10 @@ struct MonthlyCalendarPage: View {
         sourceShiftInstanceID: String,
         candidateShiftInstances: [GeneratedShiftInstance]
     ) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 10) {
             Text(title)
                 .font(.headline)
+                .padding(.horizontal, 2)
             ScrollView {
                 LazyVStack(spacing: 8) {
                     ForEach(candidateShiftInstances) { instance in
@@ -468,10 +482,10 @@ struct MonthlyCalendarPage: View {
                     }
                 }
                 .padding(.horizontal, 1)
-                .padding(.vertical, 2)
+                .padding(.vertical, 3)
             }
         }
-        .padding(10)
+        .padding(12)
         .background(Color(nsColor: .underPageBackgroundColor))
         .overlay(
             RoundedRectangle(cornerRadius: 10, style: .continuous)
