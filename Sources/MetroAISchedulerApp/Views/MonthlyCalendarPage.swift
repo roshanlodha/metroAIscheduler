@@ -30,6 +30,22 @@ struct MonthlyCalendarPage: View {
         Dictionary(uniqueKeysWithValues: result.assignments.map { ($0.shiftInstanceId, $0) })
     }
 
+    private var studentColorByID: [UUID: Color] {
+        let palette = ShiftTypeColor.allCases.map(\.swatchColor)
+        guard !palette.isEmpty else { return [:] }
+        let orderedStudents = students.sorted { lhs, rhs in
+            let lhsKey = "\(lhs.displayName.lowercased())|\(lhs.email.lowercased())|\(lhs.id.uuidString)"
+            let rhsKey = "\(rhs.displayName.lowercased())|\(rhs.email.lowercased())|\(rhs.id.uuidString)"
+            return lhsKey < rhsKey
+        }
+
+        var mapping: [UUID: Color] = [:]
+        for (index, student) in orderedStudents.enumerated() {
+            mapping[student.id] = palette[index % palette.count]
+        }
+        return mapping
+    }
+
     private var shiftTypeByID: [UUID: ShiftType] {
         Dictionary(uniqueKeysWithValues: shiftTypes.map { ($0.id, $0) })
     }
@@ -224,26 +240,8 @@ struct MonthlyCalendarPage: View {
         return GridCellData(
             studentName: studentName,
             timeLabel: shortTimeRange(start: instance.startDateTime, end: instance.endDateTime),
-            color: colorForStudent(id: assignment.studentId)
+            color: studentColorByID[assignment.studentId] ?? .gray
         )
-    }
-
-    private func colorForStudent(id: UUID) -> Color {
-        // Deterministic color choice so a student remains the same color across the grid.
-        let palette: [Color] = [
-            Color(red: 0.11, green: 0.52, blue: 0.93), // blue
-            Color(red: 0.18, green: 0.72, blue: 0.38), // green
-            Color(red: 0.95, green: 0.48, blue: 0.14), // orange
-            Color(red: 0.73, green: 0.33, blue: 0.84), // purple
-            Color(red: 0.90, green: 0.22, blue: 0.28), // red
-            Color(red: 0.58, green: 0.43, blue: 0.28), // brown
-            Color(red: 0.04, green: 0.66, blue: 0.66), // teal
-            Color(red: 0.38, green: 0.45, blue: 0.57)  // slate
-        ]
-        let studentHash = id.uuidString.unicodeScalars.reduce(0) { partial, scalar in
-            partial &+ Int(scalar.value)
-        }
-        return palette[abs(studentHash) % palette.count]
     }
 
     private func timeLabel(for template: ShiftTemplate) -> String {
