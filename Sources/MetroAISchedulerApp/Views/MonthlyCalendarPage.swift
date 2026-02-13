@@ -47,11 +47,7 @@ struct MonthlyCalendarPage: View {
                     .flatMap { shiftTypeByID[$0] }
                     .map { $0.name }
                     ?? "Unassigned"
-                let color = template.shiftTypeId
-                    .flatMap { shiftTypeByID[$0] }
-                    .map { $0.color.swatchColor }
-                    ?? .gray
-                return ShiftRow(template: template, typeName: typeName, color: color)
+                return ShiftRow(template: template, typeName: typeName)
             }
             .sorted { lhs, rhs in
                 let lhsMinutes = lhs.template.startTime.hour * 60 + lhs.template.startTime.minute
@@ -228,8 +224,26 @@ struct MonthlyCalendarPage: View {
         return GridCellData(
             studentName: studentName,
             timeLabel: shortTimeRange(start: instance.startDateTime, end: instance.endDateTime),
-            color: row.color
+            color: colorForStudent(id: assignment.studentId)
         )
+    }
+
+    private func colorForStudent(id: UUID) -> Color {
+        // Deterministic color choice so a student remains the same color across the grid.
+        let palette: [Color] = [
+            Color(red: 0.11, green: 0.52, blue: 0.93), // blue
+            Color(red: 0.18, green: 0.72, blue: 0.38), // green
+            Color(red: 0.95, green: 0.48, blue: 0.14), // orange
+            Color(red: 0.73, green: 0.33, blue: 0.84), // purple
+            Color(red: 0.90, green: 0.22, blue: 0.28), // red
+            Color(red: 0.58, green: 0.43, blue: 0.28), // brown
+            Color(red: 0.04, green: 0.66, blue: 0.66), // teal
+            Color(red: 0.38, green: 0.45, blue: 0.57)  // slate
+        ]
+        let studentHash = id.uuidString.unicodeScalars.reduce(0) { partial, scalar in
+            partial &+ Int(scalar.value)
+        }
+        return palette[abs(studentHash) % palette.count]
     }
 
     private func timeLabel(for template: ShiftTemplate) -> String {
@@ -305,7 +319,6 @@ struct MonthlyCalendarPage: View {
 private struct ShiftRow: Identifiable {
     let template: ShiftTemplate
     let typeName: String
-    let color: Color
 
     var id: UUID { template.id }
 }
