@@ -42,10 +42,18 @@ final class AppViewModel: ObservableObject {
                 let solved = try solverRef.solve(project: projectSnapshot, shiftInstances: instances)
                 await MainActor.run {
                     let (sanitized, removed) = self.sanitizeAssignments(project: projectSnapshot, result: solved)
-                    self.result = sanitized
                     if removed > 0 {
-                        self.statusMessage = "Schedule generated with \(sanitized.assignments.count) assignments (\(removed) invalid assignments removed)."
+                        self.result = nil
+                        self.solverDiagnostic = SolverDiagnostic(
+                            message: "No feasible assignment found.",
+                            details: [
+                                "The solver produced \(removed) assignment(s) that violate scheduling constraints.",
+                                "No partial schedule is shown."
+                            ]
+                        )
+                        self.statusMessage = "No feasible assignment found."
                     } else {
+                        self.result = sanitized
                         self.statusMessage = "Schedule generated with \(sanitized.assignments.count) assignments."
                     }
                     self.isSolving = false
@@ -308,6 +316,11 @@ final class AppViewModel: ObservableObject {
 
         let shiftByID = Dictionary(uniqueKeysWithValues: result.shiftInstances.map { ($0.id, $0) })
         let templateByID = Dictionary(uniqueKeysWithValues: project.shiftTemplates.map { ($0.id, $0) })
+        let overnightTypeIDs = Set(
+            project.shiftTypes
+                .filter { $0.name.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() == "overnight" }
+                .map(\.id)
+        )
 
         let filtered = result.assignments.filter { assignment in
             guard let shift = shiftByID[assignment.shiftInstanceId],
@@ -319,7 +332,8 @@ final class AppViewModel: ObservableObject {
                   template.daysOffered.contains(weekday) else {
                 return false
             }
-            if shift.isOvernight && isDayBeforeConference(weekday: weekday, conferenceDay: project.rules.conferenceDay) {
+            let isOvernightTypeShift = template.shiftTypeId.map { overnightTypeIDs.contains($0) } ?? false
+            if isOvernightTypeShift && isDayBeforeConference(weekday: weekday, conferenceDay: project.rules.conferenceDay) {
                 return false
             }
             if overlapsConference(shift: shift, calendar: calendar, rules: project.rules, timezone: timezone) {

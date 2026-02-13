@@ -7,26 +7,29 @@ struct ContentView: View {
 
     var body: some View {
         VStack(spacing: 12) {
-            HStack(alignment: .top, spacing: 12) {
-                BentoCard {
-                    ShiftTemplatesView(viewModel: viewModel)
-                }
-                .frame(minWidth: 640, maxWidth: .infinity, maxHeight: .infinity)
-
-                VStack(spacing: 12) {
+            ViewThatFits(in: .horizontal) {
+                HStack(alignment: .top, spacing: 12) {
                     BentoCard {
-                        StudentsView(project: $viewModel.project)
+                        ShiftTemplatesView(viewModel: viewModel)
                     }
-                    .frame(minHeight: 280)
+                    .frame(minWidth: 500, idealWidth: 640, maxWidth: .infinity, maxHeight: .infinity)
 
-                    BentoCard {
-                        ActionsAndRulesPane(viewModel: viewModel)
-                    }
-                    .frame(minHeight: 360)
+                    rightColumn
+                        .frame(minWidth: 420, idealWidth: 540, maxWidth: 620, maxHeight: .infinity)
                 }
-                .frame(minWidth: 480, idealWidth: 540, maxWidth: 620, maxHeight: .infinity)
+                .frame(maxHeight: .infinity)
+
+                ScrollView {
+                    VStack(spacing: 12) {
+                        BentoCard {
+                            ShiftTemplatesView(viewModel: viewModel)
+                        }
+                        .frame(minHeight: 420)
+
+                        rightColumn
+                    }
+                }
             }
-            .frame(maxHeight: .infinity)
 
             Divider()
             HStack {
@@ -68,6 +71,20 @@ struct ContentView: View {
                     onExportAllICS: exportAllICS
                 )
             }
+        }
+    }
+
+    private var rightColumn: some View {
+        VStack(spacing: 12) {
+            BentoCard {
+                StudentsView(project: $viewModel.project)
+            }
+            .frame(minHeight: 280)
+
+            BentoCard {
+                ActionsAndRulesPane(viewModel: viewModel)
+            }
+            .frame(minHeight: 360)
         }
     }
 
@@ -240,8 +257,6 @@ private struct ActionsAndRulesPane: View {
                     .buttonStyle(.borderedProminent)
                     .disabled(viewModel.isSolving)
 
-                    Button("Export Template") { exportTemplate() }
-
                     Spacer()
 
                     if viewModel.result != nil {
@@ -292,15 +307,6 @@ private struct ActionsAndRulesPane: View {
         panel.nameFieldStringValue = "schedule.csv"
         if panel.runModal() == .OK, let url = panel.url {
             viewModel.saveCSV(to: url)
-        }
-    }
-
-    private func exportTemplate() {
-        let panel = NSSavePanel()
-        panel.allowedContentTypes = [.json]
-        panel.nameFieldStringValue = "shift-schedule-template.json"
-        if panel.runModal() == .OK, let url = panel.url {
-            viewModel.exportShiftSchedule(to: url)
         }
     }
 

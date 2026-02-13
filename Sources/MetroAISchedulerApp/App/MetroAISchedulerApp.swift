@@ -9,9 +9,9 @@ struct MetroAISchedulerApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView(viewModel: viewModel)
-                .frame(minWidth: 1100, minHeight: 700)
+                .frame(minWidth: 920, minHeight: 640)
         }
-        .windowResizability(.contentSize)
+        .windowResizability(.automatic)
         .commands {
             CommandGroup(replacing: .appTermination) {
                 Button("Quit MetroAIScheduler") {

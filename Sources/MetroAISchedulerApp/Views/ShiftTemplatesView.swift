@@ -70,7 +70,6 @@ struct ShiftTemplatesView: View {
             Text("Active Shift Template")
                 .font(.title3)
             Spacer()
-            Button("Import Schedule") { importSchedule() }
         }
     }
 
@@ -280,17 +279,6 @@ struct ShiftTemplatesView: View {
             return .blue
         }
         return type.color
-    }
-
-    private func importSchedule() {
-        let panel = NSOpenPanel()
-        panel.allowedContentTypes = [.json]
-        panel.canChooseFiles = true
-        panel.canChooseDirectories = false
-        if panel.runModal() == .OK, let url = panel.url {
-            viewModel.importShiftSchedule(from: url)
-            selectedShiftID = viewModel.project.shiftTemplates.first?.id
-        }
     }
 
     private func dateBinding(for source: Binding<LocalTime?>, fallback: LocalTime) -> Binding<Date> {

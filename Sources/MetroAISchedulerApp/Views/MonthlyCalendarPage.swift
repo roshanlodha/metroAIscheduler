@@ -14,9 +14,14 @@ struct MonthlyCalendarPage: View {
     @State private var focusedWeekStart: Date = Date()
     @State private var rescheduleContext: RescheduleContext?
     @State private var constraintMessage: String?
+    @State private var undoAssignmentsStack: [[Assignment]] = []
+    @State private var redoAssignmentsStack: [[Assignment]] = []
 
     private let shiftColumnWidth: CGFloat = 260
     private let headerHeight: CGFloat = 42
+
+    private var canUndo: Bool { !undoAssignmentsStack.isEmpty }
+    private var canRedo: Bool { !redoAssignmentsStack.isEmpty }
 
     private var calendar: Calendar {
         var cal = Calendar(identifier: .gregorian)
@@ -142,6 +147,22 @@ struct MonthlyCalendarPage: View {
                 .font(.title3)
 
             Spacer()
+
+            Button {
+                undoLastReschedule()
+            } label: {
+                Image(systemName: "arrow.uturn.backward")
+            }
+            .disabled(!canUndo)
+            .help("Undo")
+
+            Button {
+                redoLastReschedule()
+            } label: {
+                Image(systemName: "arrow.uturn.forward")
+            }
+            .disabled(!canRedo)
+            .help("Redo")
 
             Button {
                 if let previous = calendar.date(byAdding: .day, value: -7, to: focusedWeekStart) {
@@ -316,7 +337,7 @@ struct MonthlyCalendarPage: View {
             constraintMessage = "Reschedule blocked: this change violates schedule constraints."
             return
         }
-        result.assignments = candidateAssignments
+        applyAssignmentChange(candidateAssignments)
         constraintMessage = nil
     }
 
@@ -339,9 +360,8 @@ struct MonthlyCalendarPage: View {
                 }
                 .padding(.bottom, 2)
 
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(studentName(for: sourceAssignment.studentId))
-                        .font(.headline)
+                VStack(alignment: .leading, spacing: 6) {
+                    studentBadge(for: sourceAssignment.studentId)
                     Text("\(sourceInstance.name) • \(monthDayLabel(for: sourceInstance.startDateTime)) • \(shortTimeRange(start: sourceInstance.startDateTime, end: sourceInstance.endDateTime))")
                         .font(.caption)
                         .foregroundStyle(.secondary)
@@ -410,6 +430,8 @@ struct MonthlyCalendarPage: View {
             ScrollView {
                 LazyVStack(spacing: 8) {
                     ForEach(candidateShiftInstances) { instance in
+                        let assignedStudentID = assignmentByShiftID[instance.id]?.studentId
+                        let assignedColor = assignedStudentID.flatMap { studentColorByID[$0] }
                         HStack(alignment: .center, spacing: 10) {
                             VStack(alignment: .leading, spacing: 3) {
                                 Text(instance.name)
@@ -421,10 +443,8 @@ struct MonthlyCalendarPage: View {
                                 Text(shortTimeRange(start: instance.startDateTime, end: instance.endDateTime))
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
-                                if let assignment = assignmentByShiftID[instance.id] {
-                                    Text("Assigned: \(studentName(for: assignment.studentId))")
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
+                                if let assignedStudentID {
+                                    studentBadge(for: assignedStudentID, prefix: "Assigned:")
                                 }
                             }
                             Spacer(minLength: 12)
@@ -439,7 +459,7 @@ struct MonthlyCalendarPage: View {
                         }
                         .padding(10)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(Color(nsColor: .controlBackgroundColor))
+                        .background((assignedColor ?? Color(nsColor: .controlBackgroundColor)).opacity(assignedColor == nil ? 1 : 0.15))
                         .overlay(
                             RoundedRectangle(cornerRadius: 9, style: .continuous)
                                 .stroke(Color.primary.opacity(0.08), lineWidth: 1)
@@ -719,6 +739,47 @@ struct MonthlyCalendarPage: View {
             timeLabel: shortTimeRange(start: instance.startDateTime, end: instance.endDateTime),
             color: studentColorByID[assignment.studentId] ?? .gray
         )
+    }
+
+    private func applyAssignmentChange(_ assignments: [Assignment]) {
+        guard assignments != result.assignments else { return }
+        undoAssignmentsStack.append(result.assignments)
+        redoAssignmentsStack.removeAll()
+        result.assignments = assignments
+    }
+
+    private func undoLastReschedule() {
+        guard let previousAssignments = undoAssignmentsStack.popLast() else { return }
+        redoAssignmentsStack.append(result.assignments)
+        result.assignments = previousAssignments
+        constraintMessage = nil
+    }
+
+    private func redoLastReschedule() {
+        guard let nextAssignments = redoAssignmentsStack.popLast() else { return }
+        undoAssignmentsStack.append(result.assignments)
+        result.assignments = nextAssignments
+        constraintMessage = nil
+    }
+
+    @ViewBuilder
+    private func studentBadge(for studentID: UUID, prefix: String? = nil) -> some View {
+        let color = studentColorByID[studentID] ?? .gray
+        HStack(spacing: 6) {
+            if let prefix {
+                Text(prefix)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            Text(studentName(for: studentID))
+                .font(.caption.weight(.semibold))
+                .lineLimit(1)
+        }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .foregroundStyle(.white)
+        .background(color.opacity(0.95))
+        .clipShape(Capsule())
     }
 
     private func timeLabel(for template: ShiftTemplate) -> String {
