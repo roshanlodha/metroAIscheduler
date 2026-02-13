@@ -1,0 +1,322 @@
+{
+  "blockWindow" : {
+    "endDate" : "2026-03-28T04:00:00Z",
+    "startDate" : "2026-03-02T17:00:00Z"
+  },
+  "defaultStudentCount" : 7,
+  "name" : "BIDMC AI",
+  "orientation" : {
+    "endTime" : {
+      "hour" : 12,
+      "minute" : 0
+    },
+    "startDate" : "2026-03-02T17:00:00Z",
+    "startTime" : {
+      "hour" : 8,
+      "minute" : 0
+    }
+  },
+  "rules" : {
+    "blockStartDay" : 2,
+    "conferenceDay" : 4,
+    "conferenceEndTime" : {
+      "hour" : 12,
+      "minute" : 0
+    },
+    "conferenceStartTime" : {
+      "hour" : 8,
+      "minute" : 0
+    },
+    "noDoubleBooking" : true,
+    "numShiftsRequired" : 14,
+    "solverTimeLimitSeconds" : 20,
+    "timeOffHours" : 6,
+    "timezone" : "America\/Los_Angeles"
+  },
+  "schemaVersion" : 2,
+  "shiftTemplates" : [
+    {
+      "active" : true,
+      "daysOffered" : [
+        6,
+        7,
+        1,
+        4,
+        5,
+        2
+      ],
+      "endTime" : {
+        "hour" : 15,
+        "minute" : 0
+      },
+      "id" : "E818BFA8-69E7-43B5-948C-2B5123B98802",
+      "isOvernight" : false,
+      "location" : "BIDMC",
+      "name" : "T1 (morning)",
+      "shiftTypeId" : "D9FDB62B-74F6-4ED8-B84C-6EEE5C97B10D",
+      "startTime" : {
+        "hour" : 7,
+        "minute" : 0
+      }
+    },
+    {
+      "active" : true,
+      "daysOffered" : [
+        7,
+        1
+      ],
+      "endTime" : {
+        "hour" : 21,
+        "minute" : 0
+      },
+      "id" : "C4731D78-E400-4316-B252-2D5A2A370C82",
+      "isOvernight" : false,
+      "location" : "BIDMC",
+      "name" : "T2A (weekend)",
+      "shiftTypeId" : "D9FDB62B-74F6-4ED8-B84C-6EEE5C97B10D",
+      "startTime" : {
+        "hour" : 12,
+        "minute" : 0
+      }
+    },
+    {
+      "active" : true,
+      "daysOffered" : [
+        4,
+        5,
+        2,
+        6
+      ],
+      "endTime" : {
+        "hour" : 18,
+        "minute" : 0
+      },
+      "id" : "6C3AA5EA-BF02-4322-A5FC-5DB62B204A6C",
+      "isOvernight" : false,
+      "location" : "BIDMC",
+      "name" : "T2A (weekdays)",
+      "shiftTypeId" : "D9FDB62B-74F6-4ED8-B84C-6EEE5C97B10D",
+      "startTime" : {
+        "hour" : 10,
+        "minute" : 0
+      }
+    },
+    {
+      "active" : true,
+      "daysOffered" : [
+        5,
+        4,
+        2,
+        1,
+        7,
+        3,
+        6
+      ],
+      "endTime" : {
+        "hour" : 23,
+        "minute" : 0
+      },
+      "id" : "C5AEBF5E-83DF-403A-9344-FBD50130685D",
+      "isOvernight" : false,
+      "location" : "BIDMC",
+      "name" : "T1 (evening)",
+      "shiftTypeId" : "D9FDB62B-74F6-4ED8-B84C-6EEE5C97B10D",
+      "startTime" : {
+        "hour" : 14,
+        "minute" : 0
+      }
+    },
+    {
+      "active" : true,
+      "daysOffered" : [
+        5,
+        1,
+        7,
+        3,
+        2,
+        6,
+        4
+      ],
+      "endTime" : {
+        "hour" : 1,
+        "minute" : 0
+      },
+      "id" : "C8FA700B-627E-4691-827A-E7C36D82C584",
+      "isOvernight" : false,
+      "location" : "BIDMC",
+      "name" : "T2B",
+      "shiftTypeId" : "D9FDB62B-74F6-4ED8-B84C-6EEE5C97B10D",
+      "startTime" : {
+        "hour" : 17,
+        "minute" : 0
+      }
+    },
+    {
+      "active" : true,
+      "daysOffered" : [
+        5,
+        4,
+        1,
+        6,
+        3,
+        2,
+        7
+      ],
+      "endTime" : {
+        "hour" : 7,
+        "minute" : 0
+      },
+      "id" : "149FE513-6076-43E8-9376-11F0AA7CC964",
+      "isOvernight" : true,
+      "location" : "BIDMC",
+      "name" : "T1 (afternoon)",
+      "shiftTypeId" : "CCBCDCE3-D19E-4CDA-8B92-D74CC1F3A4F1",
+      "startTime" : {
+        "hour" : 23,
+        "minute" : 0
+      }
+    },
+    {
+      "active" : true,
+      "daysOffered" : [
+        1,
+        2,
+        3,
+        7,
+        6,
+        5,
+        4
+      ],
+      "endTime" : {
+        "hour" : 20,
+        "minute" : 0
+      },
+      "id" : "37EC7045-D1B4-49DA-AC3F-DEB33D6421A0",
+      "isOvernight" : false,
+      "location" : "BIDMC",
+      "name" : "RED",
+      "shiftTypeId" : "8F85D6CD-C845-4276-97B5-73B6E9E3DA33",
+      "startTime" : {
+        "hour" : 12,
+        "minute" : 0
+      }
+    },
+    {
+      "active" : true,
+      "daysOffered" : [
+        2,
+        3,
+        6,
+        5,
+        4,
+        1,
+        7
+      ],
+      "endTime" : {
+        "hour" : 19,
+        "minute" : 0
+      },
+      "id" : "6025CA65-9704-4161-892D-0D19822D3603",
+      "isOvernight" : false,
+      "location" : "Needham",
+      "name" : "Needham (community)",
+      "shiftTypeId" : "DCB671FE-9DDA-41ED-BF24-21CA9C535E26",
+      "startTime" : {
+        "hour" : 12,
+        "minute" : 0
+      }
+    },
+    {
+      "active" : true,
+      "daysOffered" : [
+        7,
+        5,
+        2,
+        3,
+        4,
+        6,
+        1
+      ],
+      "endTime" : {
+        "hour" : 23,
+        "minute" : 0
+      },
+      "id" : "0CFB19C0-2A2F-40CE-9CCA-32FCEEE1EF10",
+      "isOvernight" : false,
+      "location" : "BIDMC",
+      "name" : "T3",
+      "shiftTypeId" : "D9FDB62B-74F6-4ED8-B84C-6EEE5C97B10D",
+      "startTime" : {
+        "hour" : 15,
+        "minute" : 0
+      }
+    }
+  ],
+  "shiftTypes" : [
+    {
+      "color" : "blue",
+      "id" : "D9FDB62B-74F6-4ED8-B84C-6EEE5C97B10D",
+      "name" : "Core"
+    },
+    {
+      "color" : "purple",
+      "id" : "CCBCDCE3-D19E-4CDA-8B92-D74CC1F3A4F1",
+      "minShifts" : 2,
+      "name" : "Overnight"
+    },
+    {
+      "color" : "brown",
+      "id" : "DCB671FE-9DDA-41ED-BF24-21CA9C535E26",
+      "maxShifts" : 1,
+      "minShifts" : 1,
+      "name" : "Needham"
+    },
+    {
+      "color" : "red",
+      "id" : "8F85D6CD-C845-4276-97B5-73B6E9E3DA33",
+      "maxShifts" : 1,
+      "minShifts" : 1,
+      "name" : "RED"
+    }
+  ],
+  "students" : [
+    {
+      "email" : "",
+      "id" : "F992B7BC-C796-4C83-B88E-F0C592DC5F03",
+      "name" : "Alice"
+    },
+    {
+      "email" : "",
+      "id" : "56CB3059-A9CF-4E9C-A864-466D2ADFB544",
+      "name" : "Bob"
+    },
+    {
+      "email" : "",
+      "id" : "8312501D-84D7-49F5-B2AE-64A471456BC9",
+      "name" : "Candace"
+    },
+    {
+      "email" : "",
+      "id" : "1CCCEE64-BB50-4F9F-8291-067C0E2F6EA7",
+      "name" : "Derrick"
+    },
+    {
+      "email" : "",
+      "id" : "B769F533-C2A7-4F17-9386-153855581E7A",
+      "name" : "Evelyn"
+    },
+    {
+      "email" : "",
+      "id" : "25717D1A-D2F5-4457-883A-2BBE4FCEA7C1",
+      "name" : "Frank"
+    },
+    {
+      "email" : "",
+      "id" : "FA0D4B95-07E6-4D6B-8708-998F007DB6FB",
+      "name" : "Gerald"
+    }
+  ],
+  "templateLibrary" : [
+
+  ]
+}

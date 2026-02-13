@@ -125,7 +125,7 @@ struct ContentView: View {
     private func saveProject() {
         let panel = NSSavePanel()
         panel.allowedContentTypes = [.json]
-        panel.nameFieldStringValue = "metro-project.json"
+        panel.nameFieldStringValue = "template.json"
         if panel.runModal() == .OK, let url = panel.url {
             viewModel.saveProject(to: url)
         }
