@@ -1,7 +1,13 @@
 import SwiftUI
 
 struct StudentsView: View {
+    private enum StudentField: Hashable {
+        case name(UUID)
+        case email(UUID)
+    }
+
     @Binding var project: ScheduleTemplateProject
+    @FocusState private var focusedField: StudentField?
     private let actionColumnWidth: CGFloat = 34
 
     var body: some View {
@@ -69,11 +75,21 @@ struct StudentsView: View {
                 .textFieldStyle(.plain)
                 .padding(.horizontal, 10)
                 .frame(maxWidth: .infinity, minHeight: 30, alignment: .leading)
+                .focused($focusedField, equals: .name(student.id))
+                .onKeyPress(.tab, phases: .down) { keyPress in
+                    handleTab(from: .name(student.id), backwards: keyPress.modifiers.contains(.shift))
+                    return .handled
+                }
             Divider()
             TextField("student@example.com", text: rowBinding.email)
                 .textFieldStyle(.plain)
                 .padding(.horizontal, 10)
                 .frame(maxWidth: .infinity, minHeight: 30, alignment: .leading)
+                .focused($focusedField, equals: .email(student.id))
+                .onKeyPress(.tab, phases: .down) { keyPress in
+                    handleTab(from: .email(student.id), backwards: keyPress.modifiers.contains(.shift))
+                    return .handled
+                }
             Divider()
 
             if !isEmpty(student) {
@@ -112,5 +128,17 @@ struct StudentsView: View {
     private func isEmpty(_ student: Student) -> Bool {
         student.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
         student.email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    private func handleTab(from field: StudentField, backwards: Bool) {
+        let orderedFields = project.students.flatMap { student in
+            [StudentField.name(student.id), StudentField.email(student.id)]
+        }
+
+        guard let currentIndex = orderedFields.firstIndex(of: field), !orderedFields.isEmpty else { return }
+
+        let delta = backwards ? -1 : 1
+        let nextIndex = (currentIndex + delta + orderedFields.count) % orderedFields.count
+        focusedField = orderedFields[nextIndex]
     }
 }
