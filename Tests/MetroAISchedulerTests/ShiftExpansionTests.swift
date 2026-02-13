@@ -94,6 +94,54 @@ final class ShiftExpansionTests: XCTestCase {
         XCTAssertFalse(weekdays.contains(Weekday.tuesday.rawValue))
     }
 
+    func testOrientationBlocksShiftsUntilEndTime() {
+        var project = ScheduleTemplateProject.sample(now: Date(timeIntervalSince1970: 1_700_000_000))
+        project.rules.timezone = "America/New_York"
+        project.blockWindow.startDate = localDate(year: 2026, month: 2, day: 9, timezone: project.rules.timezone) // Monday
+        project.blockWindow.endDate = localDate(year: 2026, month: 2, day: 10, timezone: project.rules.timezone)
+        project.orientation.startDate = localDate(year: 2026, month: 2, day: 9, timezone: project.rules.timezone)
+        project.orientation.startTime = LocalTime(hour: 8, minute: 0)
+        project.orientation.endTime = LocalTime(hour: 12, minute: 0)
+        project.rules.conferenceDay = .wednesday
+
+        project.shiftTemplates = [
+            ShiftTemplate(
+                id: UUID(uuidString: "00000000-0000-0000-0000-000000000021")!,
+                name: "Morning Shift",
+                location: "A",
+                isOvernight: false,
+                minShifts: nil,
+                maxShifts: nil,
+                startTime: LocalTime(hour: 7, minute: 0),
+                endTime: LocalTime(hour: 15, minute: 0),
+                lengthHours: nil,
+                daysOffered: [.monday, .tuesday],
+                active: true
+            ),
+            ShiftTemplate(
+                id: UUID(uuidString: "00000000-0000-0000-0000-000000000022")!,
+                name: "Afternoon Shift",
+                location: "B",
+                isOvernight: false,
+                minShifts: nil,
+                maxShifts: nil,
+                startTime: LocalTime(hour: 13, minute: 0),
+                endTime: LocalTime(hour: 21, minute: 0),
+                lengthHours: nil,
+                daysOffered: [.monday, .tuesday],
+                active: true
+            )
+        ]
+
+        let shifts = ShiftExpansion.expand(project: project)
+        let mondayShifts = shifts.filter {
+            Calendar(identifier: .gregorian).component(.weekday, from: $0.startDateTime) == Weekday.monday.rawValue
+        }
+
+        XCTAssertEqual(mondayShifts.count, 1)
+        XCTAssertEqual(mondayShifts.first?.name, "Afternoon Shift")
+    }
+
     private func localDate(year: Int, month: Int, day: Int, timezone: String) -> Date {
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = TimeZone(identifier: timezone) ?? .current

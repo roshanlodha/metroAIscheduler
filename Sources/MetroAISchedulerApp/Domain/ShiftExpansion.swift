@@ -8,6 +8,7 @@ enum ShiftExpansion {
 
         let start = calendar.startOfDay(for: project.blockWindow.startDate)
         let end = calendar.startOfDay(for: project.blockWindow.endDate)
+        let orientationEnd = orientationEndDate(project: project, calendar: calendar, timezone: timezone)
 
         var instances: [GeneratedShiftInstance] = []
         var day = start
@@ -30,6 +31,9 @@ enum ShiftExpansion {
 
                 guard let startDate = calendar.date(from: components) else { continue }
                 guard let endDate = resolveEndDate(startDate: startDate, template: template, calendar: calendar, rules: project.rules) else {
+                    continue
+                }
+                if startDate < orientationEnd {
                     continue
                 }
                 if overlapsConferenceWindow(
@@ -62,6 +66,37 @@ enum ShiftExpansion {
         }
 
         return instances.sorted { $0.startDateTime < $1.startDateTime }
+    }
+
+    private static func orientationEndDate(
+        project: ScheduleTemplateProject,
+        calendar: Calendar,
+        timezone: TimeZone
+    ) -> Date {
+        let orientation = project.orientation
+        let orientationDay = calendar.startOfDay(for: orientation.startDate)
+
+        var startComponents = calendar.dateComponents([.year, .month, .day], from: orientationDay)
+        startComponents.hour = orientation.startTime.hour
+        startComponents.minute = orientation.startTime.minute
+        startComponents.second = 0
+        startComponents.timeZone = timezone
+
+        var endComponents = calendar.dateComponents([.year, .month, .day], from: orientationDay)
+        endComponents.hour = orientation.endTime.hour
+        endComponents.minute = orientation.endTime.minute
+        endComponents.second = 0
+        endComponents.timeZone = timezone
+
+        guard let startDate = calendar.date(from: startComponents),
+              let rawEndDate = calendar.date(from: endComponents) else {
+            return calendar.startOfDay(for: project.blockWindow.startDate)
+        }
+
+        if rawEndDate > startDate {
+            return rawEndDate
+        }
+        return calendar.date(byAdding: .day, value: 1, to: rawEndDate) ?? rawEndDate
     }
 
     static func defaultLengthHours(template: ShiftTemplate, rules: GlobalScheduleRules) -> Int {

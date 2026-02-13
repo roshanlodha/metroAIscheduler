@@ -5,6 +5,10 @@ struct SettingsView: View {
 
     var body: some View {
         Form {
+            Section("Block Window") {
+                DatePicker("Block Start Date", selection: $viewModel.project.blockWindow.startDate, displayedComponents: .date)
+            }
+
             Section("Student Defaults") {
                 Stepper(value: $viewModel.project.defaultStudentCount, in: 0...200) {
                     Text("Default number of students: \(viewModel.project.defaultStudentCount)")
@@ -39,6 +43,9 @@ struct SettingsView: View {
             viewModel.validate()
         }
         .onChange(of: viewModel.project.defaultStudentCount) { _, _ in
+            viewModel.validate()
+        }
+        .onChange(of: viewModel.project.blockWindow.startDate) { _, _ in
             viewModel.validate()
         }
     }

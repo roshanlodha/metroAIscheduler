@@ -304,6 +304,20 @@ struct BlockWindow: Codable, Equatable {
     var endDate: Date
 }
 
+struct OrientationWindow: Codable, Equatable {
+    var startDate: Date
+    var startTime: LocalTime
+    var endTime: LocalTime
+
+    static func `default`(startDate: Date) -> OrientationWindow {
+        OrientationWindow(
+            startDate: startDate,
+            startTime: LocalTime(hour: 8, minute: 0),
+            endTime: LocalTime(hour: 12, minute: 0)
+        )
+    }
+}
+
 struct GeneratedShiftInstance: Identifiable, Codable, Equatable {
     var id: String
     var templateId: UUID
@@ -327,6 +341,7 @@ struct ScheduleTemplateProject: Codable, Equatable {
     var templateLibrary: [ShiftBundleTemplate]
     var students: [Student]
     var defaultStudentCount: Int
+    var orientation: OrientationWindow
     var rules: GlobalScheduleRules
     var blockWindow: BlockWindow
 
@@ -338,6 +353,7 @@ struct ScheduleTemplateProject: Codable, Equatable {
         case templateLibrary
         case students
         case defaultStudentCount
+        case orientation
         case rules
         case blockWindow
     }
@@ -350,6 +366,7 @@ struct ScheduleTemplateProject: Codable, Equatable {
         templateLibrary: [ShiftBundleTemplate],
         students: [Student],
         defaultStudentCount: Int,
+        orientation: OrientationWindow,
         rules: GlobalScheduleRules,
         blockWindow: BlockWindow
     ) {
@@ -360,6 +377,7 @@ struct ScheduleTemplateProject: Codable, Equatable {
         self.templateLibrary = templateLibrary
         self.students = students
         self.defaultStudentCount = defaultStudentCount
+        self.orientation = orientation
         self.rules = rules
         self.blockWindow = blockWindow
     }
@@ -373,8 +391,9 @@ struct ScheduleTemplateProject: Codable, Equatable {
         templateLibrary = try container.decodeIfPresent([ShiftBundleTemplate].self, forKey: .templateLibrary) ?? []
         students = try container.decodeIfPresent([Student].self, forKey: .students) ?? []
         defaultStudentCount = try container.decodeIfPresent(Int.self, forKey: .defaultStudentCount) ?? 0
-        rules = try container.decodeIfPresent(GlobalScheduleRules.self, forKey: .rules) ?? .default
         blockWindow = try container.decode(BlockWindow.self, forKey: .blockWindow)
+        orientation = try container.decodeIfPresent(OrientationWindow.self, forKey: .orientation) ?? .default(startDate: blockWindow.startDate)
+        rules = try container.decodeIfPresent(GlobalScheduleRules.self, forKey: .rules) ?? .default
     }
 
     func encode(to encoder: Encoder) throws {
@@ -386,6 +405,7 @@ struct ScheduleTemplateProject: Codable, Equatable {
         try container.encode(templateLibrary, forKey: .templateLibrary)
         try container.encode(students, forKey: .students)
         try container.encode(defaultStudentCount, forKey: .defaultStudentCount)
+        try container.encode(orientation, forKey: .orientation)
         try container.encode(rules, forKey: .rules)
         try container.encode(blockWindow, forKey: .blockWindow)
     }
@@ -400,6 +420,7 @@ struct ScheduleTemplateProject: Codable, Equatable {
             templateLibrary: [MetroPresetFactory.metroEDTemplate()],
             students: [],
             defaultStudentCount: 0,
+            orientation: .default(startDate: blockWindow.startDate),
             rules: .default,
             blockWindow: blockWindow
         )
@@ -419,6 +440,7 @@ struct ScheduleTemplateProject: Codable, Equatable {
                 Student(firstName: "Jordan", lastName: "Patel", email: "jordan@example.edu")
             ],
             defaultStudentCount: 2,
+            orientation: .default(startDate: blockWindow.startDate),
             rules: .default,
             blockWindow: blockWindow
         )
@@ -430,8 +452,8 @@ struct ScheduleTemplateProject: Codable, Equatable {
         calendar.firstWeekday = 2
 
         let weekStart = calendar.dateInterval(of: .weekOfYear, for: now)?.start ?? calendar.startOfDay(for: now)
-        let start = calendar.date(byAdding: .day, value: 3, to: weekStart) ?? weekStart // Thursday of current week
-        let end = calendar.date(byAdding: .day, value: 22, to: start) ?? start // Friday, 3 weeks after Thursday
+        let start = weekStart // Monday of current week
+        let end = calendar.date(byAdding: .day, value: 22, to: start) ?? start
         return BlockWindow(startDate: start, endDate: end)
     }
 }

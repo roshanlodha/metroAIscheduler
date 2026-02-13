@@ -137,6 +137,38 @@ private struct ActionsAndRulesPane: View {
 
                 GroupBox {
                     VStack(alignment: .leading, spacing: 10) {
+                        Text("Orientation")
+                            .font(.headline)
+                        HStack(spacing: 16) {
+                            blockField("Start Day") {
+                                DatePicker("", selection: $viewModel.project.orientation.startDate, displayedComponents: .date)
+                                    .labelsHidden()
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                            }
+                            blockField("Start Time") {
+                                DatePicker(
+                                    "",
+                                    selection: localTimeBinding($viewModel.project.orientation.startTime),
+                                    displayedComponents: .hourAndMinute
+                                )
+                                .labelsHidden()
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            }
+                            blockField("End Time") {
+                                DatePicker(
+                                    "",
+                                    selection: localTimeBinding($viewModel.project.orientation.endTime),
+                                    displayedComponents: .hourAndMinute
+                                )
+                                .labelsHidden()
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            }
+                        }
+                    }
+                }
+
+                GroupBox {
+                    VStack(alignment: .leading, spacing: 10) {
                         Text("Conference")
                             .font(.headline)
                         HStack(spacing: 16) {

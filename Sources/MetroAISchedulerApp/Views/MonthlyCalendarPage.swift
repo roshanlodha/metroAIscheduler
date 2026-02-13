@@ -1,4 +1,5 @@
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct MonthlyCalendarPage: View {
     @Binding var result: ScheduleResult
@@ -202,20 +203,14 @@ struct MonthlyCalendarPage: View {
             .overlay(Rectangle().stroke(Color.primary.opacity(0.08), lineWidth: 0.5))
 
             ForEach(weekDays, id: \.self) { day in
-                if let cell = cellData(for: row, day: day) {
-                    VStack(alignment: .leading, spacing: 1) {
-                        Text(cell.studentName)
-                            .font(.caption.weight(.semibold))
-                            .lineLimit(1)
-                        Text(cell.timeLabel)
-                            .font(.caption2)
-                            .lineLimit(1)
-                    }
-                    .padding(.horizontal, 6)
-                    .frame(width: dayWidth, height: rowHeight, alignment: .leading)
-                    .background(cell.color.opacity(0.9))
-                    .foregroundStyle(.white)
-                    .overlay(Rectangle().stroke(Color.primary.opacity(0.08), lineWidth: 0.5))
+                if let instance = shiftInstance(for: row, day: day) {
+                    let assignment = assignmentByShiftID[instance.id]
+                    dropTargetCell(
+                        instance: instance,
+                        assignment: assignment,
+                        dayWidth: dayWidth,
+                        rowHeight: rowHeight
+                    )
                 } else {
                     Rectangle()
                         .fill(Color(nsColor: .windowBackgroundColor))
@@ -226,15 +221,81 @@ struct MonthlyCalendarPage: View {
         }
     }
 
-    private func cellData(for row: ShiftRow, day: Date) -> GridCellData? {
-        guard let instance = result.shiftInstances.first(where: {
+    @ViewBuilder
+    private func dropTargetCell(
+        instance: GeneratedShiftInstance,
+        assignment: Assignment?,
+        dayWidth: CGFloat,
+        rowHeight: CGFloat
+    ) -> some View {
+        Group {
+            if let assignment, let cell = cellData(assignment: assignment, instance: instance) {
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(cell.studentName)
+                        .font(.caption.weight(.semibold))
+                        .lineLimit(1)
+                    Text(cell.timeLabel)
+                        .font(.caption2)
+                        .lineLimit(1)
+                }
+                .padding(.horizontal, 6)
+                .frame(width: dayWidth, height: rowHeight, alignment: .leading)
+                .background(cell.color.opacity(0.9))
+                .foregroundStyle(.white)
+                .overlay(Rectangle().stroke(Color.primary.opacity(0.08), lineWidth: 0.5))
+                .onDrag {
+                    NSItemProvider(object: NSString(string: instance.id))
+                }
+            } else {
+                Rectangle()
+                    .fill(Color(nsColor: .windowBackgroundColor))
+                    .frame(width: dayWidth, height: rowHeight)
+                    .overlay(Rectangle().stroke(Color.primary.opacity(0.08), lineWidth: 0.5))
+            }
+        }
+        .onDrop(of: [UTType.plainText], isTargeted: nil) { providers in
+            handleDrop(providers: providers, targetShiftInstanceID: instance.id)
+        }
+    }
+
+    private func handleDrop(providers: [NSItemProvider], targetShiftInstanceID: String) -> Bool {
+        guard let provider = providers.first(where: { $0.canLoadObject(ofClass: NSString.self) }) else {
+            return false
+        }
+
+        provider.loadObject(ofClass: NSString.self) { value, _ in
+            guard let sourceShiftInstanceID = value as? NSString else { return }
+            DispatchQueue.main.async {
+                moveOrSwapAssignment(from: String(sourceShiftInstanceID), to: targetShiftInstanceID)
+            }
+        }
+        return true
+    }
+
+    private func moveOrSwapAssignment(from sourceShiftInstanceID: String, to targetShiftInstanceID: String) {
+        guard sourceShiftInstanceID != targetShiftInstanceID else { return }
+        guard let sourceIndex = result.assignments.firstIndex(where: { $0.shiftInstanceId == sourceShiftInstanceID }) else {
+            return
+        }
+
+        let sourceStudentID = result.assignments[sourceIndex].studentId
+
+        if let targetIndex = result.assignments.firstIndex(where: { $0.shiftInstanceId == targetShiftInstanceID }) {
+            let targetStudentID = result.assignments[targetIndex].studentId
+            result.assignments[sourceIndex].studentId = targetStudentID
+            result.assignments[targetIndex].studentId = sourceStudentID
+        } else {
+            result.assignments[sourceIndex].shiftInstanceId = targetShiftInstanceID
+        }
+    }
+
+    private func shiftInstance(for row: ShiftRow, day: Date) -> GeneratedShiftInstance? {
+        result.shiftInstances.first(where: {
             $0.templateId == row.template.id && calendar.isDate($0.startDateTime, inSameDayAs: day)
-        }) else {
-            return nil
-        }
-        guard let assignment = assignmentByShiftID[instance.id] else {
-            return nil
-        }
+        })
+    }
+
+    private func cellData(assignment: Assignment, instance: GeneratedShiftInstance) -> GridCellData? {
         let student = studentByID[assignment.studentId]
         let studentName = (student?.displayName.isEmpty == false ? student?.displayName : student?.email) ?? "Unassigned"
         return GridCellData(
