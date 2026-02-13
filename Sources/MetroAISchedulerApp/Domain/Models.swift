@@ -326,6 +326,7 @@ struct ScheduleTemplateProject: Codable, Equatable {
     var shiftTypes: [ShiftType]
     var templateLibrary: [ShiftBundleTemplate]
     var students: [Student]
+    var defaultStudentCount: Int
     var rules: GlobalScheduleRules
     var blockWindow: BlockWindow
 
@@ -336,6 +337,7 @@ struct ScheduleTemplateProject: Codable, Equatable {
         case shiftTypes
         case templateLibrary
         case students
+        case defaultStudentCount
         case rules
         case blockWindow
     }
@@ -347,6 +349,7 @@ struct ScheduleTemplateProject: Codable, Equatable {
         shiftTypes: [ShiftType],
         templateLibrary: [ShiftBundleTemplate],
         students: [Student],
+        defaultStudentCount: Int,
         rules: GlobalScheduleRules,
         blockWindow: BlockWindow
     ) {
@@ -356,6 +359,7 @@ struct ScheduleTemplateProject: Codable, Equatable {
         self.shiftTypes = shiftTypes
         self.templateLibrary = templateLibrary
         self.students = students
+        self.defaultStudentCount = defaultStudentCount
         self.rules = rules
         self.blockWindow = blockWindow
     }
@@ -368,6 +372,7 @@ struct ScheduleTemplateProject: Codable, Equatable {
         shiftTypes = try container.decodeIfPresent([ShiftType].self, forKey: .shiftTypes) ?? []
         templateLibrary = try container.decodeIfPresent([ShiftBundleTemplate].self, forKey: .templateLibrary) ?? []
         students = try container.decodeIfPresent([Student].self, forKey: .students) ?? []
+        defaultStudentCount = try container.decodeIfPresent(Int.self, forKey: .defaultStudentCount) ?? 0
         rules = try container.decodeIfPresent(GlobalScheduleRules.self, forKey: .rules) ?? .default
         blockWindow = try container.decode(BlockWindow.self, forKey: .blockWindow)
     }
@@ -380,6 +385,7 @@ struct ScheduleTemplateProject: Codable, Equatable {
         try container.encode(shiftTypes, forKey: .shiftTypes)
         try container.encode(templateLibrary, forKey: .templateLibrary)
         try container.encode(students, forKey: .students)
+        try container.encode(defaultStudentCount, forKey: .defaultStudentCount)
         try container.encode(rules, forKey: .rules)
         try container.encode(blockWindow, forKey: .blockWindow)
     }
@@ -393,6 +399,7 @@ struct ScheduleTemplateProject: Codable, Equatable {
             shiftTypes: [],
             templateLibrary: [MetroPresetFactory.metroEDTemplate()],
             students: [],
+            defaultStudentCount: 0,
             rules: .default,
             blockWindow: blockWindow
         )
@@ -411,6 +418,7 @@ struct ScheduleTemplateProject: Codable, Equatable {
                 Student(firstName: "Alex", lastName: "Kim", email: "alex@example.edu"),
                 Student(firstName: "Jordan", lastName: "Patel", email: "jordan@example.edu")
             ],
+            defaultStudentCount: 2,
             rules: .default,
             blockWindow: blockWindow
         )

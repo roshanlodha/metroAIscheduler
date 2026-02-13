@@ -7,6 +7,7 @@ struct MonthlyCalendarPage: View {
     let rules: GlobalScheduleRules
     let shiftTemplates: [ShiftTemplate]
     let shiftTypes: [ShiftType]
+    let onExportAllICS: () -> Void
 
     @Environment(\.dismiss) private var dismiss
     @State private var focusedWeekStart: Date = Date()
@@ -85,6 +86,9 @@ struct MonthlyCalendarPage: View {
             }
 
             HStack {
+                Button("Download All ICS") {
+                    onExportAllICS()
+                }
                 Spacer()
                 Button("Done") { dismiss() }
             }
@@ -117,7 +121,7 @@ struct MonthlyCalendarPage: View {
 
             Text(weekRangeLabel)
                 .font(.title2.weight(.semibold))
-                .frame(minWidth: 320)
+                .frame(minWidth: 420)
 
             Button {
                 if let next = calendar.date(byAdding: .day, value: 7, to: focusedWeekStart) {
@@ -246,39 +250,51 @@ struct MonthlyCalendarPage: View {
     }
 
     private func weekdayLabel(for date: Date) -> String {
-        var formatter = Date.FormatStyle(date: .abbreviated, time: .omitted).weekday(.abbreviated)
+        let formatter = DateFormatter()
         formatter.timeZone = calendar.timeZone
-        return date.formatted(formatter)
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "EEE"
+        return formatter.string(from: date)
     }
 
     private func monthDayLabel(for date: Date) -> String {
-        var formatter = Date.FormatStyle(date: .abbreviated, time: .omitted).month(.abbreviated).day()
+        let formatter = DateFormatter()
         formatter.timeZone = calendar.timeZone
-        return date.formatted(formatter)
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "MMM d"
+        return formatter.string(from: date)
     }
 
     private func monthDayYearLabel(for date: Date) -> String {
-        var formatter = Date.FormatStyle(date: .abbreviated, time: .omitted).month(.abbreviated).day().year()
+        let formatter = DateFormatter()
         formatter.timeZone = calendar.timeZone
-        return date.formatted(formatter)
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "MMM d, yyyy"
+        return formatter.string(from: date)
     }
 
     private func monthWideLabel(for date: Date) -> String {
-        var formatter = Date.FormatStyle(date: .abbreviated, time: .omitted).month(.wide)
+        let formatter = DateFormatter()
         formatter.timeZone = calendar.timeZone
-        return date.formatted(formatter)
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "MMMM"
+        return formatter.string(from: date)
     }
 
     private func dayLabel(for date: Date) -> String {
-        var formatter = Date.FormatStyle(date: .abbreviated, time: .omitted).day()
+        let formatter = DateFormatter()
         formatter.timeZone = calendar.timeZone
-        return date.formatted(formatter)
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "d"
+        return formatter.string(from: date)
     }
 
     private func yearLabel(for date: Date) -> String {
-        var formatter = Date.FormatStyle(date: .abbreviated, time: .omitted).year()
+        let formatter = DateFormatter()
         formatter.timeZone = calendar.timeZone
-        return date.formatted(formatter)
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "yyyy"
+        return formatter.string(from: date)
     }
 
     private func startOfWeek(for date: Date) -> Date {

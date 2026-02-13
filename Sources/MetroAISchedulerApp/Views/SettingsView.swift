@@ -5,6 +5,12 @@ struct SettingsView: View {
 
     var body: some View {
         Form {
+            Section("Student Defaults") {
+                Stepper(value: $viewModel.project.defaultStudentCount, in: 0...200) {
+                    Text("Default number of students: \(viewModel.project.defaultStudentCount)")
+                }
+            }
+
             Section("Locked Block Rules") {
                 TextField("Timezone", text: $viewModel.project.rules.timezone)
 
@@ -30,6 +36,9 @@ struct SettingsView: View {
             viewModel.validate()
         }
         .onChange(of: viewModel.project.rules.noDoubleBooking) { _, _ in
+            viewModel.validate()
+        }
+        .onChange(of: viewModel.project.defaultStudentCount) { _, _ in
             viewModel.validate()
         }
     }

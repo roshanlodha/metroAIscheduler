@@ -21,9 +21,15 @@ struct StudentsView: View {
         }
         .padding()
         .onAppear {
+            seedDefaultStudentsIfNeeded()
             ensureTrailingEmptyRow()
         }
         .onChange(of: project.students) { _, _ in
+            ensureTrailingEmptyRow()
+        }
+        .onChange(of: project.defaultStudentCount) { oldValue, newValue in
+            guard newValue != oldValue else { return }
+            seedDefaultStudentsIfNeeded()
             ensureTrailingEmptyRow()
         }
     }
@@ -89,6 +95,18 @@ struct StudentsView: View {
         if desired != project.students {
             project.students = desired
         }
+    }
+
+    private func seedDefaultStudentsIfNeeded() {
+        let nonEmpty = project.students.filter { !isEmpty($0) }
+        guard nonEmpty.isEmpty, project.students.count <= 1, project.defaultStudentCount > 0 else {
+            return
+        }
+
+        let seeded = (1...project.defaultStudentCount).map { index in
+            Student(firstName: "Student \(index)")
+        }
+        project.students = seeded + [Student()]
     }
 
     private func isEmpty(_ student: Student) -> Bool {

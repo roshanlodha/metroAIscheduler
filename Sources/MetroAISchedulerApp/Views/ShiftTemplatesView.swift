@@ -31,15 +31,22 @@ struct ShiftTemplatesView: View {
             }
 
             GroupBox {
-                ScrollView {
-                    LazyVStack(spacing: 8) {
-                        ForEach($viewModel.project.shiftTemplates) { $shift in
-                            shiftRow(shift: $shift)
+                VStack(spacing: 8) {
+                    ScrollView {
+                        LazyVStack(spacing: 8) {
+                            ForEach($viewModel.project.shiftTemplates) { $shift in
+                                shiftRow(shift: $shift)
+                            }
                         }
+                        .padding(.vertical, 4)
                     }
-                    .padding(.vertical, 4)
+                    .frame(maxHeight: .infinity)
+
+                    HStack {
+                        Spacer()
+                        Button("Add Shift") { addShift() }
+                    }
                 }
-                .frame(maxHeight: .infinity)
             } label: {
                 Text("Shift List")
             }
@@ -64,8 +71,6 @@ struct ShiftTemplatesView: View {
                 .font(.title3)
             Spacer()
             Button("Import Schedule") { importSchedule() }
-            Button("Export Schedule") { exportSchedule() }
-            Button("Add Shift") { addShift() }
         }
     }
 
@@ -180,23 +185,25 @@ struct ShiftTemplatesView: View {
                 TextField("Location", text: shift.location)
             }
 
-            labeledRow("Type") {
-                Picker("", selection: Binding<UUID?>(
-                    get: { shift.wrappedValue.shiftTypeId },
-                    set: { shift.wrappedValue.shiftTypeId = $0 }
-                )) {
-                    Text("Unassigned").tag(UUID?.none)
-                    ForEach(viewModel.project.shiftTypes) { type in
-                        Text(type.name).tag(UUID?.some(type.id))
+            HStack(spacing: 20) {
+                labeledRow("Type") {
+                    Picker("", selection: Binding<UUID?>(
+                        get: { shift.wrappedValue.shiftTypeId },
+                        set: { shift.wrappedValue.shiftTypeId = $0 }
+                    )) {
+                        Text("Unassigned").tag(UUID?.none)
+                        ForEach(viewModel.project.shiftTypes) { type in
+                            Text(type.name).tag(UUID?.some(type.id))
+                        }
                     }
-                }
-                .labelsHidden()
-                .frame(maxWidth: 220)
-            }
-
-            labeledRow("Overnight") {
-                Toggle("", isOn: shift.isOvernight)
                     .labelsHidden()
+                    .frame(maxWidth: 220)
+                }
+
+                labeledRow("Overnight") {
+                    Toggle("", isOn: shift.isOvernight)
+                        .labelsHidden()
+                }
             }
 
             HStack(spacing: 12) {
@@ -283,15 +290,6 @@ struct ShiftTemplatesView: View {
         if panel.runModal() == .OK, let url = panel.url {
             viewModel.importShiftSchedule(from: url)
             selectedShiftID = viewModel.project.shiftTemplates.first?.id
-        }
-    }
-
-    private func exportSchedule() {
-        let panel = NSSavePanel()
-        panel.allowedContentTypes = [.json]
-        panel.nameFieldStringValue = "shift-schedule-template.json"
-        if panel.runModal() == .OK, let url = panel.url {
-            viewModel.exportShiftSchedule(to: url)
         }
     }
 

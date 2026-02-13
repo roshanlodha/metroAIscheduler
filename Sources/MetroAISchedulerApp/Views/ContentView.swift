@@ -1,4 +1,5 @@
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct ContentView: View {
     @ObservedObject var viewModel: AppViewModel
@@ -63,7 +64,8 @@ struct ContentView: View {
                     timezoneIdentifier: viewModel.project.rules.timezone,
                     rules: viewModel.project.rules,
                     shiftTemplates: viewModel.project.shiftTemplates,
-                    shiftTypes: viewModel.project.shiftTypes
+                    shiftTypes: viewModel.project.shiftTypes,
+                    onExportAllICS: exportAllICS
                 )
             }
         }
@@ -93,6 +95,16 @@ struct ContentView: View {
         panel.nameFieldStringValue = "metro-project.json"
         if panel.runModal() == .OK, let url = panel.url {
             viewModel.saveProject(to: url)
+        }
+    }
+
+    private func exportAllICS() {
+        guard viewModel.result != nil else { return }
+        let panel = NSSavePanel()
+        panel.allowedContentTypes = [UTType(filenameExtension: "zip") ?? .data]
+        panel.nameFieldStringValue = "schedules.zip"
+        if panel.runModal() == .OK, let url = panel.url {
+            viewModel.saveAllICSArchive(to: url)
         }
     }
 }
@@ -190,6 +202,8 @@ private struct ActionsAndRulesPane: View {
                     .buttonStyle(.borderedProminent)
                     .disabled(viewModel.isSolving)
 
+                    Button("Export Template") { exportTemplate() }
+
                     Spacer()
 
                     if viewModel.result != nil {
@@ -240,6 +254,15 @@ private struct ActionsAndRulesPane: View {
         panel.nameFieldStringValue = "schedule.csv"
         if panel.runModal() == .OK, let url = panel.url {
             viewModel.saveCSV(to: url)
+        }
+    }
+
+    private func exportTemplate() {
+        let panel = NSSavePanel()
+        panel.allowedContentTypes = [.json]
+        panel.nameFieldStringValue = "shift-schedule-template.json"
+        if panel.runModal() == .OK, let url = panel.url {
+            viewModel.exportShiftSchedule(to: url)
         }
     }
 

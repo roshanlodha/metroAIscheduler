@@ -123,6 +123,54 @@ final class AppViewModel: ObservableObject {
         }
     }
 
+    func saveAllICSArchive(to url: URL) {
+        guard let result else { return }
+        let exportStudents = project.students.filter { !isBlankStudent($0) }
+        guard !exportStudents.isEmpty else {
+            statusMessage = "Batch ICS export failed: no students to export."
+            return
+        }
+
+        let fileManager = FileManager.default
+        let tempRoot = fileManager.temporaryDirectory.appendingPathComponent("metro-ics-\(UUID().uuidString)", isDirectory: true)
+
+        do {
+            try fileManager.createDirectory(at: tempRoot, withIntermediateDirectories: true)
+
+            for (index, student) in exportStudents.enumerated() {
+                let name = sanitizedICSName(for: student, fallbackIndex: index + 1)
+                let path = tempRoot.appendingPathComponent("\(name).ics", isDirectory: false)
+                let ics = ICSExporter.export(for: student, project: project, result: result)
+                try ics.write(to: path, atomically: true, encoding: .utf8)
+            }
+
+            if fileManager.fileExists(atPath: url.path) {
+                try fileManager.removeItem(at: url)
+            }
+
+            let process = Process()
+            process.executableURL = URL(fileURLWithPath: "/usr/bin/zip")
+            process.arguments = ["-q", "-r", url.path, "."]
+            process.currentDirectoryURL = tempRoot
+            try process.run()
+            process.waitUntilExit()
+
+            guard process.terminationStatus == 0 else {
+                throw NSError(
+                    domain: "MetroAIScheduler.ZipExport",
+                    code: Int(process.terminationStatus),
+                    userInfo: [NSLocalizedDescriptionKey: "zip command failed with code \(process.terminationStatus)"]
+                )
+            }
+
+            statusMessage = "All student ICS files exported to \(url.lastPathComponent)."
+        } catch {
+            statusMessage = "Batch ICS export failed: \(error.localizedDescription)"
+        }
+
+        try? fileManager.removeItem(at: tempRoot)
+    }
+
     func importShiftSchedule(from url: URL) {
         do {
             let bundle = try ProjectStore.loadShiftBundle(from: url)
@@ -227,6 +275,28 @@ final class AppViewModel: ObservableObject {
         if lower.contains("west") { return "West" }
         if lower.contains("trauma") { return "Trauma" }
         return shiftName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "General" : shiftName
+    }
+
+    private func sanitizedICSName(for student: Student, fallbackIndex: Int) -> String {
+        let baseRaw = "\(student.firstName)_\(student.lastName)"
+        let trimmed = baseRaw
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .replacingOccurrences(of: " ", with: "_")
+            .lowercased()
+        let allowed = CharacterSet.alphanumerics.union(CharacterSet(charactersIn: "_-"))
+        let cleaned = String(trimmed.unicodeScalars.map { allowed.contains($0) ? Character($0) : "_" })
+            .replacingOccurrences(of: "__+", with: "_", options: .regularExpression)
+            .trimmingCharacters(in: CharacterSet(charactersIn: "_-"))
+        if cleaned.isEmpty {
+            return "student_\(fallbackIndex)"
+        }
+        return cleaned
+    }
+
+    private func isBlankStudent(_ student: Student) -> Bool {
+        student.firstName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
+        student.lastName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
+        student.email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
     private func sanitizeAssignments(project: ScheduleTemplateProject, result: ScheduleResult) -> (ScheduleResult, Int) {
