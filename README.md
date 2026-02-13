@@ -1,6 +1,6 @@
-# Metro AI Scheduler (macOS SwiftUI)
+# EM Scheduler
 
-Metro AI Scheduler is a macOS desktop app that builds student schedules with constraint programming.
+EM Shift Scheduler is a macOS desktop app that builds student schedules for EM Acting Internships with constraint programming. `metro.json` is provided as an example project. 
 
 ## Xcode Structure
 

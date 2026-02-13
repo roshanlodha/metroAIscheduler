@@ -296,6 +296,10 @@ struct MonthlyCalendarPage: View {
 
     private func moveOrSwapAssignment(from sourceShiftInstanceID: String, to targetShiftInstanceID: String) {
         guard sourceShiftInstanceID != targetShiftInstanceID else { return }
+        guard hasMatchingShiftType(sourceShiftInstanceID: sourceShiftInstanceID, targetShiftInstanceID: targetShiftInstanceID) else {
+            constraintMessage = "Reschedule blocked: source and target shifts must have the same shift type."
+            return
+        }
         guard let candidateAssignments = assignmentsAfterMoveOrSwap(
             sourceShiftInstanceID: sourceShiftInstanceID,
             targetShiftInstanceID: targetShiftInstanceID,
@@ -303,7 +307,12 @@ struct MonthlyCalendarPage: View {
         ) else {
             return
         }
-        guard satisfiesScheduleConstraints(assignments: candidateAssignments) else {
+        let affectedStudentIDs = affectedStudentIDsForMoveOrSwap(
+            sourceShiftInstanceID: sourceShiftInstanceID,
+            targetShiftInstanceID: targetShiftInstanceID,
+            baseAssignments: result.assignments
+        )
+        guard satisfiesScheduleConstraints(assignments: candidateAssignments, affectedStudentIDs: affectedStudentIDs) else {
             constraintMessage = "Reschedule blocked: this change violates schedule constraints."
             return
         }
@@ -317,8 +326,18 @@ struct MonthlyCalendarPage: View {
         if let sourceAssignment = assignmentByShiftID[sourceShiftInstanceID],
            let sourceInstance = shiftInstanceByID[sourceShiftInstanceID] {
             VStack(alignment: .leading, spacing: 14) {
-                Text("Reschedule Shift")
-                    .font(.title3.weight(.semibold))
+                HStack(alignment: .firstTextBaseline) {
+                    Text("Reschedule Shift")
+                        .font(.title3.weight(.semibold))
+                    Spacer()
+                    Text(shiftTypeName(for: sourceInstance))
+                        .font(.caption.weight(.semibold))
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(Color.accentColor.opacity(0.15))
+                        .clipShape(Capsule())
+                }
+                .padding(.bottom, 2)
 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(studentName(for: sourceAssignment.studentId))
@@ -326,17 +345,28 @@ struct MonthlyCalendarPage: View {
                     Text("\(sourceInstance.name) • \(monthDayLabel(for: sourceInstance.startDateTime)) • \(shortTimeRange(start: sourceInstance.startDateTime, end: sourceInstance.endDateTime))")
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                    Text("Only shifts with matching type are shown.")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
                 }
+                .padding(12)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color(nsColor: .controlBackgroundColor))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .stroke(Color.primary.opacity(0.08), lineWidth: 1)
+                )
+                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
 
                 HStack(alignment: .top, spacing: 16) {
                     rescheduleCandidateColumn(
-                        title: "Available Shifts",
+                        title: "Available Shifts (\(sourceCandidates.available.count))",
                         actionLabel: "Move",
                         sourceShiftInstanceID: sourceShiftInstanceID,
                         candidateShiftInstances: sourceCandidates.available
                     )
                     rescheduleCandidateColumn(
-                        title: "Filled Shifts",
+                        title: "Filled Shifts (\(sourceCandidates.filled.count))",
                         actionLabel: "Swap",
                         sourceShiftInstanceID: sourceShiftInstanceID,
                         candidateShiftInstances: sourceCandidates.filled
@@ -357,6 +387,7 @@ struct MonthlyCalendarPage: View {
             }
             .padding(18)
             .frame(minWidth: 840, minHeight: 520)
+            .background(Color(nsColor: .windowBackgroundColor))
         } else {
             VStack(spacing: 12) {
                 Text("Shift assignment no longer exists.")
@@ -379,41 +410,54 @@ struct MonthlyCalendarPage: View {
             ScrollView {
                 LazyVStack(spacing: 8) {
                     ForEach(candidateShiftInstances) { instance in
-                        VStack(alignment: .leading, spacing: 3) {
-                            Text(instance.name)
-                                .font(.subheadline.weight(.semibold))
-                                .lineLimit(1)
-                            Text("\(weekdayLabel(for: instance.startDateTime)), \(monthDayLabel(for: instance.startDateTime))")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                            Text(shortTimeRange(start: instance.startDateTime, end: instance.endDateTime))
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                            if let assignment = assignmentByShiftID[instance.id] {
-                                Text("Assigned: \(studentName(for: assignment.studentId))")
+                        HStack(alignment: .center, spacing: 10) {
+                            VStack(alignment: .leading, spacing: 3) {
+                                Text(instance.name)
+                                    .font(.subheadline.weight(.semibold))
+                                    .lineLimit(1)
+                                Text("\(weekdayLabel(for: instance.startDateTime)), \(monthDayLabel(for: instance.startDateTime))")
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
-                            }
-                            HStack {
-                                Spacer()
-                                Button(actionLabel) {
-                                    moveOrSwapAssignment(from: sourceShiftInstanceID, to: instance.id)
-                                    if constraintMessage == nil {
-                                        rescheduleContext = nil
-                                    }
+                                Text(shortTimeRange(start: instance.startDateTime, end: instance.endDateTime))
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                if let assignment = assignmentByShiftID[instance.id] {
+                                    Text("Assigned: \(studentName(for: assignment.studentId))")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
                                 }
-                                .buttonStyle(.borderedProminent)
-                                .controlSize(.small)
                             }
+                            Spacer(minLength: 12)
+                            Button(actionLabel) {
+                                moveOrSwapAssignment(from: sourceShiftInstanceID, to: instance.id)
+                                if constraintMessage == nil {
+                                    rescheduleContext = nil
+                                }
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .controlSize(.small)
                         }
                         .padding(10)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(Color(nsColor: .underPageBackgroundColor))
-                        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                        .background(Color(nsColor: .controlBackgroundColor))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 9, style: .continuous)
+                                .stroke(Color.primary.opacity(0.08), lineWidth: 1)
+                        )
+                        .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
                     }
                 }
+                .padding(.horizontal, 1)
+                .padding(.vertical, 2)
             }
         }
+        .padding(10)
+        .background(Color(nsColor: .underPageBackgroundColor))
+        .overlay(
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .stroke(Color.primary.opacity(0.08), lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
 
@@ -444,6 +488,9 @@ struct MonthlyCalendarPage: View {
     }
 
     private func isRescheduleCandidateAllowed(sourceShiftInstanceID: String, targetShiftInstanceID: String) -> Bool {
+        guard hasMatchingShiftType(sourceShiftInstanceID: sourceShiftInstanceID, targetShiftInstanceID: targetShiftInstanceID) else {
+            return false
+        }
         guard let candidateAssignments = assignmentsAfterMoveOrSwap(
             sourceShiftInstanceID: sourceShiftInstanceID,
             targetShiftInstanceID: targetShiftInstanceID,
@@ -451,7 +498,21 @@ struct MonthlyCalendarPage: View {
         ) else {
             return false
         }
-        return satisfiesScheduleConstraints(assignments: candidateAssignments)
+        let affectedStudentIDs = affectedStudentIDsForMoveOrSwap(
+            sourceShiftInstanceID: sourceShiftInstanceID,
+            targetShiftInstanceID: targetShiftInstanceID,
+            baseAssignments: result.assignments
+        )
+        return satisfiesScheduleConstraints(assignments: candidateAssignments, affectedStudentIDs: affectedStudentIDs)
+    }
+
+    private func hasMatchingShiftType(sourceShiftInstanceID: String, targetShiftInstanceID: String) -> Bool {
+        shiftTypeID(for: sourceShiftInstanceID) == shiftTypeID(for: targetShiftInstanceID)
+    }
+
+    private func shiftTypeID(for shiftInstanceID: String) -> UUID? {
+        guard let shiftInstance = shiftInstanceByID[shiftInstanceID] else { return nil }
+        return shiftTemplateByID[shiftInstance.templateId]?.shiftTypeId
     }
 
     private func assignmentsAfterMoveOrSwap(
@@ -477,7 +538,22 @@ struct MonthlyCalendarPage: View {
         return updatedAssignments
     }
 
-    private func satisfiesScheduleConstraints(assignments: [Assignment]) -> Bool {
+    private func affectedStudentIDsForMoveOrSwap(
+        sourceShiftInstanceID: String,
+        targetShiftInstanceID: String,
+        baseAssignments: [Assignment]
+    ) -> Set<UUID> {
+        var affected: Set<UUID> = []
+        if let source = baseAssignments.first(where: { $0.shiftInstanceId == sourceShiftInstanceID }) {
+            affected.insert(source.studentId)
+        }
+        if let target = baseAssignments.first(where: { $0.shiftInstanceId == targetShiftInstanceID }) {
+            affected.insert(target.studentId)
+        }
+        return affected
+    }
+
+    private func satisfiesScheduleConstraints(assignments: [Assignment], affectedStudentIDs: Set<UUID>) -> Bool {
         let timezone = TimeZone(identifier: timezoneIdentifier) ?? .current
         var localCalendar = Calendar(identifier: .gregorian)
         localCalendar.timeZone = timezone
@@ -503,14 +579,6 @@ struct MonthlyCalendarPage: View {
                 .filter { $0.name.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() == "overnight" }
                 .map(\.id)
         )
-        let overnightRequired = max(
-            0,
-            shiftTypes
-                .filter { $0.name.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() == "overnight" }
-                .compactMap(\.minShifts)
-                .max() ?? 0
-        )
-        let requiredAssignmentsPerStudent = max(0, rules.numShiftsRequired - max(0, overnightRequired - 1))
         let dayBeforeConference = rules.conferenceDay == .sunday
             ? Weekday.saturday
             : Weekday(rawValue: rules.conferenceDay.rawValue - 1)
@@ -520,23 +588,24 @@ struct MonthlyCalendarPage: View {
             guard let shift = shiftInstanceByID[assignment.shiftInstanceId] else { return false }
             assignmentsByStudent[assignment.studentId, default: []].append(shift)
 
-            if overlapsConference(shift: shift, calendar: localCalendar, rules: rules, timezone: timezone) {
-                return false
-            }
+            if affectedStudentIDs.contains(assignment.studentId) {
+                if overlapsConference(shift: shift, calendar: localCalendar, rules: rules, timezone: timezone) {
+                    return false
+                }
 
-            if let template = shiftTemplateByID[shift.templateId],
-               let typeID = template.shiftTypeId,
-               overnightTypeIDs.contains(typeID),
-               let shiftWeekday = Weekday(rawValue: localCalendar.component(.weekday, from: shift.startDateTime)),
-               let dayBeforeConference,
-               shiftWeekday == dayBeforeConference {
-                return false
+                if let template = shiftTemplateByID[shift.templateId],
+                   let typeID = template.shiftTypeId,
+                   overnightTypeIDs.contains(typeID),
+                   let shiftWeekday = Weekday(rawValue: localCalendar.component(.weekday, from: shift.startDateTime)),
+                   let dayBeforeConference,
+                   shiftWeekday == dayBeforeConference {
+                    return false
+                }
             }
         }
 
-        for student in students {
+        for student in students where affectedStudentIDs.contains(student.id) {
             let studentShifts = assignmentsByStudent[student.id, default: []]
-            if studentShifts.count != requiredAssignmentsPerStudent { return false }
 
             let sorted = studentShifts.sorted { $0.startDateTime < $1.startDateTime }
             for index in 0..<sorted.count {
@@ -559,44 +628,16 @@ struct MonthlyCalendarPage: View {
             }
 
             var perTypeCounts: [UUID: Int] = [:]
-            var overnightShifts: [GeneratedShiftInstance] = []
             for shift in studentShifts {
                 guard let template = shiftTemplateByID[shift.templateId] else { continue }
                 if let typeID = template.shiftTypeId {
                     perTypeCounts[typeID, default: 0] += 1
-                    if overnightTypeIDs.contains(typeID) {
-                        overnightShifts.append(shift)
-                    }
                 }
             }
 
             for shiftType in shiftTypes {
                 let count = perTypeCounts[shiftType.id, default: 0]
-                if let minShifts = shiftType.minShifts, count < minShifts { return false }
                 if let maxShifts = shiftType.maxShifts, count > maxShifts { return false }
-            }
-
-            if overnightRequired > 0 && overnightShifts.count != overnightRequired {
-                return false
-            }
-
-            if overnightRequired > 1 {
-                let sortedOvernights = overnightShifts.sorted { $0.startDateTime < $1.startDateTime }
-                for index in 1..<sortedOvernights.count {
-                    let previousStart = sortedOvernights[index - 1].startDateTime
-                    let currentStart = sortedOvernights[index].startDateTime
-                    if currentStart.timeIntervalSince(previousStart) != 86_400 {
-                        return false
-                    }
-                }
-
-                if let first = sortedOvernights.first, let last = sortedOvernights.last {
-                    for shift in sorted where !sortedOvernights.contains(shift) {
-                        if shift.startDateTime < last.endDateTime && first.startDateTime < shift.endDateTime {
-                            return false
-                        }
-                    }
-                }
             }
         }
 
@@ -653,6 +694,15 @@ struct MonthlyCalendarPage: View {
     private func studentName(for id: UUID) -> String {
         guard let student = studentByID[id] else { return "Unknown Student" }
         return student.displayName.isEmpty ? student.email : student.displayName
+    }
+
+    private func shiftTypeName(for instance: GeneratedShiftInstance) -> String {
+        guard let template = shiftTemplateByID[instance.templateId],
+              let shiftTypeID = template.shiftTypeId,
+              let shiftType = shiftTypeByID[shiftTypeID] else {
+            return "Unassigned Type"
+        }
+        return shiftType.name
     }
 
     private func shiftInstance(for row: ShiftRow, day: Date) -> GeneratedShiftInstance? {
