@@ -112,6 +112,9 @@ struct ContentView: View {
 private struct ActionsAndRulesPane: View {
     @ObservedObject var viewModel: AppViewModel
     private let weekdayOrder: [Weekday] = [.sunday, .monday, .tuesday, .wednesday, .thursday, .friday, .saturday]
+    private var projectTimeZone: TimeZone {
+        TimeZone(identifier: viewModel.project.rules.timezone) ?? .current
+    }
 
     var body: some View {
         ScrollView {
@@ -122,12 +125,14 @@ private struct ActionsAndRulesPane: View {
                             .font(.headline)
                         HStack(spacing: 16) {
                             blockField("Block Start Day") {
-                                DatePicker("", selection: $viewModel.project.blockWindow.startDate, displayedComponents: .date)
+                                DatePicker("", selection: dateOnlyBinding($viewModel.project.blockWindow.startDate), displayedComponents: .date)
+                                    .environment(\.timeZone, projectTimeZone)
                                     .labelsHidden()
                                     .frame(maxWidth: .infinity, alignment: .leading)
                             }
                             blockField("End Day") {
-                                DatePicker("", selection: $viewModel.project.blockWindow.endDate, displayedComponents: .date)
+                                DatePicker("", selection: dateOnlyBinding($viewModel.project.blockWindow.endDate), displayedComponents: .date)
+                                    .environment(\.timeZone, projectTimeZone)
                                     .labelsHidden()
                                     .frame(maxWidth: .infinity, alignment: .leading)
                             }
@@ -141,7 +146,8 @@ private struct ActionsAndRulesPane: View {
                             .font(.headline)
                         HStack(spacing: 16) {
                             blockField("Start Day") {
-                                DatePicker("", selection: $viewModel.project.orientation.startDate, displayedComponents: .date)
+                                DatePicker("", selection: dateOnlyBinding($viewModel.project.orientation.startDate), displayedComponents: .date)
+                                    .environment(\.timeZone, projectTimeZone)
                                     .labelsHidden()
                                     .frame(maxWidth: .infinity, alignment: .leading)
                             }
@@ -348,6 +354,28 @@ private struct ActionsAndRulesPane: View {
                 localTime.wrappedValue = LocalTime(hour: components.hour ?? 0, minute: components.minute ?? 0)
             }
         )
+    }
+
+    private func dateOnlyBinding(_ date: Binding<Date>) -> Binding<Date> {
+        Binding(
+            get: {
+                normalizedDateOnly(date.wrappedValue)
+            },
+            set: { newValue in
+                date.wrappedValue = normalizedDateOnly(newValue)
+            }
+        )
+    }
+
+    private func normalizedDateOnly(_ value: Date) -> Date {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = projectTimeZone
+        var components = calendar.dateComponents([.year, .month, .day], from: value)
+        components.hour = 12
+        components.minute = 0
+        components.second = 0
+        components.timeZone = projectTimeZone
+        return calendar.date(from: components) ?? value
     }
 }
 

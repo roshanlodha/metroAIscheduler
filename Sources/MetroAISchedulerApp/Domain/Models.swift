@@ -202,6 +202,7 @@ struct GlobalScheduleRules: Codable, Equatable {
     var numShiftsRequired: Int
     var timezone: String
     var noDoubleBooking: Bool
+    var blockStartDay: Weekday
     var conferenceDay: Weekday
     var conferenceStartTime: LocalTime
     var conferenceEndTime: LocalTime
@@ -213,6 +214,7 @@ struct GlobalScheduleRules: Codable, Equatable {
             numShiftsRequired: 14,
             timezone: "America/New_York",
             noDoubleBooking: true,
+            blockStartDay: .monday,
             conferenceDay: .wednesday,
             conferenceStartTime: LocalTime(hour: 8, minute: 0),
             conferenceEndTime: LocalTime(hour: 12, minute: 0),
@@ -225,6 +227,7 @@ struct GlobalScheduleRules: Codable, Equatable {
         case numShiftsRequired
         case timezone
         case noDoubleBooking
+        case blockStartDay
         case conferenceDay
         case conferenceStartTime
         case conferenceEndTime
@@ -237,6 +240,7 @@ struct GlobalScheduleRules: Codable, Equatable {
         numShiftsRequired: Int,
         timezone: String,
         noDoubleBooking: Bool,
+        blockStartDay: Weekday,
         conferenceDay: Weekday,
         conferenceStartTime: LocalTime,
         conferenceEndTime: LocalTime,
@@ -246,6 +250,7 @@ struct GlobalScheduleRules: Codable, Equatable {
         self.numShiftsRequired = numShiftsRequired
         self.timezone = timezone
         self.noDoubleBooking = noDoubleBooking
+        self.blockStartDay = blockStartDay
         self.conferenceDay = conferenceDay
         self.conferenceStartTime = conferenceStartTime
         self.conferenceEndTime = conferenceEndTime
@@ -258,6 +263,7 @@ struct GlobalScheduleRules: Codable, Equatable {
         numShiftsRequired = try container.decode(Int.self, forKey: .numShiftsRequired)
         timezone = try container.decode(String.self, forKey: .timezone)
         noDoubleBooking = try container.decode(Bool.self, forKey: .noDoubleBooking)
+        blockStartDay = try container.decodeIfPresent(Weekday.self, forKey: .blockStartDay) ?? .monday
         solverTimeLimitSeconds = try container.decode(Int.self, forKey: .solverTimeLimitSeconds)
 
         if let conferenceDay = try container.decodeIfPresent(Weekday.self, forKey: .conferenceDay) {
@@ -276,6 +282,7 @@ struct GlobalScheduleRules: Codable, Equatable {
         try container.encode(numShiftsRequired, forKey: .numShiftsRequired)
         try container.encode(timezone, forKey: .timezone)
         try container.encode(noDoubleBooking, forKey: .noDoubleBooking)
+        try container.encode(blockStartDay, forKey: .blockStartDay)
         try container.encode(conferenceDay, forKey: .conferenceDay)
         try container.encode(conferenceStartTime, forKey: .conferenceStartTime)
         try container.encode(conferenceEndTime, forKey: .conferenceEndTime)
@@ -411,7 +418,7 @@ struct ScheduleTemplateProject: Codable, Equatable {
     }
 
     static func empty(now: Date = Date()) -> ScheduleTemplateProject {
-        let blockWindow = defaultBlockWindow(now: now)
+        let blockWindow = defaultBlockWindow(now: now, blockStartDay: GlobalScheduleRules.default.blockStartDay)
         return ScheduleTemplateProject(
             schemaVersion: 2,
             name: "Untitled Project",
@@ -427,7 +434,7 @@ struct ScheduleTemplateProject: Codable, Equatable {
     }
 
     static func sample(now: Date = Date()) -> ScheduleTemplateProject {
-        let blockWindow = defaultBlockWindow(now: now)
+        let blockWindow = defaultBlockWindow(now: now, blockStartDay: GlobalScheduleRules.default.blockStartDay)
         let metroTemplate = MetroPresetFactory.metroEDTemplate()
         return ScheduleTemplateProject(
             schemaVersion: 2,
@@ -446,13 +453,15 @@ struct ScheduleTemplateProject: Codable, Equatable {
         )
     }
 
-    private static func defaultBlockWindow(now: Date) -> BlockWindow {
+    private static func defaultBlockWindow(now: Date, blockStartDay: Weekday) -> BlockWindow {
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = TimeZone(identifier: GlobalScheduleRules.default.timezone) ?? .current
         calendar.firstWeekday = 2
 
         let weekStart = calendar.dateInterval(of: .weekOfYear, for: now)?.start ?? calendar.startOfDay(for: now)
-        let start = weekStart // Monday of current week
+        let dayOrder: [Weekday] = [.monday, .tuesday, .wednesday, .thursday, .friday, .saturday, .sunday]
+        let offset = dayOrder.firstIndex(of: blockStartDay) ?? 0
+        let start = calendar.date(byAdding: .day, value: offset, to: weekStart) ?? weekStart
         let end = calendar.date(byAdding: .day, value: 22, to: start) ?? start
         return BlockWindow(startDate: start, endDate: end)
     }

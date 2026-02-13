@@ -4,12 +4,17 @@ struct BlockRulesView: View {
     @Binding var project: ScheduleTemplateProject
     var onChanged: () -> Void
     private let weekdayOrder: [Weekday] = [.sunday, .monday, .tuesday, .wednesday, .thursday, .friday, .saturday]
+    private var projectTimeZone: TimeZone {
+        TimeZone(identifier: project.rules.timezone) ?? .current
+    }
 
     var body: some View {
         Form {
             Section("Block Window") {
-                DatePicker("Start Date", selection: $project.blockWindow.startDate, displayedComponents: .date)
-                DatePicker("End Date", selection: $project.blockWindow.endDate, displayedComponents: .date)
+                DatePicker("Start Date", selection: dateOnlyBinding($project.blockWindow.startDate), displayedComponents: .date)
+                    .environment(\.timeZone, projectTimeZone)
+                DatePicker("End Date", selection: dateOnlyBinding($project.blockWindow.endDate), displayedComponents: .date)
+                    .environment(\.timeZone, projectTimeZone)
             }
 
             Section("Global Rules") {
@@ -64,5 +69,27 @@ struct BlockRulesView: View {
                 localTime.wrappedValue = LocalTime(hour: components.hour ?? 0, minute: components.minute ?? 0)
             }
         )
+    }
+
+    private func dateOnlyBinding(_ date: Binding<Date>) -> Binding<Date> {
+        Binding(
+            get: {
+                normalizedDateOnly(date.wrappedValue)
+            },
+            set: { newValue in
+                date.wrappedValue = normalizedDateOnly(newValue)
+            }
+        )
+    }
+
+    private func normalizedDateOnly(_ value: Date) -> Date {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = projectTimeZone
+        var components = calendar.dateComponents([.year, .month, .day], from: value)
+        components.hour = 12
+        components.minute = 0
+        components.second = 0
+        components.timeZone = projectTimeZone
+        return calendar.date(from: components) ?? value
     }
 }

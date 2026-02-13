@@ -142,6 +142,30 @@ final class ShiftExpansionTests: XCTestCase {
         XCTAssertEqual(mondayShifts.first?.name, "Afternoon Shift")
     }
 
+    func testMetroProjectGeneratesTuesdayShiftsAfterOrientationEnds() throws {
+        let projectURL = URL(fileURLWithPath: "/Users/roshanlodha/Documents/metroAIscheduler/metro-project.json")
+        let project = try ProjectStore.loadProject(from: projectURL)
+        let shifts = ShiftExpansion.expand(project: project)
+        XCTAssertFalse(shifts.isEmpty)
+
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: project.rules.timezone) ?? .current
+
+        let orientationDay = calendar.startOfDay(for: project.orientation.startDate)
+        var orientationEndComponents = calendar.dateComponents([.year, .month, .day], from: orientationDay)
+        orientationEndComponents.hour = project.orientation.endTime.hour
+        orientationEndComponents.minute = project.orientation.endTime.minute
+        orientationEndComponents.second = 0
+        orientationEndComponents.timeZone = calendar.timeZone
+        let orientationEnd = calendar.date(from: orientationEndComponents) ?? orientationDay
+
+        let tuesdayShiftsAfterOrientation = shifts.filter { shift in
+            calendar.component(.weekday, from: shift.startDateTime) == Weekday.tuesday.rawValue &&
+            shift.startDateTime >= orientationEnd
+        }
+        XCTAssertFalse(tuesdayShiftsAfterOrientation.isEmpty)
+    }
+
     private func localDate(year: Int, month: Int, day: Int, timezone: String) -> Date {
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = TimeZone(identifier: timezone) ?? .current
